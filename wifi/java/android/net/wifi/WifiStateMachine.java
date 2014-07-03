@@ -113,7 +113,7 @@ import edu.buffalo.cse.phonelab.Logger;
 public class WifiStateMachine extends StateMachine {
 
     private static final String NETWORKTYPE = "WIFI";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private final String PHONELAB_TAG = "PhoneLab-" + this.getClass().getSimpleName();
 
