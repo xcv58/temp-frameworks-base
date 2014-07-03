@@ -28,11 +28,14 @@ import java.net.UnknownHostException;
 import java.util.EnumMap;
 import java.util.Locale;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Describes the state of any Wifi connection that is active or
  * is in the process of being set up.
  */
-public class WifiInfo implements Parcelable {
+public class WifiInfo implements Parcelable, JSONable {
     private static final String TAG = "WifiInfo";
     /**
      * This is the map described in the Javadoc comment above. The positions
@@ -309,6 +312,21 @@ public class WifiInfo implements Parcelable {
             append(", Metered hint: ").append(mMeteredHint);
 
         return sb.toString();
+    }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("SupplicantState", mSupplicantState == null? null: mSupplicantState.name())
+            .put("SSID", mWifiSsid == null? null: mWifiSsid.toString())
+            .put("BSSID", mBSSID)
+            .put("MAC", mMacAddress)
+            .put("RSSI", mRssi)
+            .put("LinkSpeed", mLinkSpeed)
+            .put("NetID", mNetworkId)
+            .put("MeteredHint", mMeteredHint)
+            .put("IP", mIpAddress == null? null: mIpAddress.toString())
+            .put("HiddenSSID", mHiddenSSID);
     }
 
     /** Implement the Parcelable interface {@hide} */

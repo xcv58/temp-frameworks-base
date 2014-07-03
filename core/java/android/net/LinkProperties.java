@@ -31,6 +31,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
+
+
+
 /**
  * Describes the properties of a network link.
  *
@@ -58,7 +64,7 @@ import java.util.Hashtable;
  *
  * @hide
  */
-public class LinkProperties implements Parcelable {
+public class LinkProperties implements Parcelable, JSONable {
     // The interface described by the network link.
     private String mIfaceName;
     private Collection<LinkAddress> mLinkAddresses = new ArrayList<LinkAddress>();
@@ -376,6 +382,30 @@ public class LinkProperties implements Parcelable {
             + proxy + stacked + "}";
     }
 
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        StrictJSONObject json = (new StrictJSONObject())
+            .put("IfaceName", mIfaceName)
+            .put("Domains", mDomains)
+            .put("Mtu", mMtu)
+            .put("ProxyProperties", mHttpProxy)
+            .put("Routes", mRoutes);
+
+        StrictJSONArray array = new StrictJSONArray();
+        for (LinkAddress a : mLinkAddresses) {
+            array.put(a.toString());
+        }
+        json.put("LinkAddresses", array);
+
+        array = new StrictJSONArray();
+        for (InetAddress a : mDnses) {
+            array.put(a.toString());
+        }
+        json.put("Dnses", array);
+
+        return json;
+    }
+
     /**
      * Returns true if this link has an IPv4 address.
      *
@@ -383,9 +413,9 @@ public class LinkProperties implements Parcelable {
      */
     public boolean hasIPv4Address() {
         for (LinkAddress address : mLinkAddresses) {
-          if (address.getAddress() instanceof Inet4Address) {
-            return true;
-          }
+            if (address.getAddress() instanceof Inet4Address) {
+                return true;
+            }
         }
         return false;
     }
@@ -397,9 +427,9 @@ public class LinkProperties implements Parcelable {
      */
     public boolean hasIPv6Address() {
         for (LinkAddress address : mLinkAddresses) {
-          if (address.getAddress() instanceof Inet6Address) {
-            return true;
-          }
+            if (address.getAddress() instanceof Inet6Address) {
+                return true;
+            }
         }
         return false;
     }
@@ -424,7 +454,7 @@ public class LinkProperties implements Parcelable {
         Collection<InetAddress> targetAddresses = target.getAddresses();
         Collection<InetAddress> sourceAddresses = getAddresses();
         return (sourceAddresses.size() == targetAddresses.size()) ?
-                    sourceAddresses.containsAll(targetAddresses) : false;
+            sourceAddresses.containsAll(targetAddresses) : false;
     }
 
     /**
@@ -442,7 +472,7 @@ public class LinkProperties implements Parcelable {
             if (mDomains.equals(targetDomains) == false) return false;
         }
         return (mDnses.size() == targetDnses.size()) ?
-                    mDnses.containsAll(targetDnses) : false;
+            mDnses.containsAll(targetDnses) : false;
     }
 
     /**
@@ -454,7 +484,7 @@ public class LinkProperties implements Parcelable {
     public boolean isIdenticalRoutes(LinkProperties target) {
         Collection<RouteInfo> targetRoutes = target.getRoutes();
         return (mRoutes.size() == targetRoutes.size()) ?
-                    mRoutes.containsAll(targetRoutes) : false;
+            mRoutes.containsAll(targetRoutes) : false;
     }
 
     /**
@@ -465,7 +495,7 @@ public class LinkProperties implements Parcelable {
      */
     public boolean isIdenticalHttpProxy(LinkProperties target) {
         return getHttpProxy() == null ? target.getHttpProxy() == null :
-                    getHttpProxy().equals(target.getHttpProxy());
+            getHttpProxy().equals(target.getHttpProxy());
     }
 
     /**
@@ -525,12 +555,12 @@ public class LinkProperties implements Parcelable {
         LinkProperties target = (LinkProperties) obj;
 
         return isIdenticalInterfaceName(target) &&
-                isIdenticalAddresses(target) &&
-                isIdenticalDnses(target) &&
-                isIdenticalRoutes(target) &&
-                isIdenticalHttpProxy(target) &&
-                isIdenticalStackedLinks(target) &&
-                isIdenticalMtu(target);
+            isIdenticalAddresses(target) &&
+            isIdenticalDnses(target) &&
+            isIdenticalRoutes(target) &&
+            isIdenticalHttpProxy(target) &&
+            isIdenticalStackedLinks(target) &&
+            isIdenticalMtu(target);
     }
 
     /**
@@ -633,7 +663,7 @@ public class LinkProperties implements Parcelable {
                 + mRoutes.size() * 41
                 + ((null == mHttpProxy) ? 0 : mHttpProxy.hashCode())
                 + mStackedLinks.hashCode() * 47)
-                + mMtu * 51;
+            + mMtu * 51;
     }
 
     /**

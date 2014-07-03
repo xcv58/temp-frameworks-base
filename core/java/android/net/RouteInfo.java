@@ -26,6 +26,9 @@ import java.net.Inet6Address;
 
 import java.util.Collection;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * A simple container for route information.
  *
@@ -42,7 +45,7 @@ import java.util.Collection;
  *
  * @hide
  */
-public class RouteInfo implements Parcelable {
+public class RouteInfo implements Parcelable, JSONable {
     /**
      * The IP destination address for this route.
      */
@@ -185,6 +188,17 @@ public class RouteInfo implements Parcelable {
         return val;
     }
 
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("Destination", mDestination.toString())
+            .put("Gateway", mGateway.toString())
+            .put("Interface", mInterface)
+            .put("IsDefault", mIsDefault)
+            .put("IsHost", mIsHost)
+            .put("HasGateway", mHasGateway);
+    }
+
     public int describeContents() {
         return 0;
     }
@@ -217,16 +231,16 @@ public class RouteInfo implements Parcelable {
         RouteInfo target = (RouteInfo) obj;
 
         boolean sameDestination = ( mDestination == null) ?
-                target.getDestination() == null
-                : mDestination.equals(target.getDestination());
+            target.getDestination() == null
+            : mDestination.equals(target.getDestination());
 
         boolean sameAddress = (mGateway == null) ?
-                target.getGateway() == null
-                : mGateway.equals(target.getGateway());
+            target.getGateway() == null
+            : mGateway.equals(target.getGateway());
 
         boolean sameInterface = (mInterface == null) ?
-                target.getInterface() == null
-                : mInterface.equals(target.getInterface());
+            target.getInterface() == null
+            : mInterface.equals(target.getInterface());
 
         return sameDestination && sameAddress && sameInterface
             && mIsDefault == target.mIsDefault;
@@ -242,43 +256,43 @@ public class RouteInfo implements Parcelable {
 
     public static final Creator<RouteInfo> CREATOR =
         new Creator<RouteInfo>() {
-        public RouteInfo createFromParcel(Parcel in) {
-            InetAddress destAddr = null;
-            int prefix = 0;
-            InetAddress gateway = null;
+            public RouteInfo createFromParcel(Parcel in) {
+                InetAddress destAddr = null;
+                int prefix = 0;
+                InetAddress gateway = null;
 
-            if (in.readByte() == 1) {
-                byte[] addr = in.createByteArray();
-                prefix = in.readInt();
+                if (in.readByte() == 1) {
+                    byte[] addr = in.createByteArray();
+                    prefix = in.readInt();
 
-                try {
-                    destAddr = InetAddress.getByAddress(addr);
-                } catch (UnknownHostException e) {}
+                    try {
+                        destAddr = InetAddress.getByAddress(addr);
+                    } catch (UnknownHostException e) {}
+                }
+
+                if (in.readByte() == 1) {
+                    byte[] addr = in.createByteArray();
+
+                    try {
+                        gateway = InetAddress.getByAddress(addr);
+                    } catch (UnknownHostException e) {}
+                }
+
+                String iface = in.readString();
+
+                LinkAddress dest = null;
+
+                if (destAddr != null) {
+                    dest = new LinkAddress(destAddr, prefix);
+                }
+
+                return new RouteInfo(dest, gateway, iface);
             }
 
-            if (in.readByte() == 1) {
-                byte[] addr = in.createByteArray();
-
-                try {
-                    gateway = InetAddress.getByAddress(addr);
-                } catch (UnknownHostException e) {}
+            public RouteInfo[] newArray(int size) {
+                return new RouteInfo[size];
             }
-
-            String iface = in.readString();
-
-            LinkAddress dest = null;
-
-            if (destAddr != null) {
-                dest = new LinkAddress(destAddr, prefix);
-            }
-
-            return new RouteInfo(dest, gateway, iface);
-        }
-
-        public RouteInfo[] newArray(int size) {
-            return new RouteInfo[size];
-        }
-    };
+        };
 
     protected boolean matches(InetAddress destination) {
         if (destination == null) return false;
@@ -306,9 +320,9 @@ public class RouteInfo implements Parcelable {
             if (NetworkUtils.addressTypeMatches(route.mDestination.getAddress(), dest)) {
                 if ((bestRoute != null) &&
                         (bestRoute.mDestination.getNetworkPrefixLength() >=
-                        route.mDestination.getNetworkPrefixLength())) {
+                         route.mDestination.getNetworkPrefixLength())) {
                     continue;
-                }
+                         }
                 if (route.matches(dest)) bestRoute = route;
             }
         }

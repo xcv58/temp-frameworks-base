@@ -25,11 +25,15 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
+
 /**
  * A container class for the http proxy info
  * @hide
  */
-public class ProxyProperties implements Parcelable {
+public class ProxyProperties implements Parcelable, JSONable {
 
     private String mHost;
     private int mPort;
@@ -182,6 +186,15 @@ public class ProxyProperties implements Parcelable {
         return sb.toString();
     }
 
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("Host", mHost)
+            .put("Port", mPort)
+            .put("ExclusionList", mExclusionList)
+            .put("ParsedExclusionList", mParsedExclusionList);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ProxyProperties)) return false;
@@ -218,8 +231,8 @@ public class ProxyProperties implements Parcelable {
      */
     public int hashCode() {
         return ((null == mHost) ? 0 : mHost.hashCode())
-        + ((null == mExclusionList) ? 0 : mExclusionList.hashCode())
-        + mPort;
+            + ((null == mExclusionList) ? 0 : mExclusionList.hashCode())
+            + mPort;
     }
 
     /**
@@ -267,7 +280,7 @@ public class ProxyProperties implements Parcelable {
                 String exclList = in.readString();
                 String[] parsedExclList = in.readStringArray();
                 ProxyProperties proxyProperties =
-                        new ProxyProperties(host, port, exclList, parsedExclList);
+                    new ProxyProperties(host, port, exclList, parsedExclList);
                 return proxyProperties;
             }
 

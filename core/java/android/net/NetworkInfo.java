@@ -23,12 +23,15 @@ import com.android.internal.annotations.VisibleForTesting;
 
 import java.util.EnumMap;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Describes the status of a network interface.
  * <p>Use {@link ConnectivityManager#getActiveNetworkInfo()} to get an instance that represents
  * the current network connection.
  */
-public class NetworkInfo implements Parcelable {
+public class NetworkInfo implements Parcelable, JSONable {
 
     /**
      * Coarse-grained network state. This is probably what most applications should
@@ -430,6 +433,23 @@ public class NetworkInfo implements Parcelable {
                     append(mIsConnectedToProvisioningNetwork);
             return builder.toString();
         }
+    }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("NetworkType", mNetworkType)
+            .put("Subtype", mSubtype)
+            .put("TypeName", mTypeName)
+            .put("SubtypeName", mSubtypeName)
+            .put("State", mState.name())
+            .put("DetailedState", mDetailedState.name())
+            .put("Reason", mReason)
+            .put("ExtraInfo", mExtraInfo)
+            .put("isFailover", mIsFailover)
+            .put("isRoaming", mIsRoaming)
+            .put("IsAvailable", mIsAvailable)
+            .put("IsConnectedToProvisioningNetwork", mIsConnectedToProvisioningNetwork);
     }
 
     /**

@@ -96,8 +96,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import edu.buffalo.cse.phonelab.Logger;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 /**
  * Track the state of Wifi connectivity. All event handling is done here,
@@ -1283,7 +1282,11 @@ public class WifiStateMachine extends StateMachine {
      * TODO: doc
      */
     public String syncGetWifiStateByName() {
-        switch (mWifiState.get()) {
+        return getWifiStateByName(mWifiState.get());
+    }
+
+    public String getWifiStateByName(int state) {
+        switch (state) {
             case WIFI_STATE_DISABLING:
                 return "disabling";
             case WIFI_STATE_DISABLED:
@@ -1841,6 +1844,12 @@ public class WifiStateMachine extends StateMachine {
 
         if (DBG) log("setWifiState: " + syncGetWifiStateByName());
 
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.WIFI_STATE_CHANGED_ACTION)
+            .put("CurrentState", getWifiStateByName(wifiState.get()))
+            .put("PreviousState", getWifiStateByName(previousWifiState))
+            .log();
+
         final Intent intent = new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_WIFI_STATE, wifiState);
@@ -2178,23 +2187,24 @@ public class WifiStateMachine extends StateMachine {
                                       DEFAULT_MAX_DHCP_RETRIES);
     }
 
-    private void logScanResults() {
-        JSONArray array = new JSONArray();
-        for (ScanResult result : mScanResults) {
-            array.put(result.toJSONObject());
-        }
-        (new Logger(PHONELAB_TAG)).put("Action", WifiManager.SCAN_RESULTS_AVAILABLE_ACTION).put("Results", array).log();
-    }
-
     private void sendScanResultsAvailableBroadcast() {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+            .put("Results", mScanResults)
+            .log();
+
         noteScanEnd();
-        logScanResults();
         Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
     }
 
     private void sendRssiChangeBroadcast(final int newRssi) {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.RSSI_CHANGED_ACTION)
+            .put("WifiInfo", mWifiInfo)
+            .log();
+
         Intent intent = new Intent(WifiManager.RSSI_CHANGED_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_NEW_RSSI, newRssi);
@@ -2202,6 +2212,13 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void sendNetworkStateChangeBroadcast(String bssid) {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.NETWORK_STATE_CHANGED_ACTION)
+            .put("WifiInfo", mWifiInfo)
+            .put("NetworkInfo", mNetworkInfo)
+            .put("LinkProperties", mLinkProperties)
+            .log();
+
         Intent intent = new Intent(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_NETWORK_INFO, new NetworkInfo(mNetworkInfo));
@@ -2216,6 +2233,11 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void sendLinkConfigurationChangedBroadcast() {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.LINK_CONFIGURATION_CHANGED_ACTION)
+            .put("LinkProperties", mLinkProperties)
+            .log();
+
         Intent intent = new Intent(WifiManager.LINK_CONFIGURATION_CHANGED_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_LINK_PROPERTIES, new LinkProperties(mLinkProperties));
@@ -2223,6 +2245,11 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void sendSupplicantConnectionChangedBroadcast(boolean connected) {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)
+            .put("Connected", connected)
+            .log();
+
         Intent intent = new Intent(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, connected);

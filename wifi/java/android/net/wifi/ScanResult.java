@@ -18,8 +18,10 @@ package android.net.wifi;
 
 import android.os.Parcelable;
 import android.os.Parcel;
-import org.json.JSONObject;
-import org.json.JSONException;
+
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 
 /**
  * Describes information about a detected access point. In addition
@@ -27,7 +29,7 @@ import org.json.JSONException;
  * {@code quality}, {@code noise}, and {@code maxbitrate} attributes,
  * but does not currently report them to external clients.
  */
-public class ScanResult implements Parcelable {
+public class ScanResult implements Parcelable, JSONable {
     /** The network name. */
     public String SSID;
 
@@ -147,20 +149,14 @@ public class ScanResult implements Parcelable {
     }
 
     /** {@hide} */
-    public JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("SSID", SSID);
-            json.put("BSSID", BSSID);
-            json.put("capabilities", capabilities);
-            json.put("level", level);
-            json.put("frequency", frequency);
-            json.put("distanceCm", distanceCm);
-            json.put("distanceSdCm", distanceSdCm);
-        }
-        catch (JSONException e) {
-        }
-        return json;
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("SSID", SSID)
+            .put("BSSID", BSSID)
+            .put("capabilities", capabilities)
+            .put("level", level)
+            .put("frequency", frequency)
+            .put("timestamp", timestamp);
     }
 
     /** Implement the Parcelable interface {@hide} */
@@ -194,15 +190,15 @@ public class ScanResult implements Parcelable {
                     wifiSsid = WifiSsid.CREATOR.createFromParcel(in);
                 }
                 return new ScanResult(
-                    wifiSsid,
-                    in.readString(),
-                    in.readString(),
-                    in.readInt(),
-                    in.readInt(),
-                    in.readLong(),
-                    in.readInt(),
-                    in.readInt()
-                );
+                        wifiSsid,
+                        in.readString(),
+                        in.readString(),
+                        in.readInt(),
+                        in.readInt(),
+                        in.readLong(),
+                        in.readInt(),
+                        in.readInt()
+                        );
             }
 
             public ScanResult[] newArray(int size) {
