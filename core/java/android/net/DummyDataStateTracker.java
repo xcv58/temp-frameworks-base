@@ -33,7 +33,7 @@ public class DummyDataStateTracker extends BaseNetworkStateTracker {
 
     private static final String TAG = "DummyDataStateTracker";
     private static final boolean DBG = true;
-    private static final boolean VDBG = false;
+    private static final boolean VDBG = true;
 
     private boolean mTeardownRequested = false;
     private Handler mTarget;

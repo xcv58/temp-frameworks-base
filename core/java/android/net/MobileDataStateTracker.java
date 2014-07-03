@@ -55,7 +55,7 @@ public class MobileDataStateTracker extends BaseNetworkStateTracker {
 
     private static final String TAG = "MobileDataStateTracker";
     private static final boolean DBG = true;
-    private static final boolean VDBG = false;
+    private static final boolean VDBG = true;
 
     private PhoneConstants.DataState mMobileDataState;
     private ITelephony mPhoneService;

@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class LinkCapabilities implements Parcelable {
     private static final String TAG = "LinkCapabilities";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     /** The Map of Keys to Values */
     private HashMap<Integer, String> mCapabilities;
