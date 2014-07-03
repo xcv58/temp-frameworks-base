@@ -18,6 +18,8 @@ package android.net.wifi;
 
 import android.os.Parcelable;
 import android.os.Parcel;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 /**
  * Describes information about a detected access point. In addition
@@ -142,6 +144,23 @@ public class ScanResult implements Parcelable {
                 append("(cm)");
 
         return sb.toString();
+    }
+
+    /** {@hide} */
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("SSID", SSID);
+            json.put("BSSID", BSSID);
+            json.put("capabilities", capabilities);
+            json.put("level", level);
+            json.put("frequency", frequency);
+            json.put("distanceCm", distanceCm);
+            json.put("distanceSdCm", distanceSdCm);
+        }
+        catch (JSONException e) {
+        }
+        return json;
     }
 
     /** Implement the Parcelable interface {@hide} */
