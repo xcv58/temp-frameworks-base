@@ -96,6 +96,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
+import edu.buffalo.cse.phonelab.Logger;
+
 /**
  * Track the state of Wifi connectivity. All event handling is done here,
  * and all changes in connectivity state are initiated here.
@@ -111,6 +114,8 @@ public class WifiStateMachine extends StateMachine {
 
     private static final String NETWORKTYPE = "WIFI";
     private static final boolean DBG = false;
+
+    private final String PHONELAB_TAG = "PhoneLab-" + this.getClass().getSimpleName();
 
     private WifiMonitor mWifiMonitor;
     private WifiNative mWifiNative;
@@ -2173,8 +2178,17 @@ public class WifiStateMachine extends StateMachine {
                                       DEFAULT_MAX_DHCP_RETRIES);
     }
 
+    private void logScanResults() {
+        JSONArray array = new JSONArray();
+        for (ScanResult result : mScanResults) {
+            array.put(result.toJSONObject());
+        }
+        (new Logger(PHONELAB_TAG)).put("Action", WifiManager.SCAN_RESULTS_AVAILABLE_ACTION).put("Results", array).log();
+    }
+
     private void sendScanResultsAvailableBroadcast() {
         noteScanEnd();
+        logScanResults();
         Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
