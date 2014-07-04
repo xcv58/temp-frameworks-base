@@ -19,7 +19,7 @@ import org.json.JSONArray;
  * It's different with org.json.JSONobject in two ways.
  *
  * First, values can only be one of following :
- *  - primitive types/wrappers (Boolean, Integer, Long, Double)
+ *  - primitive types/wrappers (Boolean, Integer, Long, Float, Double)
  *  - String
  *  - StrictJSONObject
  *  - StrictJSONArray
@@ -83,6 +83,17 @@ public class StrictJSONObject {
         }
         return this;
     }
+
+    public StrictJSONObject put(String name, Float value) {
+        try {
+            json.put(name, value == null? NONE: value);
+        }
+        catch (JSONException e) {
+            // ignore
+        }
+        return this;
+    }
+
 
     public StrictJSONObject put(String name, Double value) {
         try {

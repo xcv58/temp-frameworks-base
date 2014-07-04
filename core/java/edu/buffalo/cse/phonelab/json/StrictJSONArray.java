@@ -35,6 +35,11 @@ public class StrictJSONArray {
         return this;
     }
 
+    public StrictJSONArray put(Float value) {
+        array.put(value == null? NONE: value);
+        return this;
+    }
+
     public StrictJSONArray put(Double value) {
         array.put(value == null? NONE: value);
         return this;
