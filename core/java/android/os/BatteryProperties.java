@@ -18,10 +18,13 @@ package android.os;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.JSONable;
+
 /**
  * {@hide}
  */
-public class BatteryProperties implements Parcelable {
+public class BatteryProperties implements Parcelable, JSONable {
     public boolean chargerAcOnline;
     public boolean chargerUsbOnline;
     public boolean chargerWirelessOnline;
@@ -68,6 +71,72 @@ public class BatteryProperties implements Parcelable {
         p.writeInt(batteryChargeCounter);
         p.writeInt(batteryTemperature);
         p.writeString(batteryTechnology);
+    }
+
+    private String getPlugTypeString() {
+        if (chargerAcOnline) {
+            return "AC";
+        }
+        else if (chargerUsbOnline) {
+            return "USB";
+        }
+        else if (chargerWirelessOnline) {
+            return "Wireless";
+        }
+        else {
+            return "None";
+        }
+    }
+
+    private String getBatteryStatusString() {
+        switch (batteryStatus) {
+            case BatteryManager.BATTERY_STATUS_CHARGING :
+                return "Charging";
+            case BatteryManager.BATTERY_STATUS_DISCHARGING :
+                return "Discharging";
+            case BatteryManager.BATTERY_STATUS_NOT_CHARGING :
+                return "NotCharging";
+            case BatteryManager.BATTERY_STATUS_FULL :
+                return "Full";
+            case BatteryManager.BATTERY_STATUS_UNKNOWN :
+            default :
+                return "Unknown";
+        }
+    }
+
+    private String getBatteryHealthString() {
+        switch (batteryHealth) {
+            case BatteryManager.BATTERY_HEALTH_GOOD :
+                return "Good";
+            case BatteryManager.BATTERY_HEALTH_OVERHEAT :
+                return "Overheat";
+            case BatteryManager.BATTERY_HEALTH_DEAD :
+                return "Dead";
+            case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE :
+                return "OverVoltage";
+            case BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE :
+                return "UnspecifiedFailure";
+            case BatteryManager.BATTERY_HEALTH_COLD :
+                return "Cold";
+            case BatteryManager.BATTERY_HEALTH_UNKNOWN :
+            default :
+                return "Unknown";
+        }
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("PlugType", getPlugTypeString())
+            .put("Status", getBatteryStatusString())
+            .put("Health", getBatteryHealthString())
+            .put("Present", batteryPresent)
+            .put("Level", batteryLevel)
+            .put("Voltage", batteryVoltage)
+            .put("CurrentNow", batteryCurrentNow)
+            .put("ChargeCounter", batteryChargeCounter)
+            .put("Temperature", batteryTemperature)
+            .put("Technology", batteryTechnology);
     }
 
     public static final Parcelable.Creator<BatteryProperties> CREATOR

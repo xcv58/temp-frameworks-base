@@ -49,6 +49,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 
 /**
  * <p>BatteryService monitors the charging status, and charge level of the device
@@ -82,6 +84,7 @@ import java.io.PrintWriter;
  */
 public final class BatteryService extends Binder {
     private static final String TAG = BatteryService.class.getSimpleName();
+    private static final String PHONELAB_TAG = "PhoneLab-" + TAG;
 
     private static final boolean DEBUG = false;
 
@@ -467,6 +470,12 @@ public final class BatteryService extends Binder {
     }
 
     private void sendIntentLocked() {
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", Intent.ACTION_BATTERY_CHANGED)
+            .put("Scale", BATTERY_SCALE)
+            .put("BatteryProperties", mBatteryProps)
+            .log();
+
         //  Pack up the values and broadcast them to everyone
         final Intent intent = new Intent(Intent.ACTION_BATTERY_CHANGED);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY
