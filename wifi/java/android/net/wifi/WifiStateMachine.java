@@ -1846,7 +1846,7 @@ public class WifiStateMachine extends StateMachine {
 
         (new StrictJSONObject(PHONELAB_TAG))
             .put("Action", WifiManager.WIFI_STATE_CHANGED_ACTION)
-            .put("CurrentState", getWifiStateByName(wifiState.get()))
+            .put("CurrentState", getWifiStateByName(mWifiState.get()))
             .put("PreviousState", getWifiStateByName(previousWifiState))
             .log();
 
