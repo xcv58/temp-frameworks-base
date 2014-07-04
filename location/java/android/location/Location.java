@@ -26,6 +26,9 @@ import android.util.TimeUtils;
 import java.text.DecimalFormat;
 import java.util.StringTokenizer;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.JSONable;
+
 /**
  * A data class representing a geographic location.
  *
@@ -37,7 +40,7 @@ import java.util.StringTokenizer;
  * (both UTC time and elapsed real-time since boot), all other
  * parameters are optional.
  */
-public class Location implements Parcelable {
+public class Location implements Parcelable, JSONable {
     /**
      * Constant used to specify formatting of a latitude or longitude
      * in the form "[+-]DDD.DDDDD where D indicates degrees.
@@ -163,6 +166,25 @@ public class Location implements Parcelable {
         mAccuracy = 0;
         mExtras = null;
         mIsFromMockProvider = false;
+    }
+    
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("Provider", mProvider)
+            .put("Time", mTime)
+            .put("ElapsedRealtimeNanos", mElapsedRealtimeNanos)
+            .put("Latitude", mLatitude)
+            .put("Longitude", mLongitude)
+            .put("HasAltitude", mHasAltitude)
+            .put("Altitude", mAltitude)
+            .put("HasSpeed", mHasSpeed)
+            .put("Speed", mSpeed)
+            .put("HasBearing", mHasBearing)
+            .put("Bearing", mBearing)
+            .put("HasAccuracy", mHasAccuracy)
+            .put("Accuracy", mAccuracy)
+            .put("IsFromMockProvider", mIsFromMockProvider);
     }
 
     /**

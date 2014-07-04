@@ -86,12 +86,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * The service class that manages LocationProviders and issues location
  * updates and alerts.
  */
 public class LocationManagerService extends ILocationManager.Stub {
     private static final String TAG = "LocationManagerService";
+    private static final String PHONELAB_TAG = "PhoneLab-" + TAG;
     public static final boolean D = Log.isLoggable(TAG, Log.DEBUG);
 
     private static final String WAKELOCK_KEY = TAG;
@@ -1865,6 +1868,7 @@ public class LocationManagerService extends ILocationManager.Stub {
             return;
         }
 
+
         mLocationHandler.removeMessages(MSG_LOCATION_CHANGED, location);
         Message m = Message.obtain(mLocationHandler, MSG_LOCATION_CHANGED, location);
         m.arg1 = (passive ? 1 : 0);
@@ -1971,6 +1975,11 @@ public class LocationManagerService extends ILocationManager.Stub {
 
         ArrayList<Receiver> deadReceivers = null;
         ArrayList<UpdateRecord> deadUpdateRecords = null;
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", "android.location.LOCATION_CHANGED")
+            .put("Location", location)
+            .log();
 
         // Broadcast location or status to all listeners
         for (UpdateRecord r : records) {
