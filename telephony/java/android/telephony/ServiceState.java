@@ -21,6 +21,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.telephony.Rlog;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.JSONable;
+
 /**
  * Contains phone state and service related information.
  *
@@ -33,7 +36,7 @@ import android.telephony.Rlog;
  *   <li>Network selection mode
  * </ul>
  */
-public class ServiceState implements Parcelable {
+public class ServiceState implements Parcelable, JSONable {
 
     static final String LOG_TAG = "PHONE";
     static final boolean DBG = true;
@@ -560,6 +563,45 @@ public class ServiceState implements Parcelable {
                 + " DefRoamInd=" + mCdmaDefaultRoamingIndicator
                 + " EmergOnly=" + mIsEmergencyOnly);
     }
+
+    private String getStateString(int state) {
+        switch (state) {
+            case STATE_IN_SERVICE :
+                return "IN_SERVICE";
+            case STATE_OUT_OF_SERVICE :
+                return "OUT_OF_SERVICE";
+            case STATE_EMERGENCY_ONLY :
+                return "EMRGENCY_ONLY";
+            case STATE_POWER_OFF :
+                return "POWER_OFF";
+            default :
+                return "Unknown";
+        }
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("VoiceRegState", getStateString(mVoiceRegState))
+            .put("DataRegState", getStateString(mDataRegState))
+            .put("IsRoaming", mRoaming)
+            .put("OperatorAlphaLong", mOperatorAlphaLong)
+            .put("OperatorAlphaShort", mOperatorAlphaShort)
+            .put("OperatorNumeric", mOperatorNumeric)
+            .put("IsManualNetworkSelection", mIsManualNetworkSelection)
+            .put("IsEmergencyOnly", mIsEmergencyOnly)
+            .put("RilVoiceRadioTechology", rilRadioTechnologyToString(mRilVoiceRadioTechnology))
+            .put("RilDataRadioTechology", rilRadioTechnologyToString(mRilDataRadioTechnology))
+            .put("CSSIndicator", mCssIndicator)
+            .put("NetworkId", mNetworkId)
+            .put("SystemId", mSystemId)
+            .put("CdmaRoamingIndicator", mCdmaRoamingIndicator)
+            .put("CdmaDefaultRomaingIndicator", mCdmaDefaultRoamingIndicator)
+            .put("CdmaEriIconIndex", mCdmaEriIconIndex)
+            .put("CdmaEriIconMode", mCdmaEriIconMode);
+    }
+
+
 
     private void setNullState(int state) {
         if (DBG) Rlog.d(LOG_TAG, "[ServiceState] setNullState=" + state);

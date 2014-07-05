@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * A class representing the capabilities of a link
  *
@@ -129,6 +131,37 @@ public class LinkCapabilities implements Parcelable {
          * Values will be strings such as "wlan0", "rmnet0"
          */
         public final static int RO_PHYSICAL_INTERFACE = 10;
+
+        /** {@hide} */
+        public static String getNameByKey(int key) {
+            switch (key) {
+                case RO_NETWORK_TYPE :
+                    return "NETWORK_TYPE";
+
+                case RW_DESIRED_FWD_BW :
+                    return "DESIRED_FWD_BW";
+                case RW_REQUIRED_FWD_BW :
+                    return "REQUIRED_FWD_BW";
+                case RO_AVAILABLE_FWD_BW :
+                    return "AVAILABLE_FWD_BW";
+
+                case RW_DESIRED_REV_BW :
+                    return "DESIRED_REV_BW";
+                case RW_REQUIRED_REV_BW :
+                    return "REQUIRED_REV_BW";
+                case RO_AVAILABLE_REV_BW :
+                    return "AVAILABLE_REV_BW";
+
+                case RW_MAX_ALLOWED_LATENCY :
+                    return "MAX_ALLOWED_LATENCY";
+                case RO_BOUND_INTERFACE :
+                    return "BOUND_INTERFACE";
+                case RO_PHYSICAL_INTERFACE :
+                    return "PHYSICAL_INTERFACE";
+                default :
+                    return "Unknown";
+            }
+        }
     }
 
     /**
@@ -317,6 +350,15 @@ public class LinkCapabilities implements Parcelable {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        StrictJSONObject json = new StrictJSONObject();
+        for (Entry<Integer, String> entry : mCapabilities.entrySet()) {
+            json.put(Key.getNameByKey(entry.getKey()), entry.getValue());
+        }
+        return json;
     }
 
     /**

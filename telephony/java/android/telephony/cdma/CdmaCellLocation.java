@@ -19,6 +19,8 @@ package android.telephony.cdma;
 import android.os.Bundle;
 import android.telephony.CellLocation;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Represents the cell location on a CDMA phone.
  */
@@ -190,6 +192,16 @@ public class CdmaCellLocation extends CellLocation {
                    + this.mBaseStationLongitude + ","
                    + this.mSystemId + ","
                    + this.mNetworkId + "]";
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("BaseStationId", mBaseStationId)
+            .put("BaseStationLatitude", mBaseStationLatitude)
+            .put("BaseStationLongitude", mBaseStationLongitude)
+            .put("SystemId", mSystemId)
+            .put("NetworkId", mNetworkId);
     }
 
     /**

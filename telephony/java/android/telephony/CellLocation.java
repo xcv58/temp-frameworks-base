@@ -28,10 +28,13 @@ import android.telephony.gsm.GsmCellLocation;
 import com.android.internal.telephony.ITelephony;
 import com.android.internal.telephony.PhoneConstants;
 
+
+import edu.buffalo.cse.phonelab.json.JSONable;
+
 /**
  * Abstract class that represents the location of the device.  {@more}
  */
-public abstract class CellLocation {
+public abstract class CellLocation implements JSONable {
 
     /**
      * Request an update of the current location.  If the location has changed,

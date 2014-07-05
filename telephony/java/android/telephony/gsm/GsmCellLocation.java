@@ -19,6 +19,8 @@ package android.telephony.gsm;
 import android.os.Bundle;
 import android.telephony.CellLocation;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Represents the cell location on a GSM phone.
  */
@@ -120,6 +122,14 @@ public class GsmCellLocation extends CellLocation {
     @Override
     public String toString() {
         return "["+ mLac + "," + mCid + "," + mPsc + "]";
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("Lac", mLac)
+            .put("Cid", mCid)
+            .put("Psc", mPsc);
     }
 
     /**

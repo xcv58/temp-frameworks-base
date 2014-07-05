@@ -21,10 +21,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.telephony.Rlog;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.JSONable;
+
 /**
  * Contains phone signal strength related information.
  */
-public class SignalStrength implements Parcelable {
+public class SignalStrength implements Parcelable, JSONable {
 
     private static final String LOG_TAG = "SignalStrength";
     private static final boolean DBG = false;
@@ -896,6 +899,24 @@ public class SignalStrength implements Parcelable {
                 + " " + mLteRssnr
                 + " " + mLteCqi
                 + " " + (isGsm ? "gsm|lte" : "cdma"));
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("GsmSignalStrength", mGsmSignalStrength)
+            .put("GsmBitErrorRate", mGsmBitErrorRate)
+            .put("CdmaDbm", mCdmaDbm)
+            .put("CdmaEcio", mCdmaEcio)
+            .put("EvdoDbm", mEvdoDbm)
+            .put("EvdoEcio", mEvdoEcio)
+            .put("EvdoSnr", mEvdoSnr)
+            .put("LteSignalStrength", mLteSignalStrength)
+            .put("LteRsrp", mLteRsrp)
+            .put("LteRsrq", mLteRsrq)
+            .put("LteRssnr", mLteRssnr)
+            .put("LteCqi", mLteCqi)
+            .put("IsGsm", isGsm);
     }
 
     /**

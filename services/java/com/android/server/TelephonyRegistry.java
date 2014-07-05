@@ -54,12 +54,15 @@ import com.android.internal.telephony.ServiceStateTracker;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.server.am.BatteryStatsService;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Since phone process can be restarted, this class provides a centralized place
  * that applications can register and be called back from.
  */
 class TelephonyRegistry extends ITelephonyRegistry.Stub {
     private static final String TAG = "TelephonyRegistry";
+    private static final String PHONELAB_TAG = "PhoneLab-" + TAG;
     private static final boolean DBG = false;
     private static final boolean DBG_LOC = false;
 
@@ -434,6 +437,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             }
             handleRemoveListLocked();
         }
+
+        (new StrictJSONObject())
+            .put("Action", "android.telephony.MESSAGE_WAITING_CHANGED")
+            .put("MessageWaiting", mwi)
+            .log();
     }
 
     public void notifyCallForwardingChanged(boolean cfi) {
@@ -453,6 +461,12 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             }
             handleRemoveListLocked();
         }
+
+        (new StrictJSONObject())
+            .put("Action", "android.telephony.CALL_FORWARDING_CHANGED")
+            .put("CallForwarding", cfi)
+            .log();
+
     }
 
     public void notifyDataActivity(int state) {
@@ -472,6 +486,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             }
             handleRemoveListLocked();
         }
+
+        (new StrictJSONObject())
+            .put("Action", "android.telephony.DATA_ACTIVITY_CHANGED")
+            .put("DataActivity", DefaultPhoneNotifier.convertDataState(state).name())
+            .log();
     }
 
     public void notifyDataConnection(int state, boolean isDataConnectivityPossible,
@@ -581,6 +600,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             }
             handleRemoveListLocked();
         }
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", "android.telephony.CELL_LOCATION_CHANGED")
+            .put("CellLocation", CellLocation.newFromBundle(cellLocation))
+            .log();
     }
 
     public void notifyOtaspChanged(int otaspMode) {
@@ -649,6 +673,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             Binder.restoreCallingIdentity(ident);
         }
 
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", TelephonyIntents.ACTION_SERVICE_STATE_CHANGED)
+            .put("State", state)
+            .log();
+
         Intent intent = new Intent(TelephonyIntents.ACTION_SERVICE_STATE_CHANGED);
         Bundle data = new Bundle();
         state.fillInNotifierBundle(data);
@@ -665,6 +694,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         } finally {
             Binder.restoreCallingIdentity(ident);
         }
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", TelephonyIntents.ACTION_SIGNAL_STRENGTH_CHANGED)
+            .put("SignalStrength", signalStrength)
+            .log();
 
         Intent intent = new Intent(TelephonyIntents.ACTION_SIGNAL_STRENGTH_CHANGED);
         intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
@@ -688,6 +722,12 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             Binder.restoreCallingIdentity(ident);
         }
 
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", TelephonyManager.ACTION_PHONE_STATE_CHANGED)
+            .put("CallState", DefaultPhoneNotifier.convertCallState(state).name())
+            .put("IncomingNumber", incomingNumber)
+            .log();
+
         Intent intent = new Intent(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
         intent.putExtra(PhoneConstants.STATE_KEY,
                 DefaultPhoneNotifier.convertCallState(state).toString());
@@ -702,6 +742,19 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             boolean isDataConnectivityPossible,
             String reason, String apn, String apnType, LinkProperties linkProperties,
             LinkCapabilities linkCapabilities, boolean roaming) {
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", Intents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED)
+            .put("State", DefaultPhoneNotifier.convertDataState(state).name())
+            .put("IsDataConnectivityPossible", isDataConnectivityPossible)
+            .put("Reason", reason)
+            .put("APN", apn)
+            .put("APNType", apnType)
+            .put("LinkProperties", linkProperties)
+            .put("LinkCapabilities", linkCapabilities)
+            .put("IsRoaming", romaing)
+            .log();
+
         // Note: not reporting to the battery stats service here, because the
         // status bar takes care of that after taking into account all of the
         // required info.
@@ -732,6 +785,13 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     }
 
     private void broadcastDataConnectionFailed(String reason, String apnType) {
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", TelephonyIntents.ACTION_DATA_CONNECTION_FAILED)
+            .put("Reason", reason)
+            .put("APNType", apnType)
+            .log();
+
         Intent intent = new Intent(TelephonyIntents.ACTION_DATA_CONNECTION_FAILED);
         intent.putExtra(PhoneConstants.FAILURE_REASON_KEY, reason);
         intent.putExtra(PhoneConstants.DATA_APN_TYPE_KEY, apnType);
