@@ -438,7 +438,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             handleRemoveListLocked();
         }
 
-        (new StrictJSONObject())
+        (new StrictJSONObject(PHONELAB_TAG))
             .put("Action", "android.telephony.MESSAGE_WAITING_CHANGED")
             .put("MessageWaiting", mwi)
             .log();
@@ -462,7 +462,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             handleRemoveListLocked();
         }
 
-        (new StrictJSONObject())
+        (new StrictJSONObject(PHONELAB_TAG))
             .put("Action", "android.telephony.CALL_FORWARDING_CHANGED")
             .put("CallForwarding", cfi)
             .log();
@@ -487,7 +487,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             handleRemoveListLocked();
         }
 
-        (new StrictJSONObject())
+        (new StrictJSONObject(PHONELAB_TAG))
             .put("Action", "android.telephony.DATA_ACTIVITY_CHANGED")
             .put("DataActivity", DefaultPhoneNotifier.convertDataState(state).name())
             .log();
@@ -744,7 +744,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             LinkCapabilities linkCapabilities, boolean roaming) {
 
         (new StrictJSONObject(PHONELAB_TAG))
-            .put("Action", Intents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED)
+            .put("Action", TelephonyIntents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED)
             .put("State", DefaultPhoneNotifier.convertDataState(state).name())
             .put("IsDataConnectivityPossible", isDataConnectivityPossible)
             .put("Reason", reason)
@@ -752,7 +752,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             .put("APNType", apnType)
             .put("LinkProperties", linkProperties)
             .put("LinkCapabilities", linkCapabilities)
-            .put("IsRoaming", romaing)
+            .put("IsRoaming", roaming)
             .log();
 
         // Note: not reporting to the battery stats service here, because the

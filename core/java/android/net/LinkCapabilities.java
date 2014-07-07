@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 /**
@@ -33,7 +34,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  *
  * @hide
  */
-public class LinkCapabilities implements Parcelable {
+public class LinkCapabilities implements Parcelable, JSONable {
     private static final String TAG = "LinkCapabilities";
     private static final boolean DBG = true;
 

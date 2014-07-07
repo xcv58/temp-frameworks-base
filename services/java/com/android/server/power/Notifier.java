@@ -43,6 +43,8 @@ import android.util.EventLog;
 import android.util.Slog;
 import android.view.WindowManagerPolicy;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Sends broadcasts about important power state changes.
  * <p>
@@ -62,6 +64,7 @@ import android.view.WindowManagerPolicy;
  */
 final class Notifier {
     private static final String TAG = "PowerManagerNotifier";
+    private static final String PHONELAB_TAG = "PhoneLab-" + TAG;
 
     private static final boolean DEBUG = false;
 
@@ -432,6 +435,9 @@ final class Notifier {
         }
 
         if (ActivityManagerNative.isSystemReady()) {
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("Action", Intent.ACTION_SCREEN_ON)
+                .log();
             mContext.sendOrderedBroadcastAsUser(mScreenOnIntent, UserHandle.ALL, null,
                     mWakeUpBroadcastDone, mHandler, 0, null, null);
         } else {
@@ -462,6 +468,21 @@ final class Notifier {
         }
     };
 
+    private String getReasonString(int reason) {
+        switch (reason) {
+            case WindowManagerPolicy.OFF_BECAUSE_OF_USER :
+                return "User";
+            case WindowManagerPolicy.OFF_BECAUSE_OF_ADMIN :
+                return "Admin";
+            case WindowManagerPolicy.OFF_BECAUSE_OF_TIMEOUT :
+                return "Timeout";
+            case WindowManagerPolicy.OFF_BECAUSE_OF_PROX_SENSOR :
+                return "ProxSensor";
+            default :
+                return "Unknown";
+        }
+    }
+
     private void sendGoToSleepBroadcast(int reason) {
         if (DEBUG) {
             Slog.d(TAG, "Sending go to sleep broadcast.");
@@ -487,6 +508,10 @@ final class Notifier {
         }
 
         if (ActivityManagerNative.isSystemReady()) {
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("Action", Intent.ACTION_SCREEN_OFF)
+                .put("Reason", getReasonString(why))
+                .log();
             mContext.sendOrderedBroadcastAsUser(mScreenOffIntent, UserHandle.ALL, null,
                     mGoToSleepBroadcastDone, mHandler, 0, null, null);
         } else {
