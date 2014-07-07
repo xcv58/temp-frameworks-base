@@ -39,7 +39,7 @@ import libcore.net.RawSocket;
  * @hide
  */
 public class ArpPeer {
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final String TAG = "ArpPeer";
     private String mInterfaceName;
     private final InetAddress mMyAddr;

@@ -36,7 +36,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class LinkCapabilities implements Parcelable, JSONable {
     private static final String TAG = "LinkCapabilities";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     /** The Map of Keys to Values */
     private HashMap<Integer, String> mCapabilities;
