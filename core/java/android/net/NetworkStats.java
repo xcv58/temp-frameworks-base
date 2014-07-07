@@ -30,6 +30,11 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
+
+
 /**
  * Collection of active network statistics. Can contain summary details across
  * all interfaces, or details with per-UID granularity. Internally stores data
@@ -39,7 +44,7 @@ import java.util.HashSet;
  *
  * @hide
  */
-public class NetworkStats implements Parcelable {
+public class NetworkStats implements Parcelable, JSONable {
     /** {@link #iface} value when interface details unavailable. */
     public static final String IFACE_ALL = null;
     /** {@link #uid} value when UID details unavailable. */
@@ -71,7 +76,7 @@ public class NetworkStats implements Parcelable {
     private long[] txPackets;
     private long[] operations;
 
-    public static class Entry {
+    public static class Entry implements JSONable {
         public String iface;
         public int uid;
         public int set;
@@ -134,6 +139,20 @@ public class NetworkStats implements Parcelable {
             builder.append(" txPackets=").append(txPackets);
             builder.append(" operations=").append(operations);
             return builder.toString();
+        }
+
+        /** @hide */
+        public StrictJSONObject toJSONObject() {
+            return (new StrictJSONObject())
+                .put("Iface", iface)
+                .put("Uid", uid)
+                .put("Set", setToString(set))
+                .put("Tag", tagToString(tag))
+                .put("RxBytes", rxBytes)
+                .put("RxPackets", rxPackets)
+                .put("TxBytes", txBytes)
+                .put("TxPackets", txPackets)
+                .put("Operations", operations);
         }
 
         @Override
@@ -264,6 +283,16 @@ public class NetworkStats implements Parcelable {
         entry.txPackets = txPackets[i];
         entry.operations = operations[i];
         return entry;
+    }
+
+    /** @hide */
+    public StrictJSONObject toJSONObject() {
+        StrictJSONArray array = new StrictJSONArray();
+        for (int i = 0; i < size; i++) {
+            array.put(getValues(i, null));
+        }
+        return (new StrictJSONObject())
+            .put("Entries", array);
     }
 
     public long getElapsedRealtime() {

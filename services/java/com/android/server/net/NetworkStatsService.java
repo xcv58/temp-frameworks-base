@@ -132,12 +132,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Collect and persist detailed network statistics, and provide this data to
  * other system services.
  */
 public class NetworkStatsService extends INetworkStatsService.Stub {
     private static final String TAG = "NetworkStats";
+    private final String PHONELAB_TAG = "PhoneLab-" + this.getClass().getSimpleName();
     private static final boolean LOGV = false;
 
     private static final int MSG_PERFORM_POLL = 1;
@@ -982,6 +985,13 @@ public class NetworkStatsService extends INetworkStatsService.Stub {
             mXtRecorder.recordSnapshotLocked(xtSnapshot, mActiveIfaces, currentTime);
             mUidRecorder.recordSnapshotLocked(uidSnapshot, mActiveIfaces, currentTime);
             mUidTagRecorder.recordSnapshotLocked(uidSnapshot, mActiveIfaces, currentTime);
+
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("Action", "com.android.server.action.NETWORK_STATS_SNAPSHOT")
+                .put("DevSnapshot", devSnapshot)
+                .put("XtSnapshot", xtSnapshot)
+                .put("UidSnapshot", uidSnapshot)
+                .log();
 
         } catch (IllegalStateException e) {
             Log.wtf(TAG, "problem reading network stats", e);

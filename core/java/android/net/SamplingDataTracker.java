@@ -27,6 +27,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
+
 /**
  * @hide
  */
@@ -35,7 +39,7 @@ public class SamplingDataTracker
     private static final boolean DBG = false;
     private static final String  TAG = "SamplingDataTracker";
 
-    public static class SamplingSnapshot
+    public static class SamplingSnapshot implements JSONable
     {
         public long mTxByteCount;
         public long mRxByteCount;
@@ -44,6 +48,18 @@ public class SamplingDataTracker
         public long mTxPacketErrorCount;
         public long mRxPacketErrorCount;
         public long mTimestamp;
+
+        /** @hide */
+        public StrictJSONObject toJSONObject() {
+            return (new StrictJSONObject())
+                .put("TxByteCount", mTxByteCount)
+                .put("RxByteCount", mRxByteCount)
+                .put("TxPacketCount", mTxPacketCount)
+                .put("RxPacketCount", mRxPacketCount)
+                .put("TxPacketErrorCount", mTxPacketErrorCount)
+                .put("RxPacketErrorCount", mRxPacketErrorCount)
+                .put("Timetamp", mTimestamp);
+        }
     }
 
     public static void getSamplingSnapshots(Map<String, SamplingSnapshot> mapIfaceToSample) {

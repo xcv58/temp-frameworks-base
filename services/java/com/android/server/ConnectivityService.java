@@ -163,11 +163,15 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
+
 /**
  * @hide
  */
 public class ConnectivityService extends IConnectivityManager.Stub {
     private static final String TAG = "ConnectivityService";
+    private static final String PHONELAB_TAG = "PhoneLab-" + TAG;
 
     private static final boolean DBG = false;
     private static final boolean VDBG = false;
@@ -4997,6 +5001,8 @@ public class ConnectivityService extends IConnectivityManager.Stub {
         // Read samples for all interfaces
         SamplingDataTracker.getSamplingSnapshots(mapIfaceToSample);
 
+        StrictJSONArray array = new StrictJSONArray();
+
         // process samples for all networks
         for (NetworkStateTracker tracker : mNetTrackers) {
             if (tracker != null) {
@@ -5007,9 +5013,16 @@ public class ConnectivityService extends IConnectivityManager.Stub {
                     tracker.stopSampling(ss);
                     // start a new sampling cycle ..
                     tracker.startSampling(ss);
+
+                    array.put((new StrictJSONObject()).put(ifaceName, ss));
                 }
             }
         }
+
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", "android.net.ConnectivityService.PACKET_COUNT_SAMPLE")
+            .put("Samples", array)
+            .log();
 
         log("Done.");
 
