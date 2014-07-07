@@ -987,7 +987,7 @@ public class NetworkStatsService extends INetworkStatsService.Stub {
             mUidTagRecorder.recordSnapshotLocked(uidSnapshot, mActiveIfaces, currentTime);
 
             (new StrictJSONObject(PHONELAB_TAG))
-                .put("Action", "com.android.server.action.NETWORK_STATS_SNAPSHOT")
+                .put("Action", ACTION_NETWORK_STATS_UPDATED)
                 .put("DevSnapshot", devSnapshot)
                 .put("XtSnapshot", xtSnapshot)
                 .put("UidSnapshot", uidSnapshot)
