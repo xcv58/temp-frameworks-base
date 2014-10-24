@@ -372,7 +372,11 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         if (!checkNotifyPermission("notifySignalStrength()")) {
             return;
         }
+        boolean shouldBroadcast = false;
         synchronized (mRecords) {
+            if (mSignalStrength.getDbm() != signalStrength.getDbm()) {
+                shouldBroadcast = true;
+            }
             mSignalStrength = signalStrength;
             for (Record r : mRecords) {
                 if ((r.events & PhoneStateListener.LISTEN_SIGNAL_STRENGTHS) != 0) {
@@ -394,7 +398,9 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             }
             handleRemoveListLocked();
         }
-        broadcastSignalStrengthChanged(signalStrength);
+        if (shouldBroadcast) {
+            broadcastSignalStrengthChanged(signalStrength);
+        }
     }
 
     public void notifyCellInfo(List<CellInfo> cellInfo) {
