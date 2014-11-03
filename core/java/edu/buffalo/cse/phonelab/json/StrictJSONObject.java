@@ -190,7 +190,12 @@ public class StrictJSONObject {
     public void log() {
         this.put("LogFormat", LOG_FORMAT);
         if (!json.has(KEY_ACTION)) {
-            json.put(KEY_ACTION, UNKNOWN);
+            try {
+                json.put(KEY_ACTION, UNKNOWN);
+            }
+            catch (JSONException e) {
+                // ignoret
+            }
         }
         Log.i(tag, json.toString());
     }
