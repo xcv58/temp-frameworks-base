@@ -194,7 +194,7 @@ public class StrictJSONObject {
                 json.put(KEY_ACTION, UNKNOWN);
             }
             catch (JSONException e) {
-                // ignoret
+                // ignore it
             }
         }
         Log.i(tag, json.toString());
