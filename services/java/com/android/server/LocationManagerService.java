@@ -1984,7 +1984,7 @@ public class LocationManagerService extends ILocationManager.Stub {
          * "SubCategory": "Misc",
          * "Tag": "PhoneLab-Location-Misc",
          * "Action": "android.location.LOCATION_CHANGED",
-         * "Description": "Location update.",
+         * "Description": "Location update."
          * }
          */
         (new StrictJSONObject(PHONELAB_TAG))

@@ -444,7 +444,7 @@ final class Notifier {
              * "SubCategory": "Screen",
              * "Tag": "PhoneLab-Power-Screen",
              * "Action": "android.intent.action.SCREEN_ON",
-             * "Description": "Screen turned on.",
+             * "Description": "Screen turned on."
              * }
              */
             (new StrictJSONObject(PHONELAB_TAG))
@@ -528,7 +528,7 @@ final class Notifier {
              * "SubCategory": "Screen",
              * "Tag": "PhoneLab-Power-Screen",
              * "Action": "android.intent.action.SCREEN_OFF",
-             * "Description": "Screen turned off.",
+             * "Description": "Screen turned off."
              * }
              */
             (new StrictJSONObject(PHONELAB_TAG))
