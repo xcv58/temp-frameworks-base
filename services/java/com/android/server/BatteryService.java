@@ -478,7 +478,7 @@ public final class BatteryService extends Binder {
          * "Category": "Power",
          * "SubCategory": "Battery",
          * "Tag": "Power-Battery-PhoneLab",
-         * "Action": "android.intent.action.BATTERY_CHANGED.",
+         * "Action": "android.intent.action.BATTERY_CHANGED",
          * "Description": "Battery status changed."
          * }
          */
