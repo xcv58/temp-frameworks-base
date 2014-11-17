@@ -43,7 +43,7 @@ public class StrictJSONObject {
     public static final String NONE = "<none>";
 
     public static final String KEY_ACTION = "Action";
-    public static final String UNKNOWN = "<unknown>";
+    public static final String UNKNOWN = "UNKNOWN";
 
     private String tag = DEFAULT_TAG;
     private JSONObject json;
