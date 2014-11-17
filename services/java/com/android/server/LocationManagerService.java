@@ -94,7 +94,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class LocationManagerService extends ILocationManager.Stub {
     private static final String TAG = "LocationManagerService";
-    private static final String PHONELAB_TAG = "PhoneLab-Location-Misc";
+    private static final String PHONELAB_TAG = "Location-Misc-PhoneLab";
     public static final boolean D = Log.isLoggable(TAG, Log.DEBUG);
 
     private static final String WAKELOCK_KEY = TAG;

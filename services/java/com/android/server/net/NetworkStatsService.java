@@ -140,7 +140,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class NetworkStatsService extends INetworkStatsService.Stub {
     private static final String TAG = "NetworkStats";
-    private final String PHONELAB_TAG = "PhoneLab-Network-Misc";
+    private final String PHONELAB_TAG = "Network-Misc-PhoneLab";
     private static final boolean LOGV = false;
 
     private static final int MSG_PERFORM_POLL = 1;

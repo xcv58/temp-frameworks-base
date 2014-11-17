@@ -62,7 +62,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 class TelephonyRegistry extends ITelephonyRegistry.Stub {
     private static final String TAG = "TelephonyRegistry";
-    private static final String PHONELAB_TAG = "PhoneLab-Network-Telephony";
+    private static final String PHONELAB_TAG = "Network-Telephony-PhoneLab";
     private static final boolean DBG = false;
     private static final boolean DBG_LOC = false;
 

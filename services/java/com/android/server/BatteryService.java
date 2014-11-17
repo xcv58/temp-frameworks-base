@@ -84,7 +84,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public final class BatteryService extends Binder {
     private static final String TAG = BatteryService.class.getSimpleName();
-    private static final String PHONELAB_TAG = "PhoneLab-Power-Battery";
+    private static final String PHONELAB_TAG = "Power-Battery-PhoneLab";
 
     private static final boolean DEBUG = false;
 

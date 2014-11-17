@@ -114,7 +114,7 @@ public class WifiStateMachine extends StateMachine {
     private static final String NETWORKTYPE = "WIFI";
     private static final boolean DBG = false;
 
-    private final String PHONELAB_TAG = "PhoneLab-Network-Wifi";
+    private final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
 
     private WifiMonitor mWifiMonitor;
     private WifiNative mWifiNative;
