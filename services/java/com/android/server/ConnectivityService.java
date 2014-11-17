@@ -5025,7 +5025,7 @@ public class ConnectivityService extends IConnectivityManager.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Misc",
-         * "Tag": "PhoneLab-Network-Misc",
+         * "Tag": "Network-Misc-PhoneLab",
          * "Action": "android.net.ConnectivityService.PACKET_COUNT_SAMPLE",
          * "Description": "Per interface packet sampling."
          * }

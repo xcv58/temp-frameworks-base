@@ -992,7 +992,7 @@ public class NetworkStatsService extends INetworkStatsService.Stub {
              * {
              * "Category": "Network",
              * "SubCategory": "Misc",
-             * "Tag": "PhoneLab-Network-Misc",
+             * "Tag": "Network-Misc-PhoneLab",
              * "Action": "com.android.server.action.NETWORK_STATS_UPDATED",
              * "Description": "Per process network statistics."
              * }

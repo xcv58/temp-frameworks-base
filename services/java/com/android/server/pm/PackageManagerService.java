@@ -6296,8 +6296,8 @@ public class PackageManagerService extends IPackageManager.Stub {
          * {
          * "Category": "PacketManager",
          * "SubCategory": "Misc",
-         * "Tag": "PhoneLab-PackageManager-Misc",
-         * "Action": "android.intent.action.PACKAGE_*",
+         * "Tag": "PackageManager-Misc-PhoneLab",
+         * "Action": "android.intent.action.PACKAGE_{ADDED, CHANGED, REMOVED}",
          * "Description": "Package installed/uninstalled/updated."
          * }
          */
