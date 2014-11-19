@@ -1,6 +1,7 @@
 package edu.buffalo.cse.phonelab.json;
 
 import java.lang.Iterable;
+import java.util.UUID;
 
 import android.util.Log;
 
@@ -197,6 +198,7 @@ public class StrictJSONObject {
                 // ignore it
             }
         }
+        this.put("UUID", UUID.randomUUID().toString());
         Log.i(tag, json.toString());
     }
 }
