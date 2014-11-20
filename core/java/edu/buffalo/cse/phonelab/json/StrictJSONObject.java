@@ -46,6 +46,8 @@ public class StrictJSONObject {
     public static final String KEY_ACTION = "Action";
     public static final String UNKNOWN = "UNKNOWN";
 
+    private static long counter = 0;
+
     private String tag = DEFAULT_TAG;
     private JSONObject json;
 
@@ -198,7 +200,7 @@ public class StrictJSONObject {
                 // ignore it
             }
         }
-        this.put("UUID", UUID.randomUUID().toString());
+        this.put("Counter", counter++);
         Log.i(tag, json.toString());
     }
 }
