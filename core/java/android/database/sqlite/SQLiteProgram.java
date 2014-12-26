@@ -18,6 +18,7 @@ package android.database.sqlite;
 
 import android.database.DatabaseUtils;
 import android.os.CancellationSignal;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 import java.util.Arrays;
 
@@ -75,9 +76,34 @@ public abstract class SQLiteProgram extends SQLiteClosable {
             if (bindArgs != null) {
                 System.arraycopy(bindArgs, 0, mBindArgs, 0, bindArgs.length);
             }
+//            StringBuilder hashStringBuilder = new StringBuilder(400);
+//                for (int j = 0; j < mBindArgs.length; j++)
+//                {
+//                        hashStringBuilder.append(mBindArgs[j].hashCode());
+//                        hashStringBuilder.append(",");
+//                }
+//                String hashString = hashStringBuilder.toString();
+//            String[] parts = sql.split(" ");
+//            /**
+//             * PhoneLab
+//             *
+//             * {
+//             * "Category": "SQLite",
+//             * "SubCategory": "Instumentation",
+//             * "Tag": "SQLite-Query-PhoneLab",
+//             * "Action": "INSERT",
+//             * "Description": "Experimental Logging."
+//             * }
+//             */
+//            (new StrictJSONObject("SQLite-Query-PhoneLab"))
+//                    .put("Query",mSql)
+//                    .put(StrictJSONObject.KEY_ACTION, parts[0])
+//                    .put("Arguments(hashCoded)", Arrays.toString(mBindArgs))
+//                    .log();
         } else {
             mBindArgs = null;
         }
+
     }
 
     final SQLiteDatabase getDatabase() {

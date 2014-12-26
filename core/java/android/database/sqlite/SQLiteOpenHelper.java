@@ -16,11 +16,18 @@
 
 package android.database.sqlite;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.DefaultDatabaseErrorHandler;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
+
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 
 /**
  * A helper class to manage database creation and version management.
@@ -104,6 +111,24 @@ public abstract class SQLiteOpenHelper {
         mFactory = factory;
         mNewVersion = version;
         mErrorHandler = errorHandler;
+
+        int stringId = context.getApplicationInfo().labelRes;
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "SQLite",
+         * "SubCategory": "Query",
+         * "Tag": "SQLite-Query-PhoneLab",
+         * "Action": "App Name",
+         * "Description": "Logging Apps that access the database."
+         * }
+         */
+        (new StrictJSONObject("SQLite-Query-PhoneLab"))
+          .put(StrictJSONObject.KEY_ACTION, "APP_NAME")
+          .put("PackageName",context.getPackageName())
+          .put("AppName",context.getString(stringId))
+          .log();
     }
 
     /**
@@ -196,6 +221,40 @@ public abstract class SQLiteOpenHelper {
                 mDatabase = null;
             } else if (!writable || !mDatabase.isReadOnly()) {
                 // The database is already open for business.
+//            /**
+//            * This code fetches the schema of all tables in the sqlite3 database
+//            * The reason it's added here is because it executes the least number of
+//            * times compared to other location.
+//            */
+//           Cursor c = mDatabase.rawQuery(
+//                    "SELECT name FROM sqlite_master WHERE type='table'", null);
+//            ArrayList<String[]> result = new ArrayList<String[]>();
+//            int i = 0;
+//            result.add(c.getColumnNames());
+//            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+//                String[] temp = new String[c.getColumnCount()];
+//                for (i = 0; i < temp.length; i++) {
+//                    temp[i] = c.getString(i);
+//                }
+//                result.add(temp);
+//            }
+//            String[] schemas = {};
+//            result.toArray(schemas);
+//                    /**
+//                     * PhoneLab
+//                     *
+//                     * {
+//                     * "Category": "SQLite",
+//                     * "SubCategory": "Instumentation",
+//                     * "Tag": "SQLite-Instrumentation-PhoneLab",
+//                     * "Action": "SCHEMA",
+//                     * "Description": "Logging SCHEMAS of existing tables."
+//                     * }
+//                     */
+//                    (new StrictJSONObject("SQLite-Query-PhoneLab"))
+//                      .put(StrictJSONObject.KEY_ACTION, "SCHEMA")
+//                      .put("Results", Arrays.toString(schemas))
+//                      .log();
                 return mDatabase;
             }
         }
