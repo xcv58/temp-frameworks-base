@@ -38,6 +38,7 @@ import android.graphics.drawable.shapes.Shape;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pools.SynchronizedPool;
 import android.view.Gravity;
 import android.view.RemotableViewMethod;
@@ -55,8 +56,22 @@ import android.view.animation.Transformation;
 import android.widget.RemoteViews.RemoteView;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
-
+// Edit(nvd)
+import android.os.Process;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.app.ActivityManager;
+import android.os.BatteryManager;
+import android.content.Intent;
+import android.content.IntentFilter;
+// The next two are direct subclasses.
+import android.widget.AbsSeekBar;
+// Note(nvd): Not sure how to handle this. ContentLoadingProgressBar are technically ProgressBars that
+// display to the user, but they show up after x amount of time.
+// import android.support.v4.widget.ContentLoadingProgressBar;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 /**
  * <p>
  * Visual indicator of progress in some operation.  Displays a bar to the user
@@ -230,20 +245,120 @@ public class ProgressBar extends View {
 
     private AccessibilityEventSender mAccessibilityEventSender;
 
+    // Edit(nvd)
+    private final static String PROGRESSO_TAG = "Usage-ProgressBar-PhoneLab";
+    private AtomicInteger mProgressoIndeterminateCounter = new AtomicInteger();
+    // SeekBar and RatingBar extend AbsSeekBar which extends ProgressBar
+    private boolean mIsSeekBarParent;
+    private ActivityManager mActivityManager;
+    private ConnectivityManager mConnectivityManager;
+    private Intent mBatteryStatus;
+
+    private final static String START_ANIMATION = "START_ANIMATION";
+    private final static String STOP_ANIMATION = "STOP_ANIMATION";
+    private final static String DO_REFRESH_PROGRESS = "DO_REFRESH_PROGRESS";
+
+    private final static String ON_VISIBILITY_CHANGED = "ON_VISIBILITY_CHANGED";
+    private final static String ON_SAVE_INSTANCE_STATE = "ON_SAVE_INSTANCE_STATE";
+    private final static String ON_RESTORE_INSTANCE_STATE = "ON_RESTORE_INSTANCE_STATE";
+    private final static String ON_ATTACHED_TO_WINDOW = "ON_ATTACHED_TO_WINDOW";
+    private final static String ON_DETACHED_FROM_WINDOW = "ON_DETACHED_FROM_WINDOW";
+
+    // Edit(nvd)
+    /**
+     * A helper function to log using the PROGRESSO_TAG with message s.
+     *
+     * The following is an example logline:
+     *
+     * {
+     * "HashCode":1114052632,
+     * "TID":3119,
+     * "Action":"DO_REFRESH_PROGRESS",
+     * "PID":3119,
+     * "UID":10084,
+     * "LogFormat":"1.0",
+     * "AppName":"com.example.progressotest",
+     * "Metadata":"Scale: 0.94",
+     * "Timestamp":1416804281153
+     * }
+     */
+    private void logProgresso(String action, String metadata) {
+      // If only a ProgressBar...
+      if(!mIsSeekBarParent) {
+        StrictJSONObject logline = new StrictJSONObject(PROGRESSO_TAG);
+        logline.put("Action", action);
+        logline.put("AppName", mContext.getPackageName());
+        logline.put("PID", android.os.Process.myPid());
+        logline.put("UID", android.os.Process.myUid());
+        logline.put("TID", android.os.Process.myTid());
+        logline.put("Metadata", metadata);
+        logline.put("Timestamp", System.currentTimeMillis());
+        logline.put("HashCode", this.hashCode());
+        logline.log();
+      }
+    }
+
+    private void logProgresso(String action, boolean isAbsSeekBar) {
+      logProgresso(action, isAbsSeekBar ? "AbsSeekBar" : "not AbsSeekBar");
+    }
+
+    private void setIsSeekBar() {
+        mIsSeekBarParent = this instanceof AbsSeekBar;
+    }
+
     /**
      * Create a new progress bar with range 0...100 and initial progress of 0.
      * @param context the application environment
      */
     public ProgressBar(Context context) {
         this(context, null);
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "Constructed #1",
+         *  "Description": "ProgressBar object was constructed with the first constructor."
+         * }
+         */
+        logProgresso("Constructed #1", this instanceof AbsSeekBar);
+        setIsSeekBar();
     }
     
     public ProgressBar(Context context, AttributeSet attrs) {
         this(context, attrs, com.android.internal.R.attr.progressBarStyle);
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "Constructed #2",
+         *  "Description": "ProgressBar object was constructed with the second constructor."
+         * }
+         */
+        logProgresso("Constructed #2", this instanceof AbsSeekBar);
+        setIsSeekBar();
     }
 
     public ProgressBar(Context context, AttributeSet attrs, int defStyle) {
         this(context, attrs, defStyle, 0);
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "Constructed #3",
+         *  "Description": "ProgressBar object was constructed with the third constructor."
+         * }
+         */
+        logProgresso("Constructed #3", this instanceof AbsSeekBar);
+        setIsSeekBar();
     }
 
     /**
@@ -251,6 +366,12 @@ public class ProgressBar extends View {
      */
     public ProgressBar(Context context, AttributeSet attrs, int defStyle, int styleRes) {
         super(context, attrs, defStyle);
+       
+        // Note(nvd): This constructor does not get called if created from a stylesheet (I think).
+
+        // Edit(nvd)
+        setIsSeekBar();
+
         mUiThreadId = Thread.currentThread().getId();
         initProgressBar();
 
@@ -313,6 +434,18 @@ public class ProgressBar extends View {
         if (getImportantForAccessibility() == View.IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
             setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "Constructed #4",
+         *  "Description": "ProgressBar object was constructed with the fourth constructor."
+         * }
+         */
+        logProgresso("Constructued #4", this instanceof AbsSeekBar);
     }
 
     /**
@@ -589,6 +722,9 @@ public class ProgressBar extends View {
         }
     }
 
+    // Note(nvd): The View has changed and this will be redrawn in the next eventloop on the UI thread.
+    // This is called from a non-UI thread.
+    // http://stackoverflow.com/questions/5521596/what-does-postinvalidate-do
     @Override
     public void postInvalidate() {
         if (!mNoInvalidate) {
@@ -596,6 +732,7 @@ public class ProgressBar extends View {
         }
     }
 
+    // Note(nvd): WTF does this do?
     private class RefreshProgressRunnable implements Runnable {
         public void run() {
             synchronized (ProgressBar.this) {
@@ -636,10 +773,28 @@ public class ProgressBar extends View {
         }
     }
 
+    // Note(nvd): This has potential too. Why can't these things be commented?
+    // This is ultimately called by everything to update the Drawable... I'm assuming,
+    // only if this is a determinate ProgressBar. 
+    //
+    // Note(nvd): If this is the case, it's fairly easy to determine when the determinate
+    // ProgressBar is complete. I think.
     private synchronized void doRefreshProgress(int id, int progress, boolean fromUser,
             boolean callBackToApp) {
         float scale = mMax > 0 ? (float) progress / (float) mMax : 0;
         final Drawable d = mCurrentDrawable;
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "DO_REFRESH_PROGRESS",
+         *  "Description": "A determinate ProgressBar object was redrawn with new values."
+         * }
+         */
+        logProgresso(DO_REFRESH_PROGRESS, "Scale: " + scale);
         if (d != null) {
             Drawable progressDrawable = null;
 
@@ -650,6 +805,7 @@ public class ProgressBar extends View {
                 }
             }
 
+            // Note(nvd): Apparently, we're playing a game.
             final int level = (int) (scale * MAX_LEVEL);
             (progressDrawable != null ? progressDrawable : d).setLevel(level);
         } else {
@@ -667,6 +823,9 @@ public class ProgressBar extends View {
         }
     }
 
+    // Note(nvd): If the current thread is the UI thread, refresh progress yourself 
+    // in the eventloop. Otherwise, run the RefreshProgressRunnable (which calls
+    // doRefreshProgress) the next time we hit the eventloop (see `post`).
     private synchronized void refreshProgress(int id, int progress, boolean fromUser) {
         if (mUiThreadId == Thread.currentThread().getId()) {
             doRefreshProgress(id, progress, fromUser, true);
@@ -850,6 +1009,9 @@ public class ProgressBar extends View {
     /**
      * <p>Start the indeterminate progress animation.</p>
      */
+    // Note(nvd): If my assumption is correct here, we can 
+    // log that we started animating the indeterminate 
+    // ProgressBar here, and log when it stops in the next method.
     void startAnimation() {
         if (getVisibility() != VISIBLE) {
             return;
@@ -883,18 +1045,48 @@ public class ProgressBar extends View {
             mAnimation.setInterpolator(mInterpolator);
             mAnimation.setStartTime(Animation.START_ON_FIRST_FRAME);
         }
+        int started = mProgressoIndeterminateCounter.incrementAndGet();
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "START_ANIMATION",
+         *  "Description": "An indeterminate ProgressBar object started animating. Includes a Counter to determine how many times it has started and stopped."
+         * }
+         */
+        logProgresso(START_ANIMATION, "Coutner: " + started);
         postInvalidate();
     }
 
     /**
      * <p>Stop the indeterminate progress animation.</p>
      */
+    // Note(nvd): This seems to be an easy hook.
     void stopAnimation() {
         mHasAnimation = false;
         if (mIndeterminateDrawable instanceof Animatable) {
             ((Animatable) mIndeterminateDrawable).stop();
             mShouldStartAnimationDrawable = false;
         }
+        // Note(nvd): This gets called through multiple exists, so if the ProgressBar is visible
+        // and then is detached from the screen, we will still decrementAndGet. Small check needed.
+        // Also, everything seems to be coming from the UI thread. 
+        int stopped = mProgressoIndeterminateCounter.decrementAndGet();
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "STOP_ANIMATION",
+         *  "Description": "An indeterminate ProgressBar object stopped animating. Includes a Counter to determine how many times it has started and stopped."
+         * }
+         */
+        logProgresso(STOP_ANIMATION, "Coutner: " + stopped);
         postInvalidate();
     }
 
@@ -948,7 +1140,18 @@ public class ProgressBar extends View {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "ON_VISIBILITY_CHANGED",
+         *  "Description": "A ProgressBar's on-screen visibility changed; also includes the visibility level."
+         * }
+         */
+        logProgresso(ON_VISIBILITY_CHANGED, "Visibility: " + visibility);
         if (mIndeterminate) {
             // let's be nice with the UI thread
             if (visibility == GONE || visibility == INVISIBLE) {
@@ -1140,6 +1343,18 @@ public class ProgressBar extends View {
 
     @Override
     public Parcelable onSaveInstanceState() {
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "ON_SAVE_INSTANCE_STATE",
+         *  "Description": "ProgressBar saves its state (before leaving the screen, generally)."
+         * } 
+         */
+        logProgresso(ON_SAVE_INSTANCE_STATE, "");
         // Force our ancestor class to save its state
         Parcelable superState = super.onSaveInstanceState();
         SavedState ss = new SavedState(superState);
@@ -1152,6 +1367,18 @@ public class ProgressBar extends View {
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "ON_RESTORE_INSTANCE_STATE",
+         *  "Description": "ProgressBar restores its saved state (before being drawn on the screen, generally)."
+         * }
+         */
+        logProgresso(ON_RESTORE_INSTANCE_STATE, "");
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         
@@ -1162,6 +1389,18 @@ public class ProgressBar extends View {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "ON_ATTACHED_TO_WINDOW",
+         *  "Description": "ProgressBar is about to be attached to the window."
+         * }
+         */
+        logProgresso(ON_ATTACHED_TO_WINDOW, "");
         if (mIndeterminate) {
             startAnimation();
         }
@@ -1181,6 +1420,18 @@ public class ProgressBar extends View {
 
     @Override
     protected void onDetachedFromWindow() {
+        /**
+         * PhoneLab
+         *
+         * {
+         *  "Category": "Usage",
+         *  "SubCategory": "ProgressBar",
+         *  "Tag": "Usage-ProgressBar-PhoneLab",
+         *  "Action": "ON_ATTACHED_TO_WINDOW",
+         *  "Description": "ProgressBar is detached from the window."
+         * }
+         */
+        logProgresso(ON_DETACHED_FROM_WINDOW, "");
         if (mIndeterminate) {
             stopAnimation();
         }
