@@ -120,7 +120,7 @@ public abstract class SQLiteOpenHelper {
          * "Category": "SQLite",
          * "SubCategory": "Query",
          * "Tag": "SQLite-Query-PhoneLab",
-         * "Action": "App Name",
+         * "Action": "App_Name",
          * "Description": "Logging Apps that access the database."
          * }
          */
@@ -221,40 +221,6 @@ public abstract class SQLiteOpenHelper {
                 mDatabase = null;
             } else if (!writable || !mDatabase.isReadOnly()) {
                 // The database is already open for business.
-//            /**
-//            * This code fetches the schema of all tables in the sqlite3 database
-//            * The reason it's added here is because it executes the least number of
-//            * times compared to other location.
-//            */
-//           Cursor c = mDatabase.rawQuery(
-//                    "SELECT name FROM sqlite_master WHERE type='table'", null);
-//            ArrayList<String[]> result = new ArrayList<String[]>();
-//            int i = 0;
-//            result.add(c.getColumnNames());
-//            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-//                String[] temp = new String[c.getColumnCount()];
-//                for (i = 0; i < temp.length; i++) {
-//                    temp[i] = c.getString(i);
-//                }
-//                result.add(temp);
-//            }
-//            String[] schemas = {};
-//            result.toArray(schemas);
-//                    /**
-//                     * PhoneLab
-//                     *
-//                     * {
-//                     * "Category": "SQLite",
-//                     * "SubCategory": "Instumentation",
-//                     * "Tag": "SQLite-Instrumentation-PhoneLab",
-//                     * "Action": "SCHEMA",
-//                     * "Description": "Logging SCHEMAS of existing tables."
-//                     * }
-//                     */
-//                    (new StrictJSONObject("SQLite-Query-PhoneLab"))
-//                      .put(StrictJSONObject.KEY_ACTION, "SCHEMA")
-//                      .put("Results", Arrays.toString(schemas))
-//                      .log();
                 return mDatabase;
             }
         }
