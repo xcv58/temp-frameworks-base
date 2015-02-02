@@ -59,6 +59,15 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // Edit(nvd)
+import java.security.MessageDigest;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import android.app.FragmentManager.BackStackEntry;
+import android.app.Activity;
+import android.view.ViewGroup;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Process;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -72,6 +81,7 @@ import android.widget.AbsSeekBar;
 // display to the user, but they show up after x amount of time.
 // import android.support.v4.widget.ContentLoadingProgressBar;
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
 /**
  * <p>
  * Visual indicator of progress in some operation.  Displays a bar to the user
@@ -264,6 +274,29 @@ public class ProgressBar extends View {
     private final static String ON_ATTACHED_TO_WINDOW = "ON_ATTACHED_TO_WINDOW";
     private final static String ON_DETACHED_FROM_WINDOW = "ON_DETACHED_FROM_WINDOW";
 
+    private ArrayList<View> getChildren(ViewGroup vg) {
+        ArrayList<View> ret = new ArrayList<View>();
+        for(int i = 0; i < vg.getChildCount(); i++) {
+            ret.add(vg.getChildAt(i));
+        }
+        return ret;
+    }
+
+    private void getViewTreeStringDFSHelper(View rootView, StringBuffer buffer) {
+        buffer.append(rootView.getId() + ",");
+        if(rootView instanceof ViewGroup) {
+            for(View child : getChildren((ViewGroup)rootView)) {
+                getViewTreeStringDFSHelper(child, buffer);
+            }
+        }
+    }
+
+    private String getViewTreeStringDFS(View rootView) {
+        StringBuffer buffer = new StringBuffer();
+        getViewTreeStringDFSHelper(rootView, buffer);
+        return buffer.toString();
+    }
+
     // Edit(nvd)
     /**
      * A helper function to log using the PROGRESSO_TAG with message s.
@@ -294,6 +327,28 @@ public class ProgressBar extends View {
         logline.put("Metadata", metadata);
         logline.put("Timestamp", System.currentTimeMillis());
         logline.put("HashCode", this.hashCode());
+
+        if(mContext instanceof Activity) {
+            Activity a = (Activity) mContext;
+            logline.put("LocalName", a.getLocalClassName());
+            logline.put("ComponentName", a.getComponentName().flattenToString());
+        } else {
+            logline.put("LocalName", "NA");
+            logline.put("ComponentName", "NA");
+        }
+
+        View rootView = this.getRootView();
+        logline.put("RootView", rootView.getId());
+        logline.put("Tree", getViewTreeStringDFS(rootView));
+
+        logline.put("MyId", this.getId());
+
+        String traces = "";
+        for(StackTraceElement elem : Thread.currentThread().getStackTrace()) {
+            traces += elem.toString() + "\\n";
+        }
+        logline.put("StackTrace", traces);
+
         logline.log();
       }
     }
