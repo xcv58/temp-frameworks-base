@@ -112,23 +112,28 @@ public abstract class SQLiteOpenHelper {
         mNewVersion = version;
         mErrorHandler = errorHandler;
 
-        int stringId = context.getApplicationInfo().labelRes;
-        /**
-         * PhoneLab
-         *
-         * {
-         * "Category": "SQLite",
-         * "SubCategory": "Query",
-         * "Tag": "SQLite-Query-PhoneLab",
-         * "Action": "App_Name",
-         * "Description": "Logging Apps that access the database."
-         * }
-         */
-        (new StrictJSONObject("SQLite-Query-PhoneLab"))
-          .put(StrictJSONObject.KEY_ACTION, "APP_NAME")
-          .put("PackageName",context.getPackageName())
-          .put("AppName",context.getString(stringId))
-          .log();
+        try{
+				int stringId = context.getApplicationInfo().labelRes;
+				/**
+				 * PhoneLab
+				 *
+				 * {
+				 * "Category": "SQLite",
+				 * "SubCategory": "Query",
+				 * "Tag": "SQLite-Query-PhoneLab",
+				 * "Action": "App_Name",
+				 * "Description": "Logging Apps that access the database."
+				 * }
+				 */
+				(new StrictJSONObject("SQLite-Query-PhoneLab"))
+					.put(StrictJSONObject.KEY_ACTION, "APP_NAME")
+					.put("PackageName",context.getPackageName())
+					.put("AppName",context.getString(stringId))
+					.log();
+				}
+				catch(Exception e){
+				Log.e("SQLite-Query-PhoneLab","Unable to get app info due to security reasons");
+				}
     }
 
     /**
