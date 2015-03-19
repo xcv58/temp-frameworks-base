@@ -132,7 +132,7 @@ public class DevicePolicyManagerService extends IDevicePolicyManager.Stub {
 
     private static final int MONITORING_CERT_NOTIFICATION_ID = R.string.ssl_ca_cert_warning;
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     final Context mContext;
     final PowerManager.WakeLock mWakeLock;

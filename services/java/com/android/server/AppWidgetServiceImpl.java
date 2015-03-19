@@ -93,7 +93,7 @@ class AppWidgetServiceImpl {
     private static final int MIN_UPDATE_PERIOD = 30 * 60 * 1000; // 30 minutes
     private static final int CURRENT_VERSION = 1; // Bump if the stored widgets need to be upgraded.
 
-    private static boolean DBG = false;
+    private static boolean DBG = true;
 
     /*
      * When identifying a Host or Provider based on the calling process, use the uid field. When

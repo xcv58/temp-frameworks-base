@@ -94,7 +94,7 @@ import static com.android.server.wifi.WifiController.CMD_WIFI_TOGGLED;
  */
 public final class WifiService extends IWifiManager.Stub {
     private static final String TAG = "WifiService";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     final WifiStateMachine mWifiStateMachine;
 
