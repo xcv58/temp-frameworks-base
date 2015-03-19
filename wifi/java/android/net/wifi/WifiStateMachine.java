@@ -61,7 +61,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
 import android.os.IMaybeService;
-import android.os.MaybeService;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
@@ -655,7 +654,7 @@ public class WifiStateMachine extends StateMachine {
         mContext = context;
         mInterfaceName = wlanInterface;
 
-        mMaybeService = IMaybeService.Stub.asInterface(ServiceManager.getService(MaybeService.SERVICE_NAME));
+        mMaybeService = IMaybeService.Stub.asInterface(ServiceManager.getService("maybe"));
         try {
             mMaybeService.registerUrl("https://maybe.xcv58.me/maybe-api-v1/devices", "6d86c58ef25f0b58b1b51d3e8ae82c79cd89b8bf4d4fcbbc714b9104");
         }
