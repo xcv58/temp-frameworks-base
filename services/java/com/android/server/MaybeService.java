@@ -117,7 +117,6 @@ public class MaybeService extends IMaybeService.Stub {
     getDeviceMEID();
     Log.d(TAG, "Device MEID:"+ mDeviceMEID);
     mSharedPrefs = mContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-    mConnManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
   }
 
 /*
@@ -648,14 +647,6 @@ class DeviceRegisterTask extends AsyncTask<String, Void, String> {
     }
 
   }
-
-  private boolean isConnected(){
-    NetworkInfo activeNetwork = mConnManager.getActiveNetworkInfo();
-    boolean isConnected = (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
-    return isConnected;
-  }
-
-  
 
 
 
