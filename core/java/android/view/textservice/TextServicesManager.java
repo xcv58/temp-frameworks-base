@@ -63,7 +63,7 @@ import java.util.Locale;
  */
 public final class TextServicesManager {
     private static final String TAG = TextServicesManager.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static TextServicesManager sInstance;
     private static ITextServicesManager sService;

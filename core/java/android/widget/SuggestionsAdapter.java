@@ -56,7 +56,7 @@ import java.util.WeakHashMap;
  */
 class SuggestionsAdapter extends ResourceCursorAdapter implements OnClickListener {
 
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final String LOG_TAG = "SuggestionsAdapter";
     private static final int QUERY_LIMIT = 50;
 

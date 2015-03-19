@@ -82,8 +82,8 @@ import java.util.UUID;
  */
 public final class BluetoothAdapter {
     private static final String TAG = "BluetoothAdapter";
-    private static final boolean DBG = true;
-    private static final boolean VDBG = true;
+    private static final boolean DBG = false;
+    private static final boolean VDBG = false;
 
     /**
      * Sentinel error value for this class. Guaranteed to not equal any other

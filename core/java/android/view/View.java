@@ -672,7 +672,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class View implements Drawable.Callback, KeyEvent.Callback,
         AccessibilityEventSource {
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     /**
      * The logging tag used by this class with android.util.Log.

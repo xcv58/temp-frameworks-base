@@ -60,7 +60,7 @@ import android.widget.TextView;
 public class SearchDialog extends Dialog {
 
     // Debugging support
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final String LOG_TAG = "SearchDialog";
 
     private static final String INSTANCE_KEY_COMPONENT = "comp";

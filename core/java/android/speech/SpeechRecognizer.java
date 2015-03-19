@@ -50,7 +50,7 @@ import java.util.Queue;
  */
 public class SpeechRecognizer {
     /** DEBUG value to enable verbose debug prints */
-    private final static boolean DBG = true;
+    private final static boolean DBG = false;
 
     /** Log messages identifier */
     private static final String TAG = "SpeechRecognizer";

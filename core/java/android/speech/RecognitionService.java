@@ -51,7 +51,7 @@ public abstract class RecognitionService extends Service {
     private static final String TAG = "RecognitionService";
 
     /** Debugging flag */
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     /** Binder of the recognition service */
     private RecognitionServiceBinder mBinder = new RecognitionServiceBinder(this);

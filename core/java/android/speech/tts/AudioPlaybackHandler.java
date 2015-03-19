@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 class AudioPlaybackHandler {
     private static final String TAG = "TTS.AudioPlaybackHandler";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private final LinkedBlockingQueue<PlaybackQueueItem> mQueue =
             new LinkedBlockingQueue<PlaybackQueueItem>();

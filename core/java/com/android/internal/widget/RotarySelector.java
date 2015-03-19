@@ -49,7 +49,7 @@ public class RotarySelector extends View {
     public static final int VERTICAL = 1;
 
     private static final String LOG_TAG = "RotarySelector";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final boolean VISUAL_DEBUG = false;
 
     // Listener for onDialTrigger() callbacks.

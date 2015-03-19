@@ -52,7 +52,7 @@ import com.android.internal.R;
  */
 public class SlidingTab extends ViewGroup {
     private static final String LOG_TAG = "SlidingTab";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private static final int HORIZONTAL = 0; // as defined in attrs.xml
     private static final int VERTICAL = 1;
 

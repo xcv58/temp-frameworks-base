@@ -39,7 +39,7 @@ import java.util.ArrayList;
  *
  */
 public final class ObjectAnimator extends ValueAnimator {
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     // The target object on which the property exists, set in the constructor
     private Object mTarget;

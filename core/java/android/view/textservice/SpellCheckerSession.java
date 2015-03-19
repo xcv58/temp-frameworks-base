@@ -85,7 +85,7 @@ import java.util.Queue;
  */
 public class SpellCheckerSession {
     private static final String TAG = SpellCheckerSession.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     /**
      * Name under which a SpellChecker service component publishes information about itself.
      * This meta-data must reference an XML resource.

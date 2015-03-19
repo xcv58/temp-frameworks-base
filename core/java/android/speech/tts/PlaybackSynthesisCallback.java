@@ -24,7 +24,7 @@ import android.util.Log;
 class PlaybackSynthesisCallback extends AbstractSynthesisCallback {
 
     private static final String TAG = "PlaybackSynthesisRequest";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static final int MIN_AUDIO_BUFFER_SIZE = 8192;
 

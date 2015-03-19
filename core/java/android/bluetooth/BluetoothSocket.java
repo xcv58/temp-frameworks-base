@@ -86,8 +86,8 @@ import java.nio.ByteBuffer;
  */
 public final class BluetoothSocket implements Closeable {
     private static final String TAG = "BluetoothSocket";
-    private static final boolean DBG = true;
-    private static final boolean VDBG = true;
+    private static final boolean DBG = false;
+    private static final boolean VDBG = false;
 
     /** @hide */
     public static final int MAX_RFCOMM_CHANNEL = 30;

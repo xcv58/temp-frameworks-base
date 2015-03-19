@@ -33,7 +33,7 @@ import java.nio.channels.FileChannel;
 class FileSynthesisCallback extends AbstractSynthesisCallback {
 
     private static final String TAG = "FileSynthesisRequest";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static final int MAX_AUDIO_BUFFER_SIZE = 8192;
 

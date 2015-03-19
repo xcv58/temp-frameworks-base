@@ -57,8 +57,8 @@ import java.util.List;
  */
 public final class BluetoothHealth implements BluetoothProfile {
     private static final String TAG = "BluetoothHealth";
-    private static final boolean DBG = true;
-    private static final boolean VDBG = true;
+    private static final boolean DBG = false;
+    private static final boolean VDBG = false;
 
     /**
      * Health Profile Source Role - the health device.

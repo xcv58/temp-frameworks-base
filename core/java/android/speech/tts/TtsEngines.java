@@ -57,7 +57,7 @@ import java.util.MissingResourceException;
  */
 public class TtsEngines {
     private static final String TAG = "TtsEngines";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static final String LOCALE_DELIMITER = "-";
 
