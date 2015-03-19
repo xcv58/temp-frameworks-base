@@ -51,8 +51,8 @@ import android.util.Log;
 public class BluetoothPbap {
 
     private static final String TAG = "BluetoothPbap";
-    private static final boolean DBG = false;
-    private static final boolean VDBG = false;
+    private static final boolean DBG = true;
+    private static final boolean VDBG = true;
 
     /** int extra for PBAP_STATE_CHANGED_ACTION */
     public static final String PBAP_STATE =

@@ -73,7 +73,7 @@ import java.util.Set;
  */
 public abstract class TextToSpeechService extends Service {
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private static final String TAG = "TextToSpeechService";
 
 

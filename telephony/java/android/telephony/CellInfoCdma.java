@@ -26,7 +26,7 @@ import android.telephony.Rlog;
 public final class CellInfoCdma extends CellInfo implements Parcelable {
 
     private static final String LOG_TAG = "CellInfoCdma";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private CellIdentityCdma mCellIdentityCdma;
     private CellSignalStrengthCdma mCellSignalStrengthCdma;

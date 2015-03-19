@@ -41,7 +41,7 @@ import libcore.util.ZoneInfoDB;
  */
 public class TimeUtils {
     /** @hide */ public TimeUtils() {}
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private static final String TAG = "TimeUtils";
 
     /** Cached results of getTineZones */

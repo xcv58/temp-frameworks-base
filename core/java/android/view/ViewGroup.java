@@ -104,7 +104,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR1;
 public abstract class ViewGroup extends View implements ViewParent, ViewManager {
     private static final String TAG = "ViewGroup";
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     /** @hide */
     public static boolean DEBUG_DRAW = false;
 

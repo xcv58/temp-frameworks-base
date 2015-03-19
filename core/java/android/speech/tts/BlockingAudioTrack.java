@@ -15,7 +15,7 @@ import android.util.Log;
  */
 class BlockingAudioTrack {
     private static final String TAG = "TTS.BlockingAudioTrack";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
 
     /**

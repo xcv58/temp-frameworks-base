@@ -34,7 +34,7 @@ import android.view.animation.DecelerateInterpolator;
 public class DrawableHolder implements AnimatorListener {
     public static final DecelerateInterpolator EASE_OUT_INTERPOLATOR = new DecelerateInterpolator();
     private static final String TAG = "DrawableHolder";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private float mX = 0.0f;
     private float mY = 0.0f;
     private float mScaleX = 1.0f;

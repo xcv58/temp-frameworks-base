@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class SynthesisPlaybackQueueItem extends PlaybackQueueItem {
     private static final String TAG = "TTS.SynthQueueItem";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     /**
      * Maximum length of audio we leave unconsumed by the audio track.

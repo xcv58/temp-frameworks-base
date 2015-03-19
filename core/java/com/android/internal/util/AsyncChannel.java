@@ -88,7 +88,7 @@ public class AsyncChannel {
     private static final String TAG = "AsyncChannel";
 
     /** Enable to turn on debugging */
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int BASE = Protocol.BASE_SYSTEM_ASYNC_CHANNEL;
 

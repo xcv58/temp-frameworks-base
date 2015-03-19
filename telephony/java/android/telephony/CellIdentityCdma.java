@@ -26,7 +26,7 @@ import android.telephony.Rlog;
 public final class CellIdentityCdma implements Parcelable {
 
     private static final String LOG_TAG = "CellSignalStrengthCdma";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     // Network Id 0..65535
     private final int mNetworkId;

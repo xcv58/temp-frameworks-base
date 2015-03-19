@@ -40,7 +40,7 @@ import java.util.List;
 public final class NfcActivityManager extends IAppCallback.Stub
         implements Application.ActivityLifecycleCallbacks {
     static final String TAG = NfcAdapter.TAG;
-    static final Boolean DBG = false;
+    static final Boolean DBG = true;
 
     final NfcAdapter mAdapter;
     final NfcEvent mDefaultEvent;  // cached NfcEvent (its currently always the same)

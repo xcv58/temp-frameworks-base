@@ -92,7 +92,7 @@ import java.util.List;
 public abstract class Transition implements Cloneable {
 
     private static final String LOG_TAG = "Transition";
-    static final boolean DBG = false;
+    static final boolean DBG = true;
 
     private String mName = getClass().getName();
 

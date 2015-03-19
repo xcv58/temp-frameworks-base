@@ -68,7 +68,7 @@ import java.util.Locale;
  */
 public abstract class SpellCheckerService extends Service {
     private static final String TAG = SpellCheckerService.class.getSimpleName();
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     public static final String SERVICE_INTERFACE =
             "android.service.textservice.SpellCheckerService";
 

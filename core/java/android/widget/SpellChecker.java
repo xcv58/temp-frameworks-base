@@ -47,7 +47,7 @@ import java.util.Locale;
  */
 public class SpellChecker implements SpellCheckerSessionListener {
     private static final String TAG = SpellChecker.class.getSimpleName();
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     // No more than this number of words will be parsed on each iteration to ensure a minimum
     // lock of the UI thread

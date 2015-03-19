@@ -26,7 +26,7 @@ import android.telephony.Rlog;
 public final class CellSignalStrengthWcdma extends CellSignalStrength implements Parcelable {
 
     private static final String LOG_TAG = "CellSignalStrengthWcdma";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int WCDMA_SIGNAL_STRENGTH_GREAT = 12;
     private static final int WCDMA_SIGNAL_STRENGTH_GOOD = 8;

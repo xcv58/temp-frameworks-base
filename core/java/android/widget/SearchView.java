@@ -91,7 +91,7 @@ import java.util.WeakHashMap;
  */
 public class SearchView extends LinearLayout implements CollapsibleActionView {
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private static final String LOG_TAG = "SearchView";
 
     /**
