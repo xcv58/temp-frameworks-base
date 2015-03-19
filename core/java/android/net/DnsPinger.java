@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @hide
  */
 public final class DnsPinger extends Handler {
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int RECEIVE_POLL_INTERVAL_MS = 200;
     private static final int DNS_PORT = 53;
