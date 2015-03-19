@@ -363,13 +363,6 @@ class ServerThread {
         if (factoryTest != SystemServer.FACTORY_TEST_LOW_LEVEL) {
             //if (!disableNonCoreServices) { // TODO: View depends on these; mock them?
             if (true) {
-		
-		try {
-             		Slog.i(TAG, "Starting maybe Service");
-            		ServiceManager.addService("maybe", new MaybeService(context));
-            	} catch (Throwable e) {
-                	reportWtf("starting maybe Service", e);
-            	}
                 try {
                     Slog.i(TAG, "Input Method Service");
                     imm = new InputMethodManagerService(context, wm);
@@ -823,6 +816,13 @@ class ServerThread {
                     reportWtf("starting MediaRouterService", e);
                 }
             }
+        }
+
+        try {
+            Slog.i(TAG, "Starting maybe Service");
+            ServiceManager.addService(MaybeService.SERVICE_NAME, new MaybeService(context));
+        } catch (Throwable e) {
+            reportWtf("starting maybe Service", e);
         }
 
         // Before things start rolling, be sure we have decided whether

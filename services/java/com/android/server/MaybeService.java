@@ -71,6 +71,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 public class MaybeService extends IMaybeService.Stub {
+    public static final String SERVICE_NAME = "maybe";
   private static final String TAG = "MaybeService";
   private static final String URL = "http://maybe.xcv58.me:5121/query?";
   private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";

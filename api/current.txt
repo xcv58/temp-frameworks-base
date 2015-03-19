@@ -17856,6 +17856,36 @@ package android.os {
     method public abstract android.os.IBinder asBinder();
   }
 
+  public abstract interface IMaybeListener implements android.os.IInterface {
+    method public abstract void onUpdate(java.lang.String) throws android.os.RemoteException;
+  }
+
+  public static abstract class IMaybeListener.Stub extends android.os.Binder implements android.os.IMaybeListener {
+    ctor public IMaybeListener.Stub();
+    method public android.os.IBinder asBinder();
+    method public static android.os.IMaybeListener asInterface(android.os.IBinder);
+    method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
+  }
+
+  public abstract interface IMaybeService implements android.os.IInterface {
+    method public abstract void badMaybeAlternative(java.lang.String, int) throws android.os.RemoteException;
+    method public abstract java.lang.String getAppData() throws android.os.RemoteException;
+    method public abstract java.lang.String getCurrentTime() throws android.os.RemoteException;
+    method public abstract int getMaybeAlternative(java.lang.String) throws android.os.RemoteException;
+    method public abstract void logMaybeAlternative(java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract int registerUrl(java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract void removeMaybeUpdates(android.os.IMaybeListener) throws android.os.RemoteException;
+    method public abstract void requestMaybeUpdates(java.lang.String, android.os.IMaybeListener) throws android.os.RemoteException;
+    method public abstract void scoreMaybeAlternative(java.lang.String, java.lang.String) throws android.os.RemoteException;
+  }
+
+  public static abstract class IMaybeService.Stub extends android.os.Binder implements android.os.IMaybeService {
+    ctor public IMaybeService.Stub();
+    method public android.os.IBinder asBinder();
+    method public static android.os.IMaybeService asInterface(android.os.IBinder);
+    method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
+  }
+
   public final class Looper {
     method public void dump(android.util.Printer, java.lang.String);
     method public static android.os.Looper getMainLooper();
@@ -21790,7 +21820,7 @@ package android.renderscript {
   }
 
   public class BaseObj {
-    method public synchronized void destroy();
+    method public void destroy();
     method public java.lang.String getName();
     method public void setName(java.lang.String);
   }
