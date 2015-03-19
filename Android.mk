@@ -53,6 +53,8 @@ LOCAL_SRC_FILES += \
 ##
 ## READ ME: ########################################################
 LOCAL_SRC_FILES += \
+	core/java/android/os/IMaybeListener.aidl \
+        core/java/android/os/IMaybeService.aidl \
 	core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl \
 	core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl \
 	core/java/android/accounts/IAccountManager.aidl \
