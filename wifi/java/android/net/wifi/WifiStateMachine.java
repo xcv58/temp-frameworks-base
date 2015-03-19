@@ -292,7 +292,7 @@ public class WifiStateMachine extends StateMachine {
     private AsyncChannel mWifiApConfigChannel;
 
     /* The base for wifi message types */
-    static final int BASE = Protocol.BASE_WIFI;
+    static final int BASE = Protocol.BASE_WIFI; // 131072
     /* Start the supplicant */
     static final int CMD_START_SUPPLICANT                 = BASE + 11;
     /* Stop the supplicant */
