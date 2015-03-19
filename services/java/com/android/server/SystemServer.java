@@ -493,6 +493,13 @@ class ServerThread {
                     reportWtf("starting NetworkPolicy Service", e);
                 }
 
+                try {
+                    Log.i(TAG, "Starting maybe Service");
+                    ServiceManager.addService(Context.MAYBE_SERVICE, new MaybeService(context));
+                } catch (Throwable e) {
+                    reportWtf("starting maybe Service", e);
+                }
+
                try {
                     Log.i(TAG, "Wi-Fi P2pService");
                     wifiP2p = new WifiP2pService(context);
@@ -815,13 +822,6 @@ class ServerThread {
                     reportWtf("starting MediaRouterService", e);
                 }
             }
-        }
-
-        try {
-            Log.i(TAG, "Starting maybe Service");
-            ServiceManager.addService(MaybeService.SERVICE_NAME, new MaybeService(context));
-        } catch (Throwable e) {
-            reportWtf("starting maybe Service", e);
         }
 
         // Before things start rolling, be sure we have decided whether

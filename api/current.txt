@@ -5992,6 +5992,7 @@ package android.content {
     field public static final java.lang.String KEYGUARD_SERVICE = "keyguard";
     field public static final java.lang.String LAYOUT_INFLATER_SERVICE = "layout_inflater";
     field public static final java.lang.String LOCATION_SERVICE = "location";
+    field public static final java.lang.String MAYBE_SERVICE = "maybe";
     field public static final java.lang.String MEDIA_ROUTER_SERVICE = "media_router";
     field public static final int MODE_APPEND = 32768; // 0x8000
     field public static final int MODE_ENABLE_WRITE_AHEAD_LOGGING = 8; // 0x8
@@ -17898,6 +17899,19 @@ package android.os {
     method public void quit();
     method public void quitSafely();
     method public void setMessageLogging(android.util.Printer);
+  }
+
+  public final class MaybeManager {
+    ctor public MaybeManager(android.content.Context, android.os.IMaybeService, android.os.Handler);
+    method public void badMaybeAlternative(java.lang.String, int);
+    method public java.lang.String getAppData();
+    method public java.lang.String getCurrentTime();
+    method public int getMaybeAlternative(java.lang.String);
+    method public void logMaybeAlternative(java.lang.String, java.lang.String);
+    method public int registerUrl(java.lang.String, java.lang.String);
+    method public void removeMaybeUpdates(android.os.IMaybeListener);
+    method public void requestMaybeUpdates(java.lang.String, android.os.IMaybeListener);
+    method public void scoreMaybeAlternative(java.lang.String, java.lang.String);
   }
 
   public class MemoryFile {

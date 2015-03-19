@@ -97,8 +97,6 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
-import android.os.MaybeManager;
-import java.lang.Exception;
 
 /**
  * Track the state of Wifi connectivity. All event handling is done here,
@@ -2924,56 +2922,7 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void updateSupplicantScanInterval() {
-        
-        int __ScanRate__455 = 0;
-        
-        MaybeManager maybeManager;
-        
-        try {
-          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-        } catch (Exception e) {
-          Log.e("MaybeService-ScanRate", "Failed to get maybe service.", e);
-          return;
-        };
-        
-        try {
-          __ScanRate__455 = maybeManager.getMaybeAlternative("ScanRate");
-        } catch (Exception e) {
-          Log.e("MaybeService-ScanRate", "Failed to get maybe alternative.", e);
-        };
-        switch (__ScanRate__455) {
-          
-          case 5: {
-                    mSupplicantScanIntervalMs = 30000;
-                    break;
-          }  
-          case 4: {
-                    mSupplicantScanIntervalMs = 240000;
-                    break;
-          }  
-          case 3: {
-                    mSupplicantScanIntervalMs = 120000;
-                    break;
-          }  
-          case 2: {
-                    mSupplicantScanIntervalMs = 60000;
-                    break;
-          }  
-          case 1: {
-                    mSupplicantScanIntervalMs = 30000;
-                    break;
-          }  
-          default: {
-                    mSupplicantScanIntervalMs = 15000;
-                    if (__ScanRate__455 != 0) {
-                      try {
-                        maybeManager.badMaybeAlternative("ScanRate", __ScanRate__455);
-                      } catch (Exception e) {
-                        Log.e("MaybeService-ScanRate", "Failed to report bad maybe alternative.", e);
-                      }
-                    }break;
-          }
-        }
+        mSupplicantScanIntervalMs = maybe("ScanRate") 15000, 30000, 60000, 120000, 240000, 30000;
     }
 
     class SupplicantStartedState extends State {
@@ -4619,5 +4568,4 @@ public class WifiStateMachine extends StateMachine {
         return msg;
     }
 }
-
 

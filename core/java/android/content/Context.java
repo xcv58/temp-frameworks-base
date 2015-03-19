@@ -2211,6 +2211,8 @@ public abstract class Context {
      */
     public static final String WIFI_SERVICE = "wifi";
 
+    public static final String MAYBE_SERVICE = "maybe";
+
     /**
      * Use with {@link #getSystemService} to retrieve a {@link
      * android.net.wifi.p2p.WifiP2pManager} for handling management of
