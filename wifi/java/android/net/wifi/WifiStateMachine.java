@@ -60,7 +60,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
-import android.os.IMaybeService;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
@@ -489,8 +488,6 @@ public class WifiStateMachine extends StateMachine {
      * from the default config if the setting is not set
      */
     private long mSupplicantScanIntervalMs;
-    private IMaybeService mMaybeService;
-    private static final String MAYBE_TAG = "WifiStateMachine-Maybe";
 
     /**
      * Minimum time interval between enabling all networks.
@@ -654,13 +651,6 @@ public class WifiStateMachine extends StateMachine {
         mContext = context;
         mInterfaceName = wlanInterface;
 
-        mMaybeService = IMaybeService.Stub.asInterface(ServiceManager.getService("maybe"));
-        try {
-            mMaybeService.registerUrl("https://maybe.xcv58.me/maybe-api-v1/devices", "6d86c58ef25f0b58b1b51d3e8ae82c79cd89b8bf4d4fcbbc714b9104");
-        }
-        catch (Exception e) {
-            Log.e(MAYBE_TAG, "Failed to register URL.", e);
-        }
 
         mNetworkInfo = new NetworkInfo(ConnectivityManager.TYPE_WIFI, 0, NETWORKTYPE, "");
         mBatteryStats = IBatteryStats.Stub.asInterface(ServiceManager.getService(
@@ -2932,48 +2922,7 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void updateSupplicantScanInterval() {
-        int __ScanRate__275 = 0;
-
-        try {
-            __ScanRate__275 = mMaybeService.getMaybeAlternative("ScanRate");
-        } catch (Exception e) {
-            Log.e(MAYBE_TAG, "Failed to get maybe alternative", e);
-        };
-        switch (__ScanRate__275) {
-
-            case 5: {
-                        mSupplicantScanIntervalMs = 300;
-                        break;
-            }  
-            case 4: {
-                        mSupplicantScanIntervalMs = 240;
-                        break;
-            }  
-            case 3: {
-                        mSupplicantScanIntervalMs = 120;
-                        break;
-            }  
-            case 2: {
-                        mSupplicantScanIntervalMs = 60;
-                        break;
-            }  
-            case 1: {
-                        mSupplicantScanIntervalMs = 30;
-                        break;
-            }  
-            default: {
-                         mSupplicantScanIntervalMs = 15;
-                         if (__ScanRate__275 != 0) {
-                             try {
-                                 mMaybeService.badMaybeAlternative("ScanRate", __ScanRate__275);
-                             }
-                             catch (Exception e) {
-                                 Log.e(MAYBE_TAG, "Failed to report bad maybe alternative", e);
-                             }
-                         }
-                         break;
-            }
-        }
+        mSupplicantScanIntervalMs = maybe("ScanRate") 15000, 30000, 60000, 120000, 240000, 30000;
     }
 
     class SupplicantStartedState extends State {
