@@ -36,7 +36,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class SamplingDataTracker
 {
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
     private static final String  TAG = "SamplingDataTracker";
 
     public static class SamplingSnapshot implements JSONable

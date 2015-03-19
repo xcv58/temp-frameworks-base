@@ -26,7 +26,7 @@ import android.telephony.Rlog;
 public final class CellSignalStrengthCdma extends CellSignalStrength implements Parcelable {
 
     private static final String LOG_TAG = "CellSignalStrengthCdma";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private int mCdmaDbm;   // This value is the RSSI value
     private int mCdmaEcio;  // This value is the Ec/Io

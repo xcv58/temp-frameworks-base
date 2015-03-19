@@ -104,7 +104,7 @@ import libcore.io.IoUtils;
 public class NotificationManagerService extends INotificationManager.Stub
 {
     private static final String TAG = "NotificationService";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int MAX_PACKAGE_NOTIFICATIONS = 50;
 

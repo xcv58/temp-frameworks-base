@@ -40,7 +40,7 @@ public final class ProviderMap {
 
     private static final String TAG = "ProviderMap";
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private final ActivityManagerService mAm;
 
