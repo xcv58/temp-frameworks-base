@@ -34,11 +34,11 @@
                     "value": 5
                 }
             ], 
-            "line": 2927, 
+            "line": 2947, 
             "type": "assignment", 
             "label": "ScanRate"
         }
     ], 
-    "sha224_hash": "e7eff041f88d9c3d72ef70446f48685e1712f151674df14ed5d383c8", 
+    "sha224_hash": "7639fc90a7acafe8fd92f3bc16add83bd2ac5fd93912380fe11d22d0", 
     "package": "android.net.wifi"
 }

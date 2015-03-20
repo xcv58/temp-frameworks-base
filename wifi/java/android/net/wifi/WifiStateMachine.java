@@ -60,6 +60,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
+import android.net.INetworkStatsService;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
@@ -173,6 +174,8 @@ public class WifiStateMachine extends StateMachine {
     private boolean mBluetoothConnectionActive = false;
 
     private PowerManager.WakeLock mSuspendWakeLock;
+
+    private INetworkStatsService mNetworkStatsService;
 
     /**
      * Interval in milliseconds between polling for RSSI
@@ -658,6 +661,7 @@ public class WifiStateMachine extends StateMachine {
         mBatteryStats = IBatteryStats.Stub.asInterface(ServiceManager.getService(
                 BatteryStats.SERVICE_NAME));
 
+
         IBinder b = ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);
         mNwService = INetworkManagementService.Stub.asInterface(b);
 
@@ -846,6 +850,13 @@ public class WifiStateMachine extends StateMachine {
         return result;
     }
 
+    private synchronized void updateNetworkStatsService() {
+        if (mNetworkStatsService == null) {
+            mNetworkStatsService = INetworkStatsService.Stub.asInterface(
+                    ServiceManager.getService(Context.NETWORK_STATS_SERVICE));
+        }
+    }
+
     /**
      * Initiate a wifi scan.  If workSource is not null, blame is given to it,
      * otherwise blame is given to callingUid.
@@ -855,6 +866,15 @@ public class WifiStateMachine extends StateMachine {
      * @param workSource If not null, blame is given to workSource.
      */
     public void startScan(int callingUid, WorkSource workSource) {
+        updateNetworkStatsService();
+        if (mNetworkStatsService != null) {
+            try {
+                mNetworkStatsService.forceUpdate();
+            }
+            catch (RemoteException e) {
+                Log.e(PHONELAB_TAG, "Failed to update network stats.", e);
+            }
+        }
         sendMessage(CMD_START_SCAN, callingUid, 0, workSource);
     }
 
@@ -2925,7 +2945,7 @@ public class WifiStateMachine extends StateMachine {
 
     private void updateSupplicantScanInterval() {
         
-        int __ScanRate__947 = 0;
+        int __ScanRate__788 = 0;
         
         MaybeManager maybeManager;
         
@@ -2937,11 +2957,11 @@ public class WifiStateMachine extends StateMachine {
         };
         
         try {
-          __ScanRate__947 = maybeManager.getMaybeAlternative("ScanRate");
+          __ScanRate__788 = maybeManager.getMaybeAlternative("ScanRate");
         } catch (Exception e) {
           Log.e("MaybeService-ScanRate", "Failed to get maybe alternative.", e);
         };
-        switch (__ScanRate__947) {
+        switch (__ScanRate__788) {
           
           case 5: {
                     mSupplicantScanIntervalMs = 30000;
@@ -2965,9 +2985,9 @@ public class WifiStateMachine extends StateMachine {
           }  
           default: {
                     mSupplicantScanIntervalMs = 15000;
-                    if (__ScanRate__947 != 0) {
+                    if (__ScanRate__788 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("ScanRate", __ScanRate__947);
+                        maybeManager.badMaybeAlternative("ScanRate", __ScanRate__788);
                       } catch (Exception e) {
                         Log.e("MaybeService-ScanRate", "Failed to report bad maybe alternative.", e);
                       }
