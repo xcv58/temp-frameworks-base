@@ -72,6 +72,7 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import java.util.TimerTask;
 import java.util.Timer;
+import java.util.Date;
 
 public class MaybeService extends IMaybeService.Stub {
   private static final String TAG = "MaybeService";
@@ -333,6 +334,20 @@ public class MaybeService extends IMaybeService.Stub {
     }
   }
 
+  public void logTime(String message, long time1, long time2){
+    long interval = time2 - time1;
+    if(interval < 0){
+      interval *= -1;
+    }
+    JSONObject timeObj = new JSONObject();
+    try{
+    timeObj.put("interval", interval);
+    timeObj.put("message", message);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    Log.i(TAG, timeObj.toString());
+  }
   public String getCurrentTime() throws RemoteException {
     Log.d(TAG, "Time"+":getCurrentTime()");
     Calendar cal = Calendar.getInstance();
@@ -423,6 +438,7 @@ public class MaybeService extends IMaybeService.Stub {
   }
 
   public synchronized int getMaybeAlternative(String label){
+    Date time1 = new Date();
     String packageName = getCallerPackageName();
     Log.v(TAG, "Calling package:"+packageName);
     String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
@@ -441,11 +457,22 @@ public class MaybeService extends IMaybeService.Stub {
 
     int choice = Integer.parseInt(strChoice);
     Log.i(TAG, "choice: "+choice);
+    Date time2 = new Date();
+    JSONObject jsonLog = new JSONObject();
+    try{
+    jsonLog.put("function","getMaybeAlternative");
+    jsonLog.put("label",label);
+    jsonLog.put("choice", choice);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
     return choice; 
     
   }
 
   public void badMaybeAlternative(String label, int value){
+    Date time1 = new Date();
     String packageName = getCallerPackageName();
     //TODO: Needs improvement
     /*
@@ -469,6 +496,16 @@ public class MaybeService extends IMaybeService.Stub {
       e.printStackTrace();
     }
     new ServerUpdaterTask().execute(url, hash, scoreData.toString());
+    Date time2 = new Date();
+    JSONObject jsonLog = new JSONObject();
+    try{
+    jsonLog.put("function","badMaybeAlternative");
+    jsonLog.put("label",label);
+    jsonLog.put("value", value);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
     return; //if JSONException fail silently
   }
 /*
@@ -477,6 +514,7 @@ public class MaybeService extends IMaybeService.Stub {
   }
 */
   public void scoreMaybeAlternative(String label, String jsonString){
+    Date time1 = new Date();
     String packageName = getCallerPackageName();
     //TODO: Needs improvement
     if(!MaybeUtils.isValidJSONString(jsonString)){
@@ -499,6 +537,16 @@ public class MaybeService extends IMaybeService.Stub {
     }
 
     new ServerUpdaterTask().execute(url, hash, scoreData.toString());
+    Date time2 = new Date();
+    JSONObject jsonLog = new JSONObject();
+    try{
+    jsonLog.put("function","scoreMaybeAlternative");
+    jsonLog.put("label",label);
+    jsonLog.put("value", jsonString);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
     return; //if JSONException fail silently
   }
 
