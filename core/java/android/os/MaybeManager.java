@@ -3,13 +3,16 @@ package android.os;
 import android.content.Context;
 import android.util.Log;
 import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.IBinder;
+import android.os.IMaybeService;
 
 public final class MaybeManager {
     private static final String TAG = "MaybeManager";
 
-    final IMaybeService mService;
-    final Context mContext;
-    final Handler mHandler;
+    private IMaybeService mService;
+    private Context mContext;
+    private Handler mHandler;
 
     public MaybeManager(Context context, IMaybeService service, Handler handler) {
         mContext = context;
@@ -17,7 +20,15 @@ public final class MaybeManager {
         mHandler = handler;
     }
 
+    private void checkService() {
+        if (mService == null) {
+            IBinder b = ServiceManager.getService(Context.MAYBE_SERVICE);
+            mService = IMaybeService.Stub.asInterface(b);
+        }
+    }
+
     public String getCurrentTime() {
+        checkService();
         try {
             return mService.getCurrentTime();
         }
@@ -28,6 +39,7 @@ public final class MaybeManager {
     }
 
     public String getAppData(String pkgName) {
+        checkService();
         try {
             return mService.getAppData(pkgName);
         }
@@ -38,6 +50,7 @@ public final class MaybeManager {
     }
     
     public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener) {
+        checkService();
         try {
             mService.requestMaybeUpdates(pkgName, url, listener);
         }
@@ -47,6 +60,7 @@ public final class MaybeManager {
     }
 
 	public void removeMaybeUpdates(String pkgName, IMaybeListener listener) {
+        checkService();
         try {
             mService.removeMaybeUpdates(pkgName, listener);
         }
@@ -57,6 +71,7 @@ public final class MaybeManager {
     }
 
 	public int registerUrl(String pkgName, String url, String hash) {
+        checkService();
         try {
             return mService.registerUrl(pkgName, url, hash);
         }
@@ -68,6 +83,7 @@ public final class MaybeManager {
     }
 
 	public int getMaybeAlternative(String pkgName, String label) {
+        checkService();
         try {
             return mService.getMaybeAlternative(pkgName, label);
         }
@@ -78,6 +94,7 @@ public final class MaybeManager {
     }
 
 	public void badMaybeAlternative(String pkgName, String label, int value) {
+        checkService();
         try {
             mService.badMaybeAlternative(pkgName, label, value);
         }
@@ -87,6 +104,7 @@ public final class MaybeManager {
     }
 
 	public void scoreMaybeAlternative(String pkgName, String label, String jsonString) {
+        checkService();
         try {
             mService.scoreMaybeAlternative(pkgName, label, jsonString);
         }
@@ -97,6 +115,7 @@ public final class MaybeManager {
     }
 
 	public void logMaybeAlternative(String pkgName, String label, String jsonString) {
+        checkService();
         try {
             mService.logMaybeAlternative(pkgName, label, jsonString);
         }
