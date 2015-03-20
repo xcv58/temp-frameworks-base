@@ -34,6 +34,6 @@
             "label": "ScanRate"
         }
     ], 
-    "sha224_hash": "412bcdc9815be062c5a2543fa93578d98596a251dcda210124c1dd0d", 
+    "sha224_hash": "c6f4f34e7d008f66d7d3c05d52d8dd30d9a77c04f3f2c9db39ccd41c", 
     "package": "android.net.wifi"
 }

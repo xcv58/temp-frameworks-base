@@ -1,0 +1,34 @@
+{
+    "statements": [
+        {
+            "content": "        mLinkSamplingIntervalMs = maybe(\"LinkSamplingIntervalMs\") 1000, 2000, 5000, 10000;", 
+            "alternatives": [
+                {
+                    "start": 66, 
+                    "end": 70, 
+                    "value": 0
+                }, 
+                {
+                    "start": 72, 
+                    "end": 76, 
+                    "value": 1
+                }, 
+                {
+                    "start": 78, 
+                    "end": 82, 
+                    "value": 2
+                }, 
+                {
+                    "start": 84, 
+                    "end": 89, 
+                    "value": 3
+                }
+            ], 
+            "line": 638, 
+            "type": "assignment", 
+            "label": "LinkSamplingIntervalMs"
+        }
+    ], 
+    "sha224_hash": "f0a3b68a1794593e1ddd3638050847e6f6a23ac7dbaaec0841d896da", 
+    "package": "android.net.wifi"
+}

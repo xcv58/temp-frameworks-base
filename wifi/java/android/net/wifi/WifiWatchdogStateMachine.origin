@@ -44,8 +44,6 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
-import android.os.MaybeManager;
-import java.lang.Exception;
 
 /**
  * WifiWatchdogStateMachine monitors the connection to a WiFi network. When WiFi
@@ -635,49 +633,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
     }
 
     private void updateLinkSamplingInterval() {
-        
-        int __LinkSamplingIntervalMs__767 = 0;
-        
-        MaybeManager maybeManager;
-        
-        try {
-          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-        } catch (Exception e) {
-          Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to get maybe service.", e);
-          return;
-        };
-        
-        try {
-          __LinkSamplingIntervalMs__767 = maybeManager.getMaybeAlternative("LinkSamplingIntervalMs");
-        } catch (Exception e) {
-          Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to get maybe alternative.", e);
-        };
-        switch (__LinkSamplingIntervalMs__767) {
-          
-          case 3: {
-                    mLinkSamplingIntervalMs = 10000;
-                    break;
-          }  
-          case 2: {
-                    mLinkSamplingIntervalMs = 5000;
-                    break;
-          }  
-          case 1: {
-                    mLinkSamplingIntervalMs = 2000;
-                    break;
-          }  
-          default: {
-                    mLinkSamplingIntervalMs = 1000;
-                    if (__LinkSamplingIntervalMs__767 != 0) {
-                      try {
-                        maybeManager.badMaybeAlternative("LinkSamplingIntervalMs", __LinkSamplingIntervalMs__767);
-                      } catch (Exception e) {
-                        Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to report bad maybe alternative.", e);
-                      }
-                    }
-                    break;
-          }
-        }
+        mLinkSamplingIntervalMs = maybe("LinkSamplingIntervalMs") 1000, 2000, 5000, 10000;
     }
 
     /**
@@ -1285,4 +1241,3 @@ public class WifiWatchdogStateMachine extends StateMachine {
         }
     }
 }
-
