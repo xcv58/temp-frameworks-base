@@ -407,7 +407,8 @@ public class MaybeService extends IMaybeService.Stub {
   }
 
   public int registerUrl(String url) throws RemoteException{
-    return registerUrl(url, null);
+    //return registerUrl(null, url, null);
+    return 0;
   }
 
   public int deletePackageData(){

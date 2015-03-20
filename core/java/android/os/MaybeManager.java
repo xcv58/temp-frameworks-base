@@ -29,7 +29,7 @@ public final class MaybeManager {
 
     public String getAppData(String pkgName) {
         try {
-            return mService.getAppData();
+            return mService.getAppData(pkgName);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -39,7 +39,7 @@ public final class MaybeManager {
     
     public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener) {
         try {
-            mService.requestMaybeUpdates(url, listener);
+            mService.requestMaybeUpdates(pkgName, url, listener);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -48,7 +48,7 @@ public final class MaybeManager {
 
 	public void removeMaybeUpdates(String pkgName, IMaybeListener listener) {
         try {
-            mService.removeMaybeUpdates(listener);
+            mService.removeMaybeUpdates(pkgName, listener);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -58,7 +58,7 @@ public final class MaybeManager {
 
 	public int registerUrl(String pkgName, String url, String hash) {
         try {
-            return mService.registerUrl(url, hash);
+            return mService.registerUrl(pkgName, url, hash);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -69,7 +69,7 @@ public final class MaybeManager {
 
 	public int getMaybeAlternative(String pkgName, String label) {
         try {
-            return mService.getMaybeAlternative(label);
+            return mService.getMaybeAlternative(pkgName, label);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -79,7 +79,7 @@ public final class MaybeManager {
 
 	public void badMaybeAlternative(String pkgName, String label, int value) {
         try {
-            mService.badMaybeAlternative(label, value);
+            mService.badMaybeAlternative(pkgName, label, value);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -88,7 +88,7 @@ public final class MaybeManager {
 
 	public void scoreMaybeAlternative(String pkgName, String label, String jsonString) {
         try {
-            mService.scoreMaybeAlternative(label, jsonString);
+            mService.scoreMaybeAlternative(pkgName, label, jsonString);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
@@ -98,7 +98,7 @@ public final class MaybeManager {
 
 	public void logMaybeAlternative(String pkgName, String label, String jsonString) {
         try {
-            mService.logMaybeAlternative(label, jsonString);
+            mService.logMaybeAlternative(pkgName, label, jsonString);
         }
         catch (RemoteException e) {
             Log.e(TAG, "Failed", e);
