@@ -2945,7 +2945,7 @@ public class WifiStateMachine extends StateMachine {
 
     private void updateSupplicantScanInterval() {
         
-        int __ScanRate__645 = 0;
+        int __ScanRate__927 = 0;
         
         MaybeManager maybeManager;
         
@@ -2957,11 +2957,11 @@ public class WifiStateMachine extends StateMachine {
         };
         
         try {
-          __ScanRate__645 = maybeManager.getMaybeAlternative("ScanRate");
+          __ScanRate__927 = maybeManager.getMaybeAlternative("android.net.wifi", "ScanRate");
         } catch (Exception e) {
           Log.e("MaybeService-ScanRate", "Failed to get maybe alternative.", e);
         };
-        switch (__ScanRate__645) {
+        switch (__ScanRate__927) {
           
           case 4: {
                     mSupplicantScanIntervalMs = 300000;
@@ -2981,9 +2981,9 @@ public class WifiStateMachine extends StateMachine {
           }  
           default: {
                     mSupplicantScanIntervalMs = 15000;
-                    if (__ScanRate__645 != 0) {
+                    if (__ScanRate__927 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("ScanRate", __ScanRate__645);
+                        maybeManager.badMaybeAlternative("android.net.wifi", "ScanRate", __ScanRate__927);
                       } catch (Exception e) {
                         Log.e("MaybeService-ScanRate", "Failed to report bad maybe alternative.", e);
                       }

@@ -102,7 +102,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
     public static final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
     private static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
 
-    public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = false;
+    public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = true;
 
     /*
      * RSSI levels as used by notification icon

@@ -79,7 +79,7 @@ import java.lang.Exception;
  */
 public class WifiWatchdogStateMachine extends StateMachine {
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int BASE = Protocol.BASE_WIFI_WATCHDOG;
 
@@ -104,7 +104,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
     public static final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
     private static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
 
-    public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = false;
+    public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = true;
 
     /*
      * RSSI levels as used by notification icon
@@ -636,7 +636,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
 
     private void updateLinkSamplingInterval() {
         
-        int __LinkSamplingIntervalMs__599 = 0;
+        int __LinkSamplingIntervalMs__808 = 0;
         
         MaybeManager maybeManager;
         
@@ -648,11 +648,11 @@ public class WifiWatchdogStateMachine extends StateMachine {
         };
         
         try {
-          __LinkSamplingIntervalMs__599 = maybeManager.getMaybeAlternative("LinkSamplingIntervalMs");
+          __LinkSamplingIntervalMs__808 = maybeManager.getMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs");
         } catch (Exception e) {
           Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to get maybe alternative.", e);
         };
-        switch (__LinkSamplingIntervalMs__599) {
+        switch (__LinkSamplingIntervalMs__808) {
           
           case 3: {
                     mLinkSamplingIntervalMs = 10000;
@@ -668,9 +668,9 @@ public class WifiWatchdogStateMachine extends StateMachine {
           }  
           default: {
                     mLinkSamplingIntervalMs = 1000;
-                    if (__LinkSamplingIntervalMs__599 != 0) {
+                    if (__LinkSamplingIntervalMs__808 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("LinkSamplingIntervalMs", __LinkSamplingIntervalMs__599);
+                        maybeManager.badMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs", __LinkSamplingIntervalMs__808);
                       } catch (Exception e) {
                         Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to report bad maybe alternative.", e);
                       }

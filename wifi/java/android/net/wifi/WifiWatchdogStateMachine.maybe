@@ -29,6 +29,6 @@
             "label": "LinkSamplingIntervalMs"
         }
     ], 
-    "sha224_hash": "f0a3b68a1794593e1ddd3638050847e6f6a23ac7dbaaec0841d896da", 
+    "sha224_hash": "04d9eb7819532504e5207ec87ef64e7733b0280f3982f70846eaf79c", 
     "package": "android.net.wifi"
 }
