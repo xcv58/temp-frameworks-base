@@ -1,0 +1,29 @@
+{
+    "statements": [
+        {
+            "content": "        mLowBatteryWarningLevel = maybe(\"LowBatteryWarningLevel\") 10, 20, 30;", 
+            "alternatives": [
+                {
+                    "start": 66, 
+                    "end": 68, 
+                    "value": 0
+                }, 
+                {
+                    "start": 70, 
+                    "end": 72, 
+                    "value": 1
+                }, 
+                {
+                    "start": 74, 
+                    "end": 76, 
+                    "value": 2
+                }
+            ], 
+            "line": 148, 
+            "type": "assignment", 
+            "label": "LowBatteryWarningLevel"
+        }
+    ], 
+    "sha224_hash": "36767b1ae65926bc9d24665aff619476f626a27a2c5de9ceb64dcd13", 
+    "package": "com.android.server"
+}
