@@ -2942,7 +2942,7 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void updateSupplicantScanInterval() {
-        mSupplicantScanIntervalMs = maybe("ScanRate") 15000, 30000, 60000, 120000, 240000, 30000;
+        mSupplicantScanIntervalMs = maybe("ScanRate") 15000, 30000, 60000, 120000, 300000;
     }
 
     class SupplicantStartedState extends State {

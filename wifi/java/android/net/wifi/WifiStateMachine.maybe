@@ -1,7 +1,7 @@
 {
     "statements": [
         {
-            "content": "        mSupplicantScanIntervalMs = maybe(\"ScanRate\") 15000, 30000, 60000, 120000, 240000, 30000;", 
+            "content": "        mSupplicantScanIntervalMs = maybe(\"ScanRate\") 15000, 30000, 60000, 120000, 300000;", 
             "alternatives": [
                 {
                     "start": 54, 
@@ -27,11 +27,6 @@
                     "start": 83, 
                     "end": 89, 
                     "value": 4
-                }, 
-                {
-                    "start": 91, 
-                    "end": 96, 
-                    "value": 5
                 }
             ], 
             "line": 2947, 
@@ -39,6 +34,6 @@
             "label": "ScanRate"
         }
     ], 
-    "sha224_hash": "7639fc90a7acafe8fd92f3bc16add83bd2ac5fd93912380fe11d22d0", 
+    "sha224_hash": "412bcdc9815be062c5a2543fa93578d98596a251dcda210124c1dd0d", 
     "package": "android.net.wifi"
 }
