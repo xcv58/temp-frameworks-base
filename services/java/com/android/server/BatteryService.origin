@@ -51,8 +51,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
-import android.os.MaybeManager;
-import java.lang.Exception;
 
 
 /**
@@ -145,45 +143,7 @@ public final class BatteryService extends Binder {
     private IBatteryPropertiesRegistrar mBatteryPropertiesRegistrar;
 
     private void getLowBatteryWarningLevel() {
-        
-        int __LowBatteryWarningLevel__388 = 0;
-        
-        MaybeManager maybeManager;
-        
-        try {
-          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-        } catch (Exception e) {
-          Log.e("MaybeService-LowBatteryWarningLevel", "Failed to get maybe service.", e);
-          return;
-        };
-        
-        try {
-          __LowBatteryWarningLevel__388 = maybeManager.getMaybeAlternative("LowBatteryWarningLevel");
-        } catch (Exception e) {
-          Log.e("MaybeService-LowBatteryWarningLevel", "Failed to get maybe alternative.", e);
-        };
-        switch (__LowBatteryWarningLevel__388) {
-          
-          case 2: {
-                    mLowBatteryWarningLevel = 30;
-                    break;
-          }  
-          case 1: {
-                    mLowBatteryWarningLevel = 20;
-                    break;
-          }  
-          default: {
-                    mLowBatteryWarningLevel = 10;
-                    if (__LowBatteryWarningLevel__388 != 0) {
-                      try {
-                        maybeManager.badMaybeAlternative("LowBatteryWarningLevel", __LowBatteryWarningLevel__388);
-                      } catch (Exception e) {
-                        Log.e("MaybeService-LowBatteryWarningLevel", "Failed to report bad maybe alternative.", e);
-                      }
-                    }
-                    break;
-          }
-        }
+        mLowBatteryWarningLevel = maybe("LowBatteryWarningLevel") 10, 20, 30;
         Log.d(TAG, "LowBatteryWarningLevel: " + mLowBatteryWarningLevel);
     }
 
@@ -821,4 +781,3 @@ public final class BatteryService extends Binder {
        }
     }
 }
-
