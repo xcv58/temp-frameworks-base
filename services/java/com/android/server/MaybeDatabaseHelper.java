@@ -246,6 +246,7 @@ import android.database.sqlite.SQLiteStatement;
         c.put(column, columndata);
         ret = sDatabase.update(APP_TABLE_NAME, c, PACKAGE_COL+"= ?", new String[]{packagename});
       }
+      listTableContents();
       return ret;
     }
 
@@ -271,6 +272,8 @@ import android.database.sqlite.SQLiteStatement;
 
         }catch(IllegalStateException e){
           Log.e(DBTAG, "getAppDataFromDB failed", e);
+        }catch(Exception e){
+          e.printStackTrace();
         }finally{
           if(cursor != null) cursor.close();
         }
@@ -286,7 +289,7 @@ import android.database.sqlite.SQLiteStatement;
                     null, null, null, null, null);
           if(cursor.moveToFirst()){
             while(true){
-              Log.v(DBTAG, "Row: Package="+cursor.getString(cursor.getColumnIndex(PACKAGE_COL))+"URL="+cursor.getString(cursor.getColumnIndex(URL_COL))+"DATA="+cursor.getString(cursor.getColumnIndex(DATA_COL)));
+              Log.v(DBTAG, "Row: Package="+cursor.getString(cursor.getColumnIndex(PACKAGE_COL))+" | URL="+cursor.getString(cursor.getColumnIndex(URL_COL))+" | DATA="+cursor.getString(cursor.getColumnIndex(DATA_COL)));
               if(cursor.isLast())
                 break;
               cursor.moveToNext();

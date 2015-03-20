@@ -67,23 +67,46 @@ public final class MaybeUtils{
 	}
 
 	public static String getMessageDigest(){
+		//TODO:
 		//return sha 224 Message Digest
 		return null;
 	}
 
-	public static String parseJSONString(String key, String jsonString){
+	public static JSONArray getJSONArray(String jsonString){
 		if(!isValidJSONString(jsonString)){
 			return null;
 		}
-		JSONObject jsonObj = getJSONObject(jsonString);
-		if(jsonObj == null){
+		try{
+			return new JSONArray(jsonString);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	public static String parseJSONArray(String key, String jsonString){
+		
+		JSONArray jsonArr = getJSONArray(jsonString);
+		if(jsonArr == null){
 			return null;
+		}
+		try{
+			int length = jsonArr.length();
+			
+			for(int i = 0; i < length; i++){
+				JSONObject jsonObj = jsonArr.getJSONObject(i);
+				if(jsonObj.has(MaybeService.STRING_LABEL)){
+					if(jsonObj.optString(MaybeService.STRING_LABEL).equals(key)){
+						return jsonObj.optString(MaybeService.STRING_CHOICE);
+					}
+				}
+			}
+		}catch(JSONException e){
+			e.printStackTrace();
 		}
 		
-		if(!jsonObj.has(key)){
-			return null;
-		}
-		return jsonObj.optString(key);
+		return null;
 		
 		
 		
