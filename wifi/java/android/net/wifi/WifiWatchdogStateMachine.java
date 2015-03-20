@@ -636,7 +636,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
 
     private void updateLinkSamplingInterval() {
         
-        int __LinkSamplingIntervalMs__767 = 0;
+        int __LinkSamplingIntervalMs__599 = 0;
         
         MaybeManager maybeManager;
         
@@ -648,11 +648,11 @@ public class WifiWatchdogStateMachine extends StateMachine {
         };
         
         try {
-          __LinkSamplingIntervalMs__767 = maybeManager.getMaybeAlternative("LinkSamplingIntervalMs");
+          __LinkSamplingIntervalMs__599 = maybeManager.getMaybeAlternative("LinkSamplingIntervalMs");
         } catch (Exception e) {
           Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to get maybe alternative.", e);
         };
-        switch (__LinkSamplingIntervalMs__767) {
+        switch (__LinkSamplingIntervalMs__599) {
           
           case 3: {
                     mLinkSamplingIntervalMs = 10000;
@@ -668,9 +668,9 @@ public class WifiWatchdogStateMachine extends StateMachine {
           }  
           default: {
                     mLinkSamplingIntervalMs = 1000;
-                    if (__LinkSamplingIntervalMs__767 != 0) {
+                    if (__LinkSamplingIntervalMs__599 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("LinkSamplingIntervalMs", __LinkSamplingIntervalMs__767);
+                        maybeManager.badMaybeAlternative("LinkSamplingIntervalMs", __LinkSamplingIntervalMs__599);
                       } catch (Exception e) {
                         Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to report bad maybe alternative.", e);
                       }
