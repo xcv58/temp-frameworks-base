@@ -54,8 +54,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MobileDataStateTracker extends BaseNetworkStateTracker {
 
     private static final String TAG = "MobileDataStateTracker";
-    private static final boolean DBG = true;
-    private static final boolean VDBG = true;
+    private static final boolean DBG = false;
+    private static final boolean VDBG = false;
 
     private PhoneConstants.DataState mMobileDataState;
     private ITelephony mPhoneService;

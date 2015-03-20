@@ -74,8 +74,8 @@ public class Tethering extends INetworkManagementEventObserver.Stub {
 
     private Context mContext;
     private final static String TAG = "Tethering";
-    private final static boolean DBG = true;
-    private final static boolean VDBG = true;
+    private final static boolean DBG = false;
+    private final static boolean VDBG = false;
 
     // TODO - remove both of these - should be part of interface inspection/selection stuff
     private String[] mTetherableUsbRegexs;

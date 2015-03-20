@@ -26,7 +26,7 @@ import android.telephony.Rlog;
 public final class CellIdentityLte implements Parcelable {
 
     private static final String LOG_TAG = "CellIdentityLte";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     // 3-digit Mobile Country Code, 0..999
     private final int mMcc;

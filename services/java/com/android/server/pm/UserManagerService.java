@@ -76,7 +76,7 @@ public class UserManagerService extends IUserManager.Stub {
 
     private static final String LOG_TAG = "UserManagerService";
 
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private static final String TAG_NAME = "name";
     private static final String ATTR_FLAGS = "flags";

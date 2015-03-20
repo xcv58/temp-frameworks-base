@@ -76,7 +76,7 @@ public class PhoneNumberUtils
     public static final int TOA_Unknown = 0x81;
 
     static final String LOG_TAG = "PhoneNumberUtils";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     /*
      * global-phone-number = ["+"] 1*( DIGIT / written-sep )

@@ -39,7 +39,7 @@ import edu.buffalo.cse.phonelab.json.JSONable;
 public class ServiceState implements Parcelable, JSONable {
 
     static final String LOG_TAG = "PHONE";
-    static final boolean DBG = true;
+    static final boolean DBG = false;
 
     /**
      * Normal operation condition, the phone is registered

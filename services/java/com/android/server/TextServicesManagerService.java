@@ -64,7 +64,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TextServicesManagerService extends ITextServicesManager.Stub {
     private static final String TAG = TextServicesManagerService.class.getSimpleName();
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     private final Context mContext;
     private boolean mSystemReady;

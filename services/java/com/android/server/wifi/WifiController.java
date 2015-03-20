@@ -49,7 +49,7 @@ import java.io.PrintWriter;
 
 class WifiController extends StateMachine {
     private static final String TAG = "WifiController";
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
     private Context mContext;
     private boolean mScreenOff;
     private boolean mDeviceIdle;
