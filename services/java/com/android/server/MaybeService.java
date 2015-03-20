@@ -577,16 +577,16 @@ public class MaybeService extends IMaybeService.Stub {
       }
     }
     String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
+    
     JSONObject logData = new JSONObject();
     try{
-    logData.put(STRING_TYPE, STRING_LOG);
-    logData.put(STRING_NAME, packageName);
-    logData.put(STRING_LAST_CHOICE, lastChoice);
-    logData.put(label,jsonString);
+      logData.put(STRING_TYPE, STRING_LOG);
+      logData.put(STRING_NAME, packageName);
+      logData.put(STRING_LAST_CHOICE, lastChoice);
+      logData.put(label,jsonString);
     }catch(JSONException e){
       e.printStackTrace();
     }
-
     new ServerUpdaterTask().execute(url, hash, logData.toString());
 
     return;
@@ -704,16 +704,21 @@ class ServerUpdaterTask extends AsyncTask<String, Void, String> {
           networkResponse = ERR_GENERIC_ERROR;
         }
         
-        if(out!=null){
-          out.close();
-          out = null;
-        }
+        
       }catch(IOException e){
         e.printStackTrace();
       }catch(Exception e){
         e.printStackTrace();
       }finally{
-        
+
+        if(out!=null){
+          try{
+            out.close();
+            out = null;
+          }catch(IOException e){
+            e.printStackTrace();
+          }
+        }
       }
 
       return networkResponse;
