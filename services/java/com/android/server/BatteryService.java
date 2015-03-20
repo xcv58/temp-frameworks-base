@@ -146,7 +146,7 @@ public final class BatteryService extends Binder {
 
     private void getLowBatteryWarningLevel() {
         
-        int __LowBatteryWarningLevel__388 = 0;
+        int __LowBatteryWarningLevel__960 = 0;
         
         MaybeManager maybeManager;
         
@@ -158,11 +158,11 @@ public final class BatteryService extends Binder {
         };
         
         try {
-          __LowBatteryWarningLevel__388 = maybeManager.getMaybeAlternative("LowBatteryWarningLevel");
+          __LowBatteryWarningLevel__960 = maybeManager.getMaybeAlternative("com.android.server", "LowBatteryWarningLevel");
         } catch (Exception e) {
           Log.e("MaybeService-LowBatteryWarningLevel", "Failed to get maybe alternative.", e);
         };
-        switch (__LowBatteryWarningLevel__388) {
+        switch (__LowBatteryWarningLevel__960) {
           
           case 2: {
                     mLowBatteryWarningLevel = 30;
@@ -174,9 +174,9 @@ public final class BatteryService extends Binder {
           }  
           default: {
                     mLowBatteryWarningLevel = 10;
-                    if (__LowBatteryWarningLevel__388 != 0) {
+                    if (__LowBatteryWarningLevel__960 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("LowBatteryWarningLevel", __LowBatteryWarningLevel__388);
+                        maybeManager.badMaybeAlternative("com.android.server", "LowBatteryWarningLevel", __LowBatteryWarningLevel__960);
                       } catch (Exception e) {
                         Log.e("MaybeService-LowBatteryWarningLevel", "Failed to report bad maybe alternative.", e);
                       }
