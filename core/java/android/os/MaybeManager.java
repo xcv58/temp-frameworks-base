@@ -27,7 +27,7 @@ public final class MaybeManager {
         }
     }
 
-    public String getAppData() {
+    public String getAppData(String pkgName) {
         try {
             return mService.getAppData();
         }
@@ -37,7 +37,7 @@ public final class MaybeManager {
         }
     }
     
-    public void requestMaybeUpdates(String url, IMaybeListener listener) {
+    public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener) {
         try {
             mService.requestMaybeUpdates(url, listener);
         }
@@ -46,7 +46,7 @@ public final class MaybeManager {
         }
     }
 
-	public void removeMaybeUpdates(IMaybeListener listener) {
+	public void removeMaybeUpdates(String pkgName, IMaybeListener listener) {
         try {
             mService.removeMaybeUpdates(listener);
         }
@@ -56,7 +56,7 @@ public final class MaybeManager {
  
     }
 
-	public int registerUrl(String url, String hash) {
+	public int registerUrl(String pkgName, String url, String hash) {
         try {
             return mService.registerUrl(url, hash);
         }
@@ -67,7 +67,7 @@ public final class MaybeManager {
  
     }
 
-	public int getMaybeAlternative(String label) {
+	public int getMaybeAlternative(String pkgName, String label) {
         try {
             return mService.getMaybeAlternative(label);
         }
@@ -77,7 +77,7 @@ public final class MaybeManager {
         }
     }
 
-	public void badMaybeAlternative(String label, int value) {
+	public void badMaybeAlternative(String pkgName, String label, int value) {
         try {
             mService.badMaybeAlternative(label, value);
         }
@@ -86,7 +86,7 @@ public final class MaybeManager {
         }
     }
 
-	public void scoreMaybeAlternative(String label, String jsonString) {
+	public void scoreMaybeAlternative(String pkgName, String label, String jsonString) {
         try {
             mService.scoreMaybeAlternative(label, jsonString);
         }
@@ -96,7 +96,7 @@ public final class MaybeManager {
  
     }
 
-	public void logMaybeAlternative(String label, String jsonString) {
+	public void logMaybeAlternative(String pkgName, String label, String jsonString) {
         try {
             mService.logMaybeAlternative(label, jsonString);
         }

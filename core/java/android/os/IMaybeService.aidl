@@ -22,22 +22,22 @@ interface IMaybeService
 
     String getCurrentTime();
 
-    String getAppData();
+    String getAppData(String pkgName);
     
-    void requestMaybeUpdates(String url, in IMaybeListener listener);
+    void requestMaybeUpdates(String pkgName, String url, in IMaybeListener listener);
 
-	void removeMaybeUpdates(in IMaybeListener listener);
+	void removeMaybeUpdates(String pkgName, in IMaybeListener listener);
 
-	/*int registerUrl(String url);*/
+	
 
-	int registerUrl(String url, String hash);
+	int registerUrl(String pkgName, String url, String hash);
 
-	int getMaybeAlternative(String label);
+	int getMaybeAlternative(String pkgName, String label);
 
-	void badMaybeAlternative(String label, int value);
+	void badMaybeAlternative(String pkgName, String label, int value);
 
-	void scoreMaybeAlternative(String label, String jsonString);
+	void scoreMaybeAlternative(String pkgName, String label, String jsonString);
 
-	void logMaybeAlternative(String label, String jsonString);
+	void logMaybeAlternative(String pkgName, String label, String jsonString);
 }
 

@@ -362,9 +362,11 @@ public class MaybeService extends IMaybeService.Stub {
     Log.i(TAG, (sdf.format(cal.getTime())).toString());
   }
   
-  public int registerUrl(String url, String hash) throws RemoteException{
+  public int registerUrl(String pkgName, String url, String hash) throws RemoteException{
     //add to database
-    String packageName = getCallerPackageName();
+    //String packageName = getCallerPackageName();
+    //temporary hack
+    String packageName = pkgName;
     if(mDbHelper.hasEntries(packageName)){
       String urlInDb = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName);
       if(url.equals(urlInDb)){
@@ -424,22 +426,24 @@ public class MaybeService extends IMaybeService.Stub {
   }
 
   /* testing only */
-  public String getAppData() throws RemoteException{
+  public String getAppData(String pkgName) throws RemoteException{
     return null;
   }
   
 
-  public void requestMaybeUpdates(String url, IMaybeListener listener){
+  public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener){
 
   }
 
-  public void removeMaybeUpdates(IMaybeListener listener){
+  public void removeMaybeUpdates(String pkgName, IMaybeListener listener){
 
   }
 
-  public synchronized int getMaybeAlternative(String label){
+  public synchronized int getMaybeAlternative(String pkgName, String label){
     Date time1 = new Date();
-    String packageName = getCallerPackageName();
+    //String packageName = getCallerPackageName();
+    //temporary hack
+    String packageName = pkgName;
     Log.v(TAG, "Calling package:"+packageName);
     String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
     //JSONObject jsonObjData = MaybeUtils.getJSONObject(jsonData);
@@ -471,9 +475,11 @@ public class MaybeService extends IMaybeService.Stub {
     
   }
 
-  public void badMaybeAlternative(String label, int value){
+  public void badMaybeAlternative(String pkgName, String label, int value){
     Date time1 = new Date();
-    String packageName = getCallerPackageName();
+    //String packageName = getCallerPackageName();
+    //temporary hack
+    String packageName = pkgName;
     //TODO: Needs improvement
     /*
     if(!MaybeUtils.isValidJSONString(jsonstring)){
@@ -513,9 +519,11 @@ public class MaybeService extends IMaybeService.Stub {
 
   }
 */
-  public void scoreMaybeAlternative(String label, String jsonString){
+  public void scoreMaybeAlternative(String pkgName, String label, String jsonString){
     Date time1 = new Date();
-    String packageName = getCallerPackageName();
+    //String packageName = getCallerPackageName();
+    //temporary hack
+    String packageName = pkgName;
     //TODO: Needs improvement
     if(!MaybeUtils.isValidJSONString(jsonString)){
       Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
@@ -550,8 +558,10 @@ public class MaybeService extends IMaybeService.Stub {
     return; //if JSONException fail silently
   }
 
-  public void logMaybeAlternative(String label, String jsonString){
-    String packageName = getCallerPackageName();
+  public void logMaybeAlternative(String pkgName, String label, String jsonString){
+    //String packageName = getCallerPackageName();
+    //temporary hack
+    String packageName = pkgName;
 
     String lastChoice = null;
 
@@ -779,7 +789,7 @@ class DeviceRegisterTask extends AsyncTask<String, Void, String> {
           }else{
             Log.d(TAG, "Network error:"+networkResponseString);
             //networkResponse = ERR_GENERIC_ERROR;
-            
+
           }
         }
         
