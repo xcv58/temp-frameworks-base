@@ -43,6 +43,8 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * WifiWatchdogStateMachine monitors the connection to a WiFi network. When WiFi
  * connects at L2 layer, the beacons from access point reach the device and it
@@ -96,6 +98,9 @@ public class WifiWatchdogStateMachine extends StateMachine {
     /* Notifications from/to WifiStateMachine */
     static final int POOR_LINK_DETECTED                             = BASE + 21;
     static final int GOOD_LINK_DETECTED                             = BASE + 22;
+
+    public static final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
+    private static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
 
     public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = false;
 
@@ -609,6 +614,28 @@ public class WifiWatchdogStateMachine extends StateMachine {
         }
     }
 
+    private void logRSSIPktCntInfo(RssiPacketCountInfo info) {
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "Network",
+         * "SubCategory": "Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
+         * "Action": "android.net.wifi.RSSI_PKT_CNT_UPDATED",
+         * "Description": "Wifi RSSI or pkt cnt updated."
+         * }
+         */
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", ACTION_RSSI_PKT_CNT_UPDATED)
+            .put("data", info)
+            .log();
+    }
+
+    private void updateLinkSamplingInterval() {
+        // LINK_SAMPLING_INTERVAL_MS = maybe("LinkSamplingIntervalMs") 1000, 2000, 5000, 10000;
+    }
+
     /**
      * WiFi is connected, but waiting for good link detection message.
      */
@@ -648,6 +675,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
 
                 case WifiManager.RSSI_PKTCNT_FETCH_SUCCEEDED:
                     RssiPacketCountInfo info = (RssiPacketCountInfo) msg.obj;
+                    logRSSIPktCntInfo(info);
                     int rssi = info.rssi;
                     if (DBG) logd("Fetch RSSI succeed, rssi=" + rssi);
 
@@ -792,6 +820,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
 
                 case WifiManager.RSSI_PKTCNT_FETCH_SUCCEEDED:
                     RssiPacketCountInfo info = (RssiPacketCountInfo) msg.obj;
+                    logRSSIPktCntInfo(info);
                     int rssi = info.rssi;
                     int mrssi = (mLastRssi + rssi) / 2;
                     int txbad = info.txbad;

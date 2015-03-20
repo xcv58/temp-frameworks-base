@@ -156,7 +156,9 @@ public class ScanResult implements Parcelable, JSONable {
             .put("capabilities", capabilities)
             .put("level", level)
             .put("frequency", frequency)
-            .put("timestamp", timestamp);
+            .put("timestamp", timestamp)
+            .put("distanceCm", distanceCm)
+            .put("distanceSdCm", distanceSdCm);
     }
 
     /** Implement the Parcelable interface {@hide} */

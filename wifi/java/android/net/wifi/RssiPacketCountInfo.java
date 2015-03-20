@@ -19,6 +19,9 @@ package android.net.wifi;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Bundle of RSSI and packet count information, for WiFi watchdog
  *
@@ -26,7 +29,7 @@ import android.os.Parcelable;
  *
  * @hide
  */
-public class RssiPacketCountInfo implements Parcelable {
+public class RssiPacketCountInfo implements Parcelable, JSONable {
 
     public int rssi;
 
@@ -68,4 +71,12 @@ public class RssiPacketCountInfo implements Parcelable {
             return new RssiPacketCountInfo[size];
         }
     };
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("rssi", rssi)
+            .put("txgood", txgood)
+            .put("txbad", txbad);
+    }
 }
