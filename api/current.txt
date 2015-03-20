@@ -17869,15 +17869,15 @@ package android.os {
   }
 
   public abstract interface IMaybeService implements android.os.IInterface {
-    method public abstract void badMaybeAlternative(java.lang.String, int) throws android.os.RemoteException;
-    method public abstract java.lang.String getAppData() throws android.os.RemoteException;
+    method public abstract void badMaybeAlternative(java.lang.String, java.lang.String, int) throws android.os.RemoteException;
+    method public abstract java.lang.String getAppData(java.lang.String) throws android.os.RemoteException;
     method public abstract java.lang.String getCurrentTime() throws android.os.RemoteException;
-    method public abstract int getMaybeAlternative(java.lang.String) throws android.os.RemoteException;
-    method public abstract void logMaybeAlternative(java.lang.String, java.lang.String) throws android.os.RemoteException;
-    method public abstract int registerUrl(java.lang.String, java.lang.String) throws android.os.RemoteException;
-    method public abstract void removeMaybeUpdates(android.os.IMaybeListener) throws android.os.RemoteException;
-    method public abstract void requestMaybeUpdates(java.lang.String, android.os.IMaybeListener) throws android.os.RemoteException;
-    method public abstract void scoreMaybeAlternative(java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract int getMaybeAlternative(java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract void logMaybeAlternative(java.lang.String, java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract int registerUrl(java.lang.String, java.lang.String, java.lang.String) throws android.os.RemoteException;
+    method public abstract void removeMaybeUpdates(java.lang.String, android.os.IMaybeListener) throws android.os.RemoteException;
+    method public abstract void requestMaybeUpdates(java.lang.String, java.lang.String, android.os.IMaybeListener) throws android.os.RemoteException;
+    method public abstract void scoreMaybeAlternative(java.lang.String, java.lang.String, java.lang.String) throws android.os.RemoteException;
   }
 
   public static abstract class IMaybeService.Stub extends android.os.Binder implements android.os.IMaybeService {
@@ -17903,15 +17903,15 @@ package android.os {
 
   public final class MaybeManager {
     ctor public MaybeManager(android.content.Context, android.os.IMaybeService, android.os.Handler);
-    method public void badMaybeAlternative(java.lang.String, int);
-    method public java.lang.String getAppData();
+    method public void badMaybeAlternative(java.lang.String, java.lang.String, int);
+    method public java.lang.String getAppData(java.lang.String);
     method public java.lang.String getCurrentTime();
-    method public int getMaybeAlternative(java.lang.String);
-    method public void logMaybeAlternative(java.lang.String, java.lang.String);
-    method public int registerUrl(java.lang.String, java.lang.String);
-    method public void removeMaybeUpdates(android.os.IMaybeListener);
-    method public void requestMaybeUpdates(java.lang.String, android.os.IMaybeListener);
-    method public void scoreMaybeAlternative(java.lang.String, java.lang.String);
+    method public int getMaybeAlternative(java.lang.String, java.lang.String);
+    method public void logMaybeAlternative(java.lang.String, java.lang.String, java.lang.String);
+    method public int registerUrl(java.lang.String, java.lang.String, java.lang.String);
+    method public void removeMaybeUpdates(java.lang.String, android.os.IMaybeListener);
+    method public void requestMaybeUpdates(java.lang.String, java.lang.String, android.os.IMaybeListener);
+    method public void scoreMaybeAlternative(java.lang.String, java.lang.String, java.lang.String);
   }
 
   public class MemoryFile {
