@@ -769,15 +769,17 @@ class DeviceRegisterTask extends AsyncTask<String, Void, String> {
         String networkResponseString = out.toString();
         Log.v(TAG, "networkResponseString:"+networkResponseString);
         if(statusCode == STATUS_204NOCONTENT || statusCode == STATUS_201CREATED || statusCode == STATUS_200OK){
-          Log.v(TAG, "DEvice Register Status code: 2xx ");
+          Log.v(TAG, "Device Register Status code: 2xx ");
           networkResponse = networkResponseString;
           mIsDeviceRegistered = true;
         }else{
-          if(networkResponse.contains(ERR_DUPLICATE_KEY)){
-            networkResponse = networkResponseString;
+          if(networkResponseString.contains(ERR_DUPLICATE_KEY)){
+            //networkResponse = networkResponseString;
             mIsDeviceRegistered = true;
           }else{
+            Log.d(TAG, "Network error:"+networkResponseString);
             //networkResponse = ERR_GENERIC_ERROR;
+            
           }
         }
         
