@@ -76,6 +76,7 @@ import java.util.Date;
 
 public class MaybeService extends IMaybeService.Stub {
   private static final String TAG = "MaybeService";
+  private static final String LOGTAG = "MaybeServiceLogging";
   private static final String URL = "https://maybe.xcv58.me/maybe-api-v1/devices";
   private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";
   private static final String GCM_ID_KEY = "gcm_id";
@@ -115,7 +116,7 @@ public class MaybeService extends IMaybeService.Stub {
   private String mGCMId = null;
   private SharedPreferences mSharedPrefs;
   private Object mGCMLock = new Object();
-  private long mPollInterval = 60; //in seconds
+  private long mPollInterval = 3600; //in seconds
   private Timer mDataDownloadTimer = null;
   private TimerTask mDataDownloaderTask = null;
 
@@ -254,6 +255,7 @@ public class MaybeService extends IMaybeService.Stub {
     mDataDownloadTimer = new Timer();
     mDataDownloaderTask = new TimerTask(){
       public void run(){
+        Log.v(TAG, "Querying server");
         if(mIsDeviceRegistered){
           synchronized(sDownloadLock){
             String deviceMeid = getDeviceMEID();
@@ -346,8 +348,30 @@ public class MaybeService extends IMaybeService.Stub {
     }catch(JSONException e){
       e.printStackTrace();
     }
-    Log.i(TAG, timeObj.toString());
+    Log.i(LOGTAG, timeObj.toString());
   }
+
+  public Date tick(){
+    return new Date();
+  }
+
+  public void tock(Date time1, JSONObject data){
+    Date time2 = new Date();
+    long interval = time2.getTime() - time1.getTime();
+    if(interval < 0){
+      interval *= -1;
+    }
+    JSONObject timeObj = new JSONObject();
+    try{
+    timeObj.put("interval", interval);
+    timeObj.put("message", data);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    Log.i(LOGTAG, timeObj.toString());
+  }
+
+
   public String getCurrentTime() throws RemoteException {
     Log.d(TAG, "Time"+":getCurrentTime()");
     Calendar cal = Calendar.getInstance();
@@ -441,45 +465,73 @@ public class MaybeService extends IMaybeService.Stub {
   }
 
   public synchronized int getMaybeAlternative(String pkgName, String label){
-    Date time1 = new Date();
+    Date tick = tick();
     //String packageName = getCallerPackageName();
     //temporary hack
     String packageName = pkgName;
+    JSONObject jsonLog = new JSONObject();
     Log.v(TAG, "Calling package:"+packageName);
     String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
     //JSONObject jsonObjData = MaybeUtils.getJSONObject(jsonData);
 
     if(jsonData == null){
       Log.i(TAG, "jsondata is null");
+      //TODO: Optimize logging for error scenarios
+      
+      try{
+        jsonLog.put("function","getMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("choice", "Error");
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","DBQUERY:NULL");
+        tock(tick, jsonLog);
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+
       return -1;
     }
 
     String strChoice = MaybeUtils.parseJSONArray(label, jsonData);
     if(strChoice == null){
       Log.i(TAG, "strchoice is null");
+      //TODO: Optimize logging for error scenarios
+      try{
+        jsonLog.put("function","getMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("choice", "Error");
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","JSON:NULL");
+        tock(tick, jsonLog);
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
       return -1;
     }
 
     int choice = Integer.parseInt(strChoice);
     Log.i(TAG, "choice: "+choice);
-    Date time2 = new Date();
-    JSONObject jsonLog = new JSONObject();
+   
+    
     try{
-    jsonLog.put("function","getMaybeAlternative");
-    jsonLog.put("label",label);
-    jsonLog.put("choice", choice);
+      jsonLog.put("function","getMaybeAlternative");
+      jsonLog.put("label",label);
+      jsonLog.put("choice", choice);
+      jsonLog.put("package", pkgName);
+
     }catch(JSONException e){
       e.printStackTrace();
     }
-    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
+    tock(tick, jsonLog);
     return choice; 
     
   }
 
   public void badMaybeAlternative(String pkgName, String label, int value){
-    Date time1 = new Date();
+    Date tick = tick();
     //String packageName = getCallerPackageName();
     //temporary hack
+    JSONObject jsonLog = new JSONObject();
     String packageName = pkgName;
     //TODO: Needs improvement
     /*
@@ -491,6 +543,16 @@ public class MaybeService extends IMaybeService.Stub {
     String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
     if(url == null){
       Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+      try{
+        jsonLog.put("function","badMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", value);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","URL:NULL");
+        tock(tick, jsonLog);
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
       return;
     }
     String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
@@ -503,16 +565,18 @@ public class MaybeService extends IMaybeService.Stub {
       e.printStackTrace();
     }
     new ServerUpdaterTask().execute(url, hash, scoreData.toString());
-    Date time2 = new Date();
-    JSONObject jsonLog = new JSONObject();
+    
+    
     try{
-    jsonLog.put("function","badMaybeAlternative");
-    jsonLog.put("label",label);
-    jsonLog.put("value", value);
+      jsonLog.put("function","badMaybeAlternative");
+      jsonLog.put("label",label);
+      jsonLog.put("value", value);
+      jsonLog.put("package", pkgName);
+      tock(tick, jsonLog);
     }catch(JSONException e){
       e.printStackTrace();
     }
-    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
+    
     return; //if JSONException fail silently
   }
 /*
@@ -521,18 +585,39 @@ public class MaybeService extends IMaybeService.Stub {
   }
 */
   public void scoreMaybeAlternative(String pkgName, String label, String jsonString){
-    Date time1 = new Date();
+    Date tick = tick();
+    JSONObject jsonLog = new JSONObject();
     //String packageName = getCallerPackageName();
     //temporary hack
     String packageName = pkgName;
     //TODO: Needs improvement
     if(!MaybeUtils.isValidJSONString(jsonString)){
       Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
+      try{
+        jsonLog.put("function","scoreMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", jsonString);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error", "JSON:INVALID");
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+      tock(tick, jsonLog);
       return; //fail silently
     }
     String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
     if(url == null){
       Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+      try{
+        jsonLog.put("function","scoreMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", jsonString);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error", "URL:NULL");
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+      tock(tick, jsonLog);
       return;
     }
     String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
@@ -546,20 +631,23 @@ public class MaybeService extends IMaybeService.Stub {
     }
 
     new ServerUpdaterTask().execute(url, hash, scoreData.toString());
-    Date time2 = new Date();
-    JSONObject jsonLog = new JSONObject();
+    
+    
     try{
     jsonLog.put("function","scoreMaybeAlternative");
     jsonLog.put("label",label);
     jsonLog.put("value", jsonString);
+    jsonLog.put("package", pkgName);
     }catch(JSONException e){
       e.printStackTrace();
     }
-    logTime(jsonLog.toString(), time1.getTime(), time2.getTime());
+    tock(tick, jsonLog);
     return; //if JSONException fail silently
   }
 
   public void logMaybeAlternative(String pkgName, String label, String jsonString){
+    Date tick = tick();
+    JSONObject jsonLog = new JSONObject();
     //String packageName = getCallerPackageName();
     //temporary hack
     String packageName = pkgName;
@@ -568,22 +656,69 @@ public class MaybeService extends IMaybeService.Stub {
 
     if(!MaybeUtils.isValidJSONString(jsonString)){
       Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
+
+      try{
+        jsonLog.put("function","logMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", jsonString);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","JSON:INVALID");
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+      tock(tick, jsonLog);
+
       return; //fail silently
     }
     String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
     if(url == null){
       Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+
+      try{
+        jsonLog.put("function","logMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", jsonString);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","URL:NULL");
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+      tock(tick, jsonLog);
+
       return;
     }
+    //TODO: How do we ensure data hasn't changed since last call?
     String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
     if(jsonData == null){
       Log.i(TAG, "jsondata is null");
+
+      try{
+        jsonLog.put("function","logMaybeAlternative");
+        jsonLog.put("label",label);
+        jsonLog.put("value", jsonString);
+        jsonLog.put("package", pkgName);
+        jsonLog.put("Error","JSON:NULL");
+      }catch(JSONException e){
+        e.printStackTrace();
+      }
+      tock(tick, jsonLog);
+
       return;
     }else{
 
       lastChoice = MaybeUtils.parseJSONArray(label, jsonData);
       if(lastChoice == null){
         Log.i(TAG, "lastChoice is null");
+        try{
+          jsonLog.put("function","logMaybeAlternative");
+          jsonLog.put("label",label);
+          jsonLog.put("value", jsonString);
+          jsonLog.put("package", pkgName);
+          jsonLog.put("Error","CHOICE:NULL");
+        }catch(JSONException e){
+          e.printStackTrace();
+        }
+        tock(tick, jsonLog);
         return;
       }
     }
@@ -600,6 +735,16 @@ public class MaybeService extends IMaybeService.Stub {
     }
     new ServerUpdaterTask().execute(url, hash, logData.toString());
 
+
+    try{
+      jsonLog.put("function","logMaybeAlternative");
+      jsonLog.put("label",label);
+      jsonLog.put("value", jsonString);
+      jsonLog.put("package", pkgName);
+    }catch(JSONException e){
+      e.printStackTrace();
+    }
+    tock(tick, jsonLog);
     return;
      
   }
