@@ -871,7 +871,7 @@ public class WifiStateMachine extends StateMachine {
             try {
                 mNetworkStatsService.forceUpdate();
             }
-            catch (RemoteException e) {
+            catch (Exception e) {
                 Log.e(PHONELAB_TAG, "Failed to update network stats.", e);
             }
         }
