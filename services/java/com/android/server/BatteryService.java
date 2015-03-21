@@ -49,6 +49,9 @@ import java.io.File;
 import java.io.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 import android.os.MaybeManager;
@@ -86,8 +89,9 @@ import java.lang.Exception;
  * </p>
  */
 public final class BatteryService extends Binder {
-    private static final String TAG = BatteryService.class.getSimpleName();
+    // private static final String TAG = BatteryService.class.getSimpleName();
     private static final String PHONELAB_TAG = "PhoneLab-Power-Battery";
+    private static final String TAG = PHONELAB_TAG;
 
     private static final boolean DEBUG = true;
 
@@ -150,7 +154,7 @@ public final class BatteryService extends Binder {
         
         int level;
         
-        int __LowBatteryWarningLevel__335 = 0;
+        int __LowBatteryWarningLevel__96 = 0;
         
         MaybeManager maybeManager;
         
@@ -162,11 +166,11 @@ public final class BatteryService extends Binder {
         };
         
         try {
-          __LowBatteryWarningLevel__335 = maybeManager.getMaybeAlternative("com.android.server", "LowBatteryWarningLevel");
+          __LowBatteryWarningLevel__96 = maybeManager.getMaybeAlternative("com.android.server", "LowBatteryWarningLevel");
         } catch (Exception e) {
           Log.e("MaybeService-LowBatteryWarningLevel", "Failed to get maybe alternative.", e);
         };
-        switch (__LowBatteryWarningLevel__335) {
+        switch (__LowBatteryWarningLevel__96) {
           
           case 2: {
                     level = 30;
@@ -178,9 +182,9 @@ public final class BatteryService extends Binder {
           }  
           default: {
                     level = 10;
-                    if (__LowBatteryWarningLevel__335 != 0) {
+                    if (__LowBatteryWarningLevel__96 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.server", "LowBatteryWarningLevel", __LowBatteryWarningLevel__335);
+                        maybeManager.badMaybeAlternative("com.android.server", "LowBatteryWarningLevel", __LowBatteryWarningLevel__96);
                       } catch (Exception e) {
                         Log.e("MaybeService-LowBatteryWarningLevel", "Failed to report bad maybe alternative.", e);
                       }
@@ -189,118 +193,123 @@ public final class BatteryService extends Binder {
           }
         }
         if (DEBUG) {
-            Log.d(TAG, "New LowBatteryWarningLevel: " + level + "; previous is: " + mLowBatteryWarningLevel);
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("New LowBatteryWarningLevel", level)
+                .put("Previous", mLowBatteryWarningLevel)
+                .log();
         }
         mLowBatteryWarningLevel = level;
     }
 
     private void getMaxCPUFreq() {
+        
+        int freq;
+        
+        int __MAX_CPU_FREQ__842 = 0;
+        
+        MaybeManager maybeManager;
+        
         try {
-            
-            int freq;
-            
-            int __MAX_CPU_FREQ__621 = 0;
-            
-            MaybeManager maybeManager;
-            
-            try {
-              maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-            } catch (Exception e) {
-              Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe service.", e);
-              return;
-            };
-            
-            try {
-              __MAX_CPU_FREQ__621 = maybeManager.getMaybeAlternative("com.android.server", "MAX_CPU_FREQ");
-            } catch (Exception e) {
-              Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe alternative.", e);
-            };
-            switch (__MAX_CPU_FREQ__621) {
-              
-              case 13: {
-                            freq = 300000;
-                            break;
-              }  
-              case 12: {
-                            freq = 422400;
-                            break;
-              }  
-              case 11: {
-                            freq = 652800;
-                            break;
-              }  
-              case 10: {
-                            freq = 729600;
-                            break;
-              }  
-              case 9: {
-                            freq = 883200;
-                            break;
-              }  
-              case 8: {
-                            freq = 960000;
-                            break;
-              }  
-              case 7: {
-                            freq = 1036800;
-                            break;
-              }  
-              case 6: {
-                            freq = 1190400;
-                            break;
-              }  
-              case 5: {
-                            freq = 1267200;
-                            break;
-              }  
-              case 4: {
-                            freq = 1497600;
-                            break;
-              }  
-              case 3: {
-                            freq = 1574400;
-                            break;
-              }  
-              case 2: {
-                            freq = 1728000;
-                            break;
-              }  
-              case 1: {
-                            freq = 1958400;
-                            break;
-              }  
-              default: {
-                            freq = 2265600;
-                            if (__MAX_CPU_FREQ__621 != 0) {
-                              try {
-                                maybeManager.badMaybeAlternative("com.android.server", "MAX_CPU_FREQ", __MAX_CPU_FREQ__621);
-                              } catch (Exception e) {
-                                Log.e("MaybeService-MAX_CPU_FREQ", "Failed to report bad maybe alternative.", e);
-                              }
-                            }
-                            break;
-              }
+          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
+        } catch (Exception e) {
+          Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe service.", e);
+          return;
+        };
+        
+        try {
+          __MAX_CPU_FREQ__842 = maybeManager.getMaybeAlternative("com.android.server", "MAX_CPU_FREQ");
+        } catch (Exception e) {
+          Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe alternative.", e);
+        };
+        switch (__MAX_CPU_FREQ__842) {
+          
+          case 3: {
+                    freq = 652800;
+                    break;
+          }  
+          case 2: {
+                    freq = 960000;
+                    break;
+          }  
+          case 1: {
+                    freq = 1574400;
+                    break;
+          }  
+          default: {
+                    freq = 2265600;
+                    if (__MAX_CPU_FREQ__842 != 0) {
+                      try {
+                        maybeManager.badMaybeAlternative("com.android.server", "MAX_CPU_FREQ", __MAX_CPU_FREQ__842);
+                      } catch (Exception e) {
+                        Log.e("MaybeService-MAX_CPU_FREQ", "Failed to report bad maybe alternative.", e);
+                      }
+                    }
+                    break;
+          }
+        }
+        if (DEBUG) {
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("New MAX CPU FREQ", freq)
+                .put("Previous", MAX_CPU_FREQ)
+                .log();
+        }
+        logCPUInfo();
+        if (freq != MAX_CPU_FREQ) {
+            MAX_CPU_FREQ = freq;
+            if (DEBUG) {
+                (new StrictJSONObject(PHONELAB_TAG))
+                    .put("Change MAX CPU FREQ", freq)
+                    .log();
+            }
+            // interactive conservative ondemand userspace powersave performance
+            writeToFile("interactive", "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
+        }
+        writeToFile(Integer.toString(MAX_CPU_FREQ), "sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq");
+    }
+
+    private void writeToFile(String value, String path) {
+        try {
+            java.lang.Process p = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(p.getOutputStream());
+            BufferedReader bf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String command = "/system/xbin/echo " + value + " > " + path + "\n";
+            Log.d(TAG, command);
+            os.writeBytes("/system/xbin/echo " + value + " > " + path + "\n");
+            os.writeBytes("exit\n");
+
+            String test;
+
+            while ((test = bf.readLine()) != null) {
+                Log.d(TAG, "SU output: " + test);
+            }
+
+            os.flush();
+            p.waitFor();
+
+        } catch (Exception e) {
+            Log.e(TAG, "error: " + e.getMessage());
+        }
+    }
+
+    private void logCPUInfo() {
+        try {
+            java.lang.Process cmd = new ProcessBuilder(new String[]{"sh","-c","/system/xbin/cat /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state"})
+                .redirectErrorStream(true).start();
+            InputStream in = cmd.getInputStream();
+            BufferedReader buf = new BufferedReader(new InputStreamReader(in));
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line=buf.readLine()) != null) {
+                sb.append(line);
+                sb.append(',');
             }
             if (DEBUG) {
-                Log.d(TAG, "New MAX CPU FREQ: " + freq + "; previous is: " + MAX_CPU_FREQ);
+                (new StrictJSONObject(PHONELAB_TAG))
+                    .put("CPU info", sb.toString())
+                    .log();
             }
-            if (freq != MAX_CPU_FREQ) {
-                MAX_CPU_FREQ = freq;
-                if (DEBUG) {
-                    Log.d(TAG, "Change MAX CPU FREQ to " + freq);
-                }
-                java.lang.Process cmd = new ProcessBuilder(new String[]{"sh","-c","/system/xbin/echo "+freq+" > sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"})
-                    .redirectErrorStream(true).start();
-                InputStream in = cmd.getInputStream();
-                BufferedReader buf = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line=buf.readLine()) != null) {
-                    if (DEBUG) {
-                        Log.d(TAG, "writing to cpu0/cpufreq/scaling_available_gov file: " + line );
-                    }
-                }
-                in.close();
-            }
+            in.close();
         } catch (Exception e) {
             Log.e(TAG, "Cpu info "+e.getMessage());
         }
@@ -317,7 +326,9 @@ public final class BatteryService extends Binder {
                 }
             };
         if (DEBUG) {
-            Log.d(TAG, "post repeat CPU, LOW_BATTERY tasks for: " + INTERVAL);
+            (new StrictJSONObject(PHONELAB_TAG))
+                .put("post repeat CPU, LOW_BATTERY tasks for", Long.toString(INTERVAL))
+                .log();
         }
         handler.postDelayed(runable, INTERVAL);
     }
@@ -621,7 +632,9 @@ public final class BatteryService extends Binder {
             if (sendBatteryLow) {
                 mSentLowBatteryBroadcast = true;
                 if (DEBUG) {
-                    Log.d(TAG, "Sending LowBatteryBroadcast");
+                    (new StrictJSONObject(PHONELAB_TAG))
+                        .put("Low BatteryBoradcast", Long.toString(System.currentTimeMillis()))
+                        .log();
                 }
                 mHandler.post(new Runnable() {
                     @Override
