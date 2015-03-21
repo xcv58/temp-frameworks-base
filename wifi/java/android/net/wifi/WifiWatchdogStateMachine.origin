@@ -77,7 +77,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class WifiWatchdogStateMachine extends StateMachine {
 
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private static final int BASE = Protocol.BASE_WIFI_WATCHDOG;
 
@@ -100,7 +100,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
     static final int GOOD_LINK_DETECTED                             = BASE + 22;
 
     public static final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
-    private static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
+    public static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
+    public static final String ACTION_WIFI_LINK_STATUS_CHANGED = "android.net.wifi.LINK_STATUS_CHANGED";
 
     public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = true;
 
@@ -181,12 +182,12 @@ public class WifiWatchdogStateMachine extends StateMachine {
      * 50% loss threshold is a good balance between accuracy and reponsiveness.
      * <=10% good threshold is a safe value to avoid jumping back to WiFi too easily.
      */
-    private static final double POOR_LINK_LOSS_THRESHOLD = 0.5;
+    private static double mPoorLinkLossThreshold;
 
     /**
-     * See {@link #POOR_LINK_LOSS_THRESHOLD}.
+     * See {@link #mPoorLinkLossThreshold}.
      */
-    private static final double GOOD_LINK_LOSS_THRESHOLD = 0.1;
+    private static double mGoodLinkLossThreshold;
 
     /**
      * Number of samples to confirm before sending a poor link notification.
@@ -223,7 +224,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
      * Adaptive good link target to avoid flapping.
      * When a poor link is detected, a good link target is calculated as follows:
      * <p>
-     *      targetRSSI = min { rssi | loss(rssi) < GOOD_LINK_LOSS_THRESHOLD } + rssi_adj[i],
+     *      targetRSSI = min { rssi | loss(rssi) < mGoodLinkLossThreshold } + rssi_adj[i],
      *                   where rssi is within the above GOOD_LINK_RSSI_RANGE.
      *      targetCount = sample_count[i] .
      * <p>
@@ -636,6 +637,14 @@ public class WifiWatchdogStateMachine extends StateMachine {
         mLinkSamplingIntervalMs = maybe("LinkSamplingIntervalMs") 1000, 2000, 5000, 10000;
     }
 
+    private void updatePoorLinkLossThreshold() {
+        mPoorLinkLossThreshold = maybe("PoorLinkLossThreshold") 0.2, 0.5, 0.8;
+    }
+
+    private void updateGoodLinkLossThreshold() {
+        mGoodLinkLossThreshold = maybe("GoodLinkLossThreshold") 0.1, 0.3, 0.6;
+    }
+
     /**
      * WiFi is connected, but waiting for good link detection message.
      */
@@ -855,7 +864,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
                             mCurrentBssid.updateLoss(mrssi, loss, dtotal);
 
                             // check for high packet loss and send poor link notification
-                            if (mCurrentLoss.mValue > POOR_LINK_LOSS_THRESHOLD
+                            updatePoorLinkLossThreshold();
+                            if (mCurrentLoss.mValue > mPoorLinkLossThreshold
                                     && mCurrentLoss.mVolume > POOR_LINK_MIN_VOLUME) {
                                 if (++mSampleCount >= POOR_LINK_SAMPLE_COUNT)
                                     if (mCurrentBssid.poorLinkDetected(rssi)) {
@@ -959,6 +969,23 @@ public class WifiWatchdogStateMachine extends StateMachine {
             }
             logd("Poor link notification is sent");
         }
+
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "Network",
+         * "SubCategory": "Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
+         * "Action": "android.net.wifi.LINK_STATUS_CHANGED",
+         * "Description": "Wifi link status changed (good or bad)."
+         * }
+         */
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", ACTION_WIFI_LINK_STATUS_CHANGED)
+            .put("goodLink", isGood)
+            .log();
+
     }
 
     /**
@@ -1151,7 +1178,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
             // scan for a target RSSI at which the link is good
             int from = rssi + GOOD_LINK_RSSI_RANGE_MIN;
             int to = rssi + GOOD_LINK_RSSI_RANGE_MAX;
-            mGoodLinkTargetRssi = findRssiTarget(from, to, GOOD_LINK_LOSS_THRESHOLD);
+            updateGoodLinkLossThreshold();
+            mGoodLinkTargetRssi = findRssiTarget(from, to, mGoodLinkLossThreshold);
             mGoodLinkTargetRssi += GOOD_LINK_TARGET[mGoodLinkTargetIndex].RSSI_ADJ_DBM;
             if (mGoodLinkTargetIndex < GOOD_LINK_TARGET.length - 1) mGoodLinkTargetIndex++;
 
@@ -1186,7 +1214,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
             // calculate a new RSSI threshold for new link verifying
             int from = BSSID_STAT_RANGE_LOW_DBM;
             int to = BSSID_STAT_RANGE_HIGH_DBM;
-            mGoodLinkTargetRssi = findRssiTarget(from, to, GOOD_LINK_LOSS_THRESHOLD);
+            updateGoodLinkLossThreshold();
+            mGoodLinkTargetRssi = findRssiTarget(from, to, mGoodLinkLossThreshold);
             mGoodLinkTargetCount = 1;
             mBssidAvoidTimeMax = SystemClock.elapsedRealtime() + MAX_AVOID_TIME[0].TIME_MS;
             if (DBG) logd("New link verifying target set, rssi=" + mGoodLinkTargetRssi + " count="

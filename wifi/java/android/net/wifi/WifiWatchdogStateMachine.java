@@ -102,7 +102,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
     static final int GOOD_LINK_DETECTED                             = BASE + 22;
 
     public static final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
-    private static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
+    public static final String ACTION_RSSI_PKT_CNT_UPDATED = "android.net.wifi.RSSI_PKT_CNT_UPDATED";
+    public static final String ACTION_WIFI_LINK_STATUS_CHANGED = "android.net.wifi.LINK_STATUS_CHANGED";
 
     public static final boolean DEFAULT_POOR_NETWORK_AVOIDANCE_ENABLED = true;
 
@@ -183,12 +184,12 @@ public class WifiWatchdogStateMachine extends StateMachine {
      * 50% loss threshold is a good balance between accuracy and reponsiveness.
      * <=10% good threshold is a safe value to avoid jumping back to WiFi too easily.
      */
-    private static final double POOR_LINK_LOSS_THRESHOLD = 0.5;
+    private static double mPoorLinkLossThreshold;
 
     /**
-     * See {@link #POOR_LINK_LOSS_THRESHOLD}.
+     * See {@link #mPoorLinkLossThreshold}.
      */
-    private static final double GOOD_LINK_LOSS_THRESHOLD = 0.1;
+    private static double mGoodLinkLossThreshold;
 
     /**
      * Number of samples to confirm before sending a poor link notification.
@@ -225,7 +226,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
      * Adaptive good link target to avoid flapping.
      * When a poor link is detected, a good link target is calculated as follows:
      * <p>
-     *      targetRSSI = min { rssi | loss(rssi) < GOOD_LINK_LOSS_THRESHOLD } + rssi_adj[i],
+     *      targetRSSI = min { rssi | loss(rssi) < mGoodLinkLossThreshold } + rssi_adj[i],
      *                   where rssi is within the above GOOD_LINK_RSSI_RANGE.
      *      targetCount = sample_count[i] .
      * <p>
@@ -636,7 +637,7 @@ public class WifiWatchdogStateMachine extends StateMachine {
 
     private void updateLinkSamplingInterval() {
         
-        int __LinkSamplingIntervalMs__808 = 0;
+        int __LinkSamplingIntervalMs__879 = 0;
         
         MaybeManager maybeManager;
         
@@ -648,11 +649,11 @@ public class WifiWatchdogStateMachine extends StateMachine {
         };
         
         try {
-          __LinkSamplingIntervalMs__808 = maybeManager.getMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs");
+          __LinkSamplingIntervalMs__879 = maybeManager.getMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs");
         } catch (Exception e) {
           Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to get maybe alternative.", e);
         };
-        switch (__LinkSamplingIntervalMs__808) {
+        switch (__LinkSamplingIntervalMs__879) {
           
           case 3: {
                     mLinkSamplingIntervalMs = 10000;
@@ -668,11 +669,95 @@ public class WifiWatchdogStateMachine extends StateMachine {
           }  
           default: {
                     mLinkSamplingIntervalMs = 1000;
-                    if (__LinkSamplingIntervalMs__808 != 0) {
+                    if (__LinkSamplingIntervalMs__879 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs", __LinkSamplingIntervalMs__808);
+                        maybeManager.badMaybeAlternative("android.net.wifi", "LinkSamplingIntervalMs", __LinkSamplingIntervalMs__879);
                       } catch (Exception e) {
                         Log.e("MaybeService-LinkSamplingIntervalMs", "Failed to report bad maybe alternative.", e);
+                      }
+                    }
+                    break;
+          }
+        }
+    }
+
+    private void updatePoorLinkLossThreshold() {
+        
+        int __PoorLinkLossThreshold__1018 = 0;
+        
+        MaybeManager maybeManager;
+        
+        try {
+          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
+        } catch (Exception e) {
+          Log.e("MaybeService-PoorLinkLossThreshold", "Failed to get maybe service.", e);
+          return;
+        };
+        
+        try {
+          __PoorLinkLossThreshold__1018 = maybeManager.getMaybeAlternative("android.net.wifi", "PoorLinkLossThreshold");
+        } catch (Exception e) {
+          Log.e("MaybeService-PoorLinkLossThreshold", "Failed to get maybe alternative.", e);
+        };
+        switch (__PoorLinkLossThreshold__1018) {
+          
+          case 2: {
+                    mPoorLinkLossThreshold = 0.8;
+                    break;
+          }  
+          case 1: {
+                    mPoorLinkLossThreshold = 0.5;
+                    break;
+          }  
+          default: {
+                    mPoorLinkLossThreshold = 0.2;
+                    if (__PoorLinkLossThreshold__1018 != 0) {
+                      try {
+                        maybeManager.badMaybeAlternative("android.net.wifi", "PoorLinkLossThreshold", __PoorLinkLossThreshold__1018);
+                      } catch (Exception e) {
+                        Log.e("MaybeService-PoorLinkLossThreshold", "Failed to report bad maybe alternative.", e);
+                      }
+                    }
+                    break;
+          }
+        }
+    }
+
+    private void updateGoodLinkLossThreshold() {
+        
+        int __GoodLinkLossThreshold__334 = 0;
+        
+        MaybeManager maybeManager;
+        
+        try {
+          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
+        } catch (Exception e) {
+          Log.e("MaybeService-GoodLinkLossThreshold", "Failed to get maybe service.", e);
+          return;
+        };
+        
+        try {
+          __GoodLinkLossThreshold__334 = maybeManager.getMaybeAlternative("android.net.wifi", "GoodLinkLossThreshold");
+        } catch (Exception e) {
+          Log.e("MaybeService-GoodLinkLossThreshold", "Failed to get maybe alternative.", e);
+        };
+        switch (__GoodLinkLossThreshold__334) {
+          
+          case 2: {
+                    mGoodLinkLossThreshold = 0.6;
+                    break;
+          }  
+          case 1: {
+                    mGoodLinkLossThreshold = 0.3;
+                    break;
+          }  
+          default: {
+                    mGoodLinkLossThreshold = 0.1;
+                    if (__GoodLinkLossThreshold__334 != 0) {
+                      try {
+                        maybeManager.badMaybeAlternative("android.net.wifi", "GoodLinkLossThreshold", __GoodLinkLossThreshold__334);
+                      } catch (Exception e) {
+                        Log.e("MaybeService-GoodLinkLossThreshold", "Failed to report bad maybe alternative.", e);
                       }
                     }
                     break;
@@ -899,7 +984,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
                             mCurrentBssid.updateLoss(mrssi, loss, dtotal);
 
                             // check for high packet loss and send poor link notification
-                            if (mCurrentLoss.mValue > POOR_LINK_LOSS_THRESHOLD
+                            updatePoorLinkLossThreshold();
+                            if (mCurrentLoss.mValue > mPoorLinkLossThreshold
                                     && mCurrentLoss.mVolume > POOR_LINK_MIN_VOLUME) {
                                 if (++mSampleCount >= POOR_LINK_SAMPLE_COUNT)
                                     if (mCurrentBssid.poorLinkDetected(rssi)) {
@@ -1003,6 +1089,23 @@ public class WifiWatchdogStateMachine extends StateMachine {
             }
             logd("Poor link notification is sent");
         }
+
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "Network",
+         * "SubCategory": "Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
+         * "Action": "android.net.wifi.LINK_STATUS_CHANGED",
+         * "Description": "Wifi link status changed (good or bad)."
+         * }
+         */
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", ACTION_WIFI_LINK_STATUS_CHANGED)
+            .put("goodLink", isGood)
+            .log();
+
     }
 
     /**
@@ -1195,7 +1298,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
             // scan for a target RSSI at which the link is good
             int from = rssi + GOOD_LINK_RSSI_RANGE_MIN;
             int to = rssi + GOOD_LINK_RSSI_RANGE_MAX;
-            mGoodLinkTargetRssi = findRssiTarget(from, to, GOOD_LINK_LOSS_THRESHOLD);
+            updateGoodLinkLossThreshold();
+            mGoodLinkTargetRssi = findRssiTarget(from, to, mGoodLinkLossThreshold);
             mGoodLinkTargetRssi += GOOD_LINK_TARGET[mGoodLinkTargetIndex].RSSI_ADJ_DBM;
             if (mGoodLinkTargetIndex < GOOD_LINK_TARGET.length - 1) mGoodLinkTargetIndex++;
 
@@ -1230,7 +1334,8 @@ public class WifiWatchdogStateMachine extends StateMachine {
             // calculate a new RSSI threshold for new link verifying
             int from = BSSID_STAT_RANGE_LOW_DBM;
             int to = BSSID_STAT_RANGE_HIGH_DBM;
-            mGoodLinkTargetRssi = findRssiTarget(from, to, GOOD_LINK_LOSS_THRESHOLD);
+            updateGoodLinkLossThreshold();
+            mGoodLinkTargetRssi = findRssiTarget(from, to, mGoodLinkLossThreshold);
             mGoodLinkTargetCount = 1;
             mBssidAvoidTimeMax = SystemClock.elapsedRealtime() + MAX_AVOID_TIME[0].TIME_MS;
             if (DBG) logd("New link verifying target set, rssi=" + mGoodLinkTargetRssi + " count="
