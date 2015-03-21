@@ -33,6 +33,7 @@ import android.os.Handler;
 import android.os.IBatteryPropertiesListener;
 import android.os.IBatteryPropertiesRegistrar;
 import android.os.IBinder;
+import android.os.Process;
 import android.os.DropBoxManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -45,8 +46,7 @@ import android.util.Slog;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -143,9 +143,14 @@ public final class BatteryService extends Binder {
     private BatteryListener mBatteryPropertiesListener;
     private IBatteryPropertiesRegistrar mBatteryPropertiesRegistrar;
 
+    private final static long INTERVAL = 1000L * 60L * 1L;  // 60 secs * 1
+    private static int MAX_CPU_FREQ = 2265600;
+
     private void getLowBatteryWarningLevel() {
         
-        int __LowBatteryWarningLevel__960 = 0;
+        int level;
+        
+        int __LowBatteryWarningLevel__335 = 0;
         
         MaybeManager maybeManager;
         
@@ -157,25 +162,25 @@ public final class BatteryService extends Binder {
         };
         
         try {
-          __LowBatteryWarningLevel__960 = maybeManager.getMaybeAlternative("com.android.server", "LowBatteryWarningLevel");
+          __LowBatteryWarningLevel__335 = maybeManager.getMaybeAlternative("com.android.server", "LowBatteryWarningLevel");
         } catch (Exception e) {
           Log.e("MaybeService-LowBatteryWarningLevel", "Failed to get maybe alternative.", e);
         };
-        switch (__LowBatteryWarningLevel__960) {
+        switch (__LowBatteryWarningLevel__335) {
           
           case 2: {
-                    mLowBatteryWarningLevel = 30;
+                    level = 30;
                     break;
           }  
           case 1: {
-                    mLowBatteryWarningLevel = 20;
+                    level = 20;
                     break;
           }  
           default: {
-                    mLowBatteryWarningLevel = 10;
-                    if (__LowBatteryWarningLevel__960 != 0) {
+                    level = 10;
+                    if (__LowBatteryWarningLevel__335 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.server", "LowBatteryWarningLevel", __LowBatteryWarningLevel__960);
+                        maybeManager.badMaybeAlternative("com.android.server", "LowBatteryWarningLevel", __LowBatteryWarningLevel__335);
                       } catch (Exception e) {
                         Log.e("MaybeService-LowBatteryWarningLevel", "Failed to report bad maybe alternative.", e);
                       }
@@ -183,10 +188,144 @@ public final class BatteryService extends Binder {
                     break;
           }
         }
-        Log.d(TAG, "LowBatteryWarningLevel: " + mLowBatteryWarningLevel);
+        if (DEBUG) {
+            Log.d(TAG, "New LowBatteryWarningLevel: " + level + "; previous is: " + mLowBatteryWarningLevel);
+        }
+        mLowBatteryWarningLevel = level;
+    }
+
+    private void getMaxCPUFreq() {
+        try {
+            
+            int freq;
+            
+            int __MAX_CPU_FREQ__621 = 0;
+            
+            MaybeManager maybeManager;
+            
+            try {
+              maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
+            } catch (Exception e) {
+              Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe service.", e);
+              return;
+            };
+            
+            try {
+              __MAX_CPU_FREQ__621 = maybeManager.getMaybeAlternative("com.android.server", "MAX_CPU_FREQ");
+            } catch (Exception e) {
+              Log.e("MaybeService-MAX_CPU_FREQ", "Failed to get maybe alternative.", e);
+            };
+            switch (__MAX_CPU_FREQ__621) {
+              
+              case 13: {
+                            freq = 300000;
+                            break;
+              }  
+              case 12: {
+                            freq = 422400;
+                            break;
+              }  
+              case 11: {
+                            freq = 652800;
+                            break;
+              }  
+              case 10: {
+                            freq = 729600;
+                            break;
+              }  
+              case 9: {
+                            freq = 883200;
+                            break;
+              }  
+              case 8: {
+                            freq = 960000;
+                            break;
+              }  
+              case 7: {
+                            freq = 1036800;
+                            break;
+              }  
+              case 6: {
+                            freq = 1190400;
+                            break;
+              }  
+              case 5: {
+                            freq = 1267200;
+                            break;
+              }  
+              case 4: {
+                            freq = 1497600;
+                            break;
+              }  
+              case 3: {
+                            freq = 1574400;
+                            break;
+              }  
+              case 2: {
+                            freq = 1728000;
+                            break;
+              }  
+              case 1: {
+                            freq = 1958400;
+                            break;
+              }  
+              default: {
+                            freq = 2265600;
+                            if (__MAX_CPU_FREQ__621 != 0) {
+                              try {
+                                maybeManager.badMaybeAlternative("com.android.server", "MAX_CPU_FREQ", __MAX_CPU_FREQ__621);
+                              } catch (Exception e) {
+                                Log.e("MaybeService-MAX_CPU_FREQ", "Failed to report bad maybe alternative.", e);
+                              }
+                            }
+                            break;
+              }
+            }
+            if (DEBUG) {
+                Log.d(TAG, "New MAX CPU FREQ: " + freq + "; previous is: " + MAX_CPU_FREQ);
+            }
+            if (freq != MAX_CPU_FREQ) {
+                MAX_CPU_FREQ = freq;
+                if (DEBUG) {
+                    Log.d(TAG, "Change MAX CPU FREQ to " + freq);
+                }
+                java.lang.Process cmd = new ProcessBuilder(new String[]{"sh","-c","/system/xbin/echo "+freq+" > sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"})
+                    .redirectErrorStream(true).start();
+                InputStream in = cmd.getInputStream();
+                BufferedReader buf = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line=buf.readLine()) != null) {
+                    if (DEBUG) {
+                        Log.d(TAG, "writing to cpu0/cpufreq/scaling_available_gov file: " + line );
+                    }
+                }
+                in.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Cpu info "+e.getMessage());
+        }
+    }
+
+    private void setRepeatTasks() {
+        final Handler handler = new Handler();
+        Runnable runable = new Runnable() {
+                @Override
+                public void run() {
+                    getLowBatteryWarningLevel();
+                    getMaxCPUFreq();
+                    handler.postDelayed(this, INTERVAL);
+                }
+            };
+        if (DEBUG) {
+            Log.d(TAG, "post repeat CPU, LOW_BATTERY tasks for: " + INTERVAL);
+        }
+        handler.postDelayed(runable, INTERVAL);
     }
 
     public BatteryService(Context context, LightsService lights) {
+        if (DEBUG) {
+            Log.d(TAG, "BatteryService Constructor called.");
+        }
         mContext = context;
         mHandler = new Handler(true /*async*/);
         mLed = new Led(context, lights);
@@ -194,9 +333,8 @@ public final class BatteryService extends Binder {
 
         mCriticalBatteryLevel = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_criticalBatteryWarningLevel);
-        // mLowBatteryWarningLevel = mContext.getResources().getInteger(
-        //         com.android.internal.R.integer.config_lowBatteryWarningLevel);
-        getLowBatteryWarningLevel();
+        mLowBatteryWarningLevel = mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_lowBatteryWarningLevel);
 
         mLowBatteryCloseWarningLevel = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_lowBatteryCloseWarningLevel);
@@ -227,6 +365,11 @@ public final class BatteryService extends Binder {
             shutdownIfNoPowerLocked();
             shutdownIfOverTempLocked();
         }
+
+        if (DEBUG) {
+            Log.d(TAG, "BatteryService systemReady called.");
+        }
+        setRepeatTasks();
     }
 
     /**
@@ -279,7 +422,6 @@ public final class BatteryService extends Binder {
      */
     public boolean isBatteryLow() {
         synchronized (mLock) {
-            getLowBatteryWarningLevel();
             return mBatteryProps.batteryPresent && mBatteryProps.batteryLevel <= mLowBatteryWarningLevel;
         }
     }
@@ -445,7 +587,6 @@ public final class BatteryService extends Binder {
              * - is not plugged and battery level falls to WARNING boundary
              *   (becomes <= mLowBatteryWarningLevel).
              */
-            getLowBatteryWarningLevel();
             final boolean sendBatteryLow = !plugged
                     && mBatteryProps.batteryStatus != BatteryManager.BATTERY_STATUS_UNKNOWN
                     && mBatteryProps.batteryLevel <= mLowBatteryWarningLevel
@@ -479,6 +620,9 @@ public final class BatteryService extends Binder {
 
             if (sendBatteryLow) {
                 mSentLowBatteryBroadcast = true;
+                if (DEBUG) {
+                    Log.d(TAG, "Sending LowBatteryBroadcast");
+                }
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -532,7 +676,7 @@ public final class BatteryService extends Binder {
          * "Description": "Battery status changed."
          * }
          */
- 
+
         (new StrictJSONObject(PHONELAB_TAG))
             .put("Action", Intent.ACTION_BATTERY_CHANGED)
             .put("Scale", BATTERY_SCALE)

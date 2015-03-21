@@ -1,29 +1,107 @@
 {
     "statements": [
         {
-            "content": "        mLowBatteryWarningLevel = maybe(\"LowBatteryWarningLevel\") 10, 20, 30;", 
+            "content": "        int level = maybe(\"LowBatteryWarningLevel\") 10, 20, 30;", 
             "alternatives": [
                 {
-                    "start": 66, 
-                    "end": 68, 
+                    "start": 52, 
+                    "end": 54, 
                     "value": 0
                 }, 
                 {
-                    "start": 70, 
-                    "end": 72, 
+                    "start": 56, 
+                    "end": 58, 
                     "value": 1
                 }, 
                 {
-                    "start": 74, 
-                    "end": 76, 
+                    "start": 60, 
+                    "end": 62, 
                     "value": 2
                 }
             ], 
-            "line": 148, 
+            "line": 151, 
             "type": "assignment", 
             "label": "LowBatteryWarningLevel"
+        }, 
+        {
+            "content": "            int freq = maybe(\"MAX_CPU_FREQ\") 2265600, 1958400, 1728000, 1574400, 1497600, 1267200, 1190400, 1036800, 960000, 883200, 729600, 652800, 422400, 300000;", 
+            "alternatives": [
+                {
+                    "start": 45, 
+                    "end": 52, 
+                    "value": 0
+                }, 
+                {
+                    "start": 54, 
+                    "end": 61, 
+                    "value": 1
+                }, 
+                {
+                    "start": 63, 
+                    "end": 70, 
+                    "value": 2
+                }, 
+                {
+                    "start": 72, 
+                    "end": 79, 
+                    "value": 3
+                }, 
+                {
+                    "start": 81, 
+                    "end": 88, 
+                    "value": 4
+                }, 
+                {
+                    "start": 90, 
+                    "end": 97, 
+                    "value": 5
+                }, 
+                {
+                    "start": 99, 
+                    "end": 106, 
+                    "value": 6
+                }, 
+                {
+                    "start": 108, 
+                    "end": 115, 
+                    "value": 7
+                }, 
+                {
+                    "start": 117, 
+                    "end": 123, 
+                    "value": 8
+                }, 
+                {
+                    "start": 125, 
+                    "end": 131, 
+                    "value": 9
+                }, 
+                {
+                    "start": 133, 
+                    "end": 139, 
+                    "value": 10
+                }, 
+                {
+                    "start": 141, 
+                    "end": 147, 
+                    "value": 11
+                }, 
+                {
+                    "start": 149, 
+                    "end": 155, 
+                    "value": 12
+                }, 
+                {
+                    "start": 157, 
+                    "end": 163, 
+                    "value": 13
+                }
+            ], 
+            "line": 160, 
+            "type": "assignment", 
+            "label": "MAX_CPU_FREQ"
         }
     ], 
-    "sha224_hash": "36767b1ae65926bc9d24665aff619476f626a27a2c5de9ceb64dcd13", 
+    "sha224_hash": "424dd8e6b79677ffa332a219c2a8a9a815c1993a6c860ff926f26796", 
     "package": "com.android.server"
 }
