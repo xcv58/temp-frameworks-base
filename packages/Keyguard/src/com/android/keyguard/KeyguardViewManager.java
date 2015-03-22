@@ -54,7 +54,7 @@ import android.widget.FrameLayout;
 import java.util.Date;
 import org.json.JSONObject;//maybe
 import org.json.JSONException;
-import com.android.internal.R;
+import com.android.keyguard.R;
 import com.android.internal.widget.LockPatternUtils;
 
 /**
