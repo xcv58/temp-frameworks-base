@@ -23,11 +23,14 @@ import android.text.TextUtils;
 
 import java.util.BitSet;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * A class representing a configured Wi-Fi network, including the
  * security configuration.
  */
-public class WifiConfiguration implements Parcelable {
+public class WifiConfiguration implements Parcelable, JSONable {
     private static final String TAG = "WifiConfiguration";
     /** {@hide} */
     public static final String ssidVarName = "ssid";
@@ -574,6 +577,18 @@ public class WifiConfiguration implements Parcelable {
     public int describeContents() {
         return 0;
     }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("networkId", networkId)
+            .put("priority", priority)
+            .put("hiddenSSID", hiddenSSID)
+            .put("status", Status.strings[status])
+            .put("SSID", SSID);
+    }
+
+
 
     /** copy constructor {@hide} */
     public WifiConfiguration(WifiConfiguration source) {

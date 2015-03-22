@@ -2238,6 +2238,24 @@ public class WifiStateMachine extends StateMachine {
             .put("Results", mScanResults)
             .log();
 
+
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "Network",
+         * "SubCategory": "Wifi",
+         * "Tag": "PhoneLab-Network-Wifi",
+         * "Action": "android.net.wifi.CONFIGURED_NETWORKS",
+         * "Description": "Configured Wifi networks."
+         * }
+         */
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", "android.net.wifi.CONFIGURED_NETWORKS")
+            .put("Networks", mWifiConfigStore.getConfiguredNetworks())
+            .log();
+
+
         noteScanEnd();
         Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
@@ -2945,7 +2963,7 @@ public class WifiStateMachine extends StateMachine {
 
     private void updateSupplicantScanInterval() {
         
-        int __ScanRate__927 = 0;
+        int __ScanRate__674 = 0;
         
         MaybeManager maybeManager;
         
@@ -2957,11 +2975,11 @@ public class WifiStateMachine extends StateMachine {
         };
         
         try {
-          __ScanRate__927 = maybeManager.getMaybeAlternative("android.net.wifi", "ScanRate");
+          __ScanRate__674 = maybeManager.getMaybeAlternative("android.net.wifi", "ScanRate");
         } catch (Exception e) {
           Log.e("MaybeService-ScanRate", "Failed to get maybe alternative.", e);
         };
-        switch (__ScanRate__927) {
+        switch (__ScanRate__674) {
           
           case 4: {
                     mSupplicantScanIntervalMs = 300000;
@@ -2981,9 +2999,9 @@ public class WifiStateMachine extends StateMachine {
           }  
           default: {
                     mSupplicantScanIntervalMs = 15000;
-                    if (__ScanRate__927 != 0) {
+                    if (__ScanRate__674 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("android.net.wifi", "ScanRate", __ScanRate__927);
+                        maybeManager.badMaybeAlternative("android.net.wifi", "ScanRate", __ScanRate__674);
                       } catch (Exception e) {
                         Log.e("MaybeService-ScanRate", "Failed to report bad maybe alternative.", e);
                       }

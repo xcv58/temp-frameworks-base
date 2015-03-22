@@ -869,7 +869,7 @@ public class WifiStateMachine extends StateMachine {
             try {
                 mNetworkStatsService.forceUpdate();
             }
-            catch (RemoteException e) {
+            catch (Exception e) {
                 Log.e(PHONELAB_TAG, "Failed to update network stats.", e);
             }
         }
@@ -2235,6 +2235,24 @@ public class WifiStateMachine extends StateMachine {
             .put("Action", WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
             .put("Results", mScanResults)
             .log();
+
+
+        /**
+         * PhoneLab
+         *
+         * {
+         * "Category": "Network",
+         * "SubCategory": "Wifi",
+         * "Tag": "PhoneLab-Network-Wifi",
+         * "Action": "android.net.wifi.CONFIGURED_NETWORKS",
+         * "Description": "Configured Wifi networks."
+         * }
+         */
+        (new StrictJSONObject(PHONELAB_TAG))
+            .put("Action", "android.net.wifi.CONFIGURED_NETWORKS")
+            .put("Networks", mWifiConfigStore.getConfiguredNetworks())
+            .log();
+
 
         noteScanEnd();
         Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
