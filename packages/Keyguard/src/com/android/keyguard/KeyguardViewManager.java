@@ -51,6 +51,11 @@ import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import java.util.Date;
+import org.json.JSONObject;//maybe
+import org.json.JSONException;
+import com.android.internal.R;
+import com.android.internal.widget.LockPatternUtils;
 
 /**
  * Manages creating, showing, hiding and resetting the keyguard.  Calls back
@@ -139,6 +144,32 @@ public class KeyguardViewManager {
         mKeyguardView.show();
         mKeyguardView.requestFocus();
     }
+
+    //Start maybe logging functions
+
+    public static Date tick(){
+      return new Date();
+    }
+
+    public static void tock(Date time1, JSONObject data){
+        Date time2 = new Date();
+        long interval = time2.getTime() - time1.getTime();
+        if(interval < 0){
+          interval *= -1;
+        }
+        JSONObject timeObj = new JSONObject();
+        try{
+        timeObj.put("interval", interval);
+        timeObj.put("start",time1.getTime());
+        timeObj.put("end",time2.getTime());
+        timeObj.put("message", data);
+        }catch(JSONException e){
+          e.printStackTrace();
+        }
+        Log.i("MaybeServiceLogging-Keyguard", timeObj.toString());
+    }
+
+    //End maybe logging
 
     private boolean shouldEnableScreenRotation() {
         Resources res = mContext.getResources();
@@ -431,6 +462,7 @@ public class KeyguardViewManager {
     }
 
     public synchronized void onScreenTurnedOn(final IKeyguardShowCallback callback) {
+        Date tick = tick();
         if (DEBUG) Log.d(TAG, "onScreenTurnedOn()");
         mScreenOn = true;
 
@@ -474,6 +506,19 @@ public class KeyguardViewManager {
             } catch (RemoteException e) {
                 Slog.w(TAG, "Exception calling onShown():", e);
             }
+        }
+
+
+        JSONObject jsonLog = new JSONObject(); //maybe
+        try{
+            jsonLog.put("event", new JSONObject().put("name","screen_state").put("screen_state","on"));
+            jsonLog.put("function","onScreenTurnedOn");
+            jsonLog.put("file","KeyguardViewManager");
+
+            
+            tock(tick, jsonLog);
+        }catch(JSONException e){
+            e.printStackTrace();
         }
     }
 

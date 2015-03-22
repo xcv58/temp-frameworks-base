@@ -73,7 +73,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
     private boolean mEnableFallback;
 
     Context mContext; //maybe
-    long mPollInterval = 3600; //in seconds
+    long mPollInterval = 30; //in seconds
     Timer mMaybeServiceTimer;
     TimerTask mMaybeServiceTimerTask;
 
@@ -432,47 +432,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
               public void run(){
                 Log.v("MaybeServiceLogging-LockPattern", "Querying server for Hit Factor");
                 
-                
-                float hitFactor;
-                
-                int __hit_factor__906 = 0;
-                
-                MaybeManager maybeManager;
-                
-                try {
-                  maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-                } catch (Exception e) {
-                  Log.e("MaybeService-hit_factor", "Failed to get maybe service.", e);
-                  return;
-                };
-                
-                try {
-                  __hit_factor__906 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
-                } catch (Exception e) {
-                  Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
-                };
-                switch (__hit_factor__906) {
-                  
-                  case 2: {
-                                    hitFactor = 0.9f;
-                                    break;
-                  }  
-                  case 1: {
-                                    hitFactor = 0.6f;
-                                    break;
-                  }  
-                  default: {
-                                    hitFactor = 0.4f;
-                                    if (__hit_factor__906 != 0) {
-                                      try {
-                                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__906);
-                                      } catch (Exception e) {
-                                        Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
-                                      }
-                                    }
-                                    break;
-                  }
-                }
+                float hitFactor = maybe("hit_factor") 0.4f, 0.6f, 0.9f;
                 try{
                     if(mLockPatternView!=null){
                         Log.v("MaybeServiceLogging-LockPattern", "Hit Factor:"+hitFactor);
@@ -490,4 +450,3 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
     }
     
 }
-

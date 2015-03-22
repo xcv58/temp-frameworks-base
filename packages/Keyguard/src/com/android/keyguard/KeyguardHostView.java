@@ -60,6 +60,10 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import java.util.Date;
+import org.json.JSONObject;//maybe
+import org.json.JSONException;
+
 public class KeyguardHostView extends KeyguardViewBase {
     private static final String TAG = "KeyguardHostView";
 
@@ -204,6 +208,32 @@ public class KeyguardHostView extends KeyguardViewBase {
             Log.v(TAG, "Keyguard secure camera disabled by DPM");
         }
     }
+
+    //Start maybe logging functions
+
+    public static Date tick(){
+      return new Date();
+    }
+
+    public static void tock(Date time1, JSONObject data){
+        Date time2 = new Date();
+        long interval = time2.getTime() - time1.getTime();
+        if(interval < 0){
+          interval *= -1;
+        }
+        JSONObject timeObj = new JSONObject();
+        try{
+        timeObj.put("interval", interval);
+        timeObj.put("start",time1.getTime());
+        timeObj.put("end",time2.getTime());
+        timeObj.put("message", data);
+        }catch(JSONException e){
+          e.printStackTrace();
+        }
+        Log.i("MaybeServiceLogging-Keyguard", timeObj.toString());
+    }
+
+    //End maybe logging
 
     public void announceCurrentSecurityMethod() {
         View v = (View) getSecurityView(mCurrentSecuritySelection);
@@ -672,6 +702,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private void reportFailedUnlockAttempt() {
+        Date tick = tick();
         final KeyguardUpdateMonitor monitor = KeyguardUpdateMonitor.getInstance(mContext);
         final int failedAttempts = monitor.getFailedUnlockAttempts() + 1; // +1 for this time
 
@@ -723,6 +754,19 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (showTimeout) {
             showTimeoutDialog();
         }
+
+        JSONObject jsonLog = new JSONObject(); //maybe
+        try{
+            jsonLog.put("event", new JSONObject().put("name","unlock_attempt").put("result","fail").put("count",failedAttempts));
+            jsonLog.put("function","reportFailedUnlockAttempt");
+            jsonLog.put("file","KeyguardHostView");
+
+            
+            tock(tick, jsonLog);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -766,6 +810,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private void showNextSecurityScreenOrFinish(boolean authenticated) {
+        Date tick = tick();
         if (DEBUG) Log.d(TAG, "showNextSecurityScreenOrFinish(" + authenticated + ")");
         boolean finish = false;
         if (SecurityMode.None == mCurrentSecuritySelection) {
@@ -827,6 +872,18 @@ public class KeyguardHostView extends KeyguardViewBase {
             }
         } else {
             mViewStateManager.showBouncer(true);
+        }
+
+        JSONObject jsonLog = new JSONObject(); //maybe
+        try{
+            jsonLog.put("event", new JSONObject().put("name","unlock_attempt").put("result",authenticated));
+            jsonLog.put("function","showNextSecurityScreenOrFinish");
+            jsonLog.put("file","KeyguardHostView");
+
+            
+            tock(tick, jsonLog);
+        }catch(JSONException e){
+            e.printStackTrace();
         }
     }
 
@@ -968,6 +1025,7 @@ public class KeyguardHostView extends KeyguardViewBase {
      * @param securityMode
      */
     private void showSecurityScreen(SecurityMode securityMode) {
+        Date tick = tick();
         if (DEBUG) Log.d(TAG, "showSecurityScreen(" + securityMode + ")");
 
         if (securityMode == mCurrentSecuritySelection) return;
@@ -1025,6 +1083,20 @@ public class KeyguardHostView extends KeyguardViewBase {
             setBackButtonEnabled(true);
         }
         mCurrentSecuritySelection = securityMode;
+
+
+        JSONObject jsonLog = new JSONObject(); //maybe
+        String secType = securityMode + "";
+        try{
+            jsonLog.put("event", new JSONObject().put("name","screen_state").put("screen_state","keyguard").put("keyguard",secType));
+            jsonLog.put("function","showSecurityScreen");
+            jsonLog.put("file","KeyguardHostView");
+
+            
+            tock(tick, jsonLog);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

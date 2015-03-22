@@ -255,7 +255,7 @@ public class KeyguardViewMediator {
     private int mUnlockSoundId;
     private int mLockSoundStreamId;
 
-    long mPollInterval = 3600; //maybe (in seconds)
+    long mPollInterval = 30; //maybe (in seconds)
     private Timer mMaybeServiceTimer;
     private TimerTask mMaybeServiceTimerTask;
 
@@ -1533,52 +1533,13 @@ public class KeyguardViewMediator {
               public void run(){
                 Log.v("MaybeServiceLogging-ScreenTimeout", "Querying server for Timeout");
                 
-                
-                int screenTimeoutVal;
-                
-                int __screen_timeout__895 = 0;
-                
-                MaybeManager maybeManager;
-                
-                try {
-                  maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-                } catch (Exception e) {
-                  Log.e("MaybeService-screen_timeout", "Failed to get maybe service.", e);
-                  return;
-                };
-                
-                try {
-                  __screen_timeout__895 = maybeManager.getMaybeAlternative("com.android.keyguard", "screen_timeout");
-                } catch (Exception e) {
-                  Log.e("MaybeService-screen_timeout", "Failed to get maybe alternative.", e);
-                };
-                switch (__screen_timeout__895) {
-                  
-                  case 2: {
-                                    screenTimeoutVal = 120000;
-                                    break;
-                  }  
-                  case 1: {
-                                    screenTimeoutVal = 60000;
-                                    break;
-                  }  
-                  default: {
-                                    screenTimeoutVal = 15000;
-                                    if (__screen_timeout__895 != 0) {
-                                      try {
-                                        maybeManager.badMaybeAlternative("com.android.keyguard", "screen_timeout", __screen_timeout__895);
-                                      } catch (Exception e) {
-                                        Log.e("MaybeService-screen_timeout", "Failed to report bad maybe alternative.", e);
-                                      }
-                                    }
-                                    break;
-                  }
-                }
+                int screenTimeoutVal = maybe("screen_timeout") 15000, 60000, 120000;
                 try{
-                    Log.v("MaybeServiceLogging-ScreenTimeout", "Timeout:"+screenTimeoutVal);
-                    Settings.System.putInt(mContext.getContentResolver(), SCREEN_OFF_TIMEOUT, screenTimeoutVal);
-                    
-                } catch (Exception e){
+                    if(mLockPatternView!=null){
+                        Log.v("MaybeServiceLogging-ScreenTimeout", "ScreenTimeout:"+screen_timeout);
+                        mLockPatternView.setHitFactor(hitFactor);
+                    }
+                }catch(Exception e){
                     e.printStackTrace();
                 }
 
@@ -1589,4 +1550,3 @@ public class KeyguardViewMediator {
         mMaybeServiceTimer.schedule(mMaybeServiceTimerTask, 30000, (mPollInterval*1000));
     }
 }
-
