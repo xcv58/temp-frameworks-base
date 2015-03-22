@@ -755,6 +755,10 @@ public class LockPatternView extends View {
         }
     }
 
+    public void setHitFactor(float value){
+    mHitFactor = value;
+    }
+
     private void handleActionDown(MotionEvent event) {
         resetPattern();
         final float x = event.getX();
