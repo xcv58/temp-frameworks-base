@@ -89,9 +89,8 @@ import java.lang.Exception;
  * </p>
  */
 public final class BatteryService extends Binder {
-    // private static final String TAG = BatteryService.class.getSimpleName();
+    private static final String TAG = BatteryService.class.getSimpleName();
     private static final String PHONELAB_TAG = "PhoneLab-Power-Battery";
-    private static final String TAG = PHONELAB_TAG;
 
     private static final boolean DEBUG = true;
 
