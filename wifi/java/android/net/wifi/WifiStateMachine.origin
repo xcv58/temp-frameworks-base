@@ -2243,7 +2243,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.CONFIGURED_NETWORKS",
          * "Description": "Configured Wifi networks."
          * }
