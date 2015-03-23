@@ -117,7 +117,7 @@ public class WifiStateMachine extends StateMachine {
     private static final String NETWORKTYPE = "WIFI";
     private static final boolean DBG = false;
 
-    private final String PHONELAB_TAG = "PhoneLab-Network-Wifi";
+    private final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
 
     private WifiMonitor mWifiMonitor;
     private WifiNative mWifiNative;
@@ -1873,7 +1873,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.WIFI_STATE_CHANGED",
          * "Description": "Wifi state change (enabled/disabled)."
          * }
@@ -2228,7 +2228,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.SCAN_RESULTS",
          * "Description": "Wifi scan results."
          * }
@@ -2269,7 +2269,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.RSSI_CHANGED",
          * "Description": "Link RSSI update."
          * }
@@ -2292,7 +2292,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.STATE_CHANGE",
          * "Description": "Network connected/disconnected."
          * }
@@ -2324,7 +2324,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.LINK_CONFIGURATION_CHANGED",
          * "Description": "Link confiration changed."
          * }
@@ -2347,7 +2347,7 @@ public class WifiStateMachine extends StateMachine {
          * {
          * "Category": "Network",
          * "SubCategory": "Wifi",
-         * "Tag": "PhoneLab-Network-Wifi",
+         * "Tag": "Network-Wifi-PhoneLab",
          * "Action": "android.net.wifi.supplicant.STATE_CHANGE",
          * "Description": "WPA supplicant conection state change."
          * }

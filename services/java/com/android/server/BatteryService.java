@@ -90,7 +90,7 @@ import java.lang.Exception;
  */
 public final class BatteryService extends Binder {
     private static final String TAG = BatteryService.class.getSimpleName();
-    private static final String PHONELAB_TAG = "PhoneLab-Power-Battery";
+    private static final String PHONELAB_TAG = "Power-Battery-PhoneLab";
 
     private static final boolean DEBUG = true;
 
@@ -683,8 +683,8 @@ public final class BatteryService extends Binder {
          * {
          * "Category": "Power",
          * "SubCategory": "Battery",
-         * "Tag": "PhoneLab-Power-Battery",
-         * "Action": "android.intent.action.BATTERY_CHANGED.",
+         * "Tag": "Power-Battery-PhoneLab",
+         * "Action": "android.intent.action.BATTERY_CHANGED",
          * "Description": "Battery status changed."
          * }
          */

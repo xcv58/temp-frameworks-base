@@ -16,11 +16,18 @@
 
 package android.database.sqlite;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.DefaultDatabaseErrorHandler;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
+
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 
 /**
  * A helper class to manage database creation and version management.
@@ -104,6 +111,29 @@ public abstract class SQLiteOpenHelper {
         mFactory = factory;
         mNewVersion = version;
         mErrorHandler = errorHandler;
+
+        try{
+				int stringId = context.getApplicationInfo().labelRes;
+				/**
+				 * PhoneLab
+				 *
+				 * {
+				 * "Category": "SQLite",
+				 * "SubCategory": "Query",
+				 * "Tag": "SQLite-Query-PhoneLab",
+				 * "Action": "App_Name",
+				 * "Description": "Logging Apps that access the database."
+				 * }
+				 */
+				(new StrictJSONObject("SQLite-Query-PhoneLab"))
+					.put(StrictJSONObject.KEY_ACTION, "APP_NAME")
+					.put("PackageName",context.getPackageName())
+					.put("AppName",context.getString(stringId))
+					.log();
+				}
+				catch(Exception e){
+				Log.e("SQLite-Query-PhoneLab","Unable to get app info due to security reasons");
+				}
     }
 
     /**

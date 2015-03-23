@@ -94,7 +94,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class LocationManagerService extends ILocationManager.Stub {
     private static final String TAG = "LocationManagerService";
-    private static final String PHONELAB_TAG = "PhoneLab-Location-Misc";
+    private static final String PHONELAB_TAG = "Location-Misc-PhoneLab";
     public static final boolean D = Log.isLoggable(TAG, Log.DEBUG);
 
     private static final String WAKELOCK_KEY = TAG;
@@ -1982,7 +1982,7 @@ public class LocationManagerService extends ILocationManager.Stub {
          * {
          * "Category": "Location",
          * "SubCategory": "Misc",
-         * "Tag": "PhoneLab-Location-Misc",
+         * "Tag": "Location-Misc-PhoneLab",
          * "Action": "android.location.LOCATION_CHANGED",
          * "Description": "Location update."
          * }

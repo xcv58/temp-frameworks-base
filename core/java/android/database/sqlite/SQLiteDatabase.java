@@ -42,6 +42,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.Arrays;
+import java.lang.String;
+
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 /**
  * Exposes methods to manage a SQLite database.
@@ -666,6 +670,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @throws SQLiteException if the database cannot be opened
      */
     public static SQLiteDatabase openDatabase(String path, CursorFactory factory, int flags) {
+
         return openDatabase(path, factory, flags, null);
     }
 
@@ -692,6 +697,86 @@ public final class SQLiteDatabase extends SQLiteClosable {
             DatabaseErrorHandler errorHandler) {
         SQLiteDatabase db = new SQLiteDatabase(path, flags, factory, errorHandler);
         db.open();
+        Cursor c = db.rawQuery(
+                "SELECT name FROM sqlite_master WHERE type='table'", null);
+        ArrayList<String[]> result = new ArrayList<String[]>();
+
+        int i = 0;
+        result.add(c.getColumnNames());
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            String[] temp = new String[c.getColumnCount()];
+            for (i = 0; i < temp.length; i++) {
+                temp[i] = c.getString(i);
+            }
+            result.add(temp);
+        }
+
+        StringBuilder tables= new StringBuilder();
+
+        for(String[] string : result){
+            tables.append(Arrays.toString(string));
+
+            for(String s : string){
+                StringBuilder schema = new StringBuilder();
+                Cursor cur = db.rawQuery("PRAGMA table_info(" + s + ")", null);
+                if (cur.moveToFirst()) {
+                    do {
+                        schema.append("cid:");
+                        schema.append(cur.getString(0));
+                        schema.append(",");
+                        schema.append("name:");
+                        schema.append(cur.getString(1));
+                        schema.append(",");
+                        schema.append("type:");
+                        schema.append(cur.getString(2));
+                        schema.append(",");
+                        schema.append("notnull:");
+                        schema.append(cur.getString(3));
+                        schema.append(",");
+                        schema.append("dflt_value:");
+                        schema.append(cur.getString(4));
+                        schema.append(",");
+                        schema.append("pk:");
+                        schema.append(cur.getString(5));
+                        schema.append("...");
+                    } while (cur.moveToNext());
+                }
+                cur.close();
+                /**
+                 * PhoneLab
+                 *
+                 * {
+                 * "Category": "SQLite",
+                 * "SubCategory": "SCHEMA",
+                 * "Tag": "SQLite-Query-PhoneLab",
+                 * "Action": "SCHEMA",
+                 * "Description": "Logging SCHEMA of tables associated with a database."
+                 * }
+                 */
+                (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                        .put(StrictJSONObject.KEY_ACTION, "SCHEMA")
+                        .put("TABLE_NAME",s)
+                        .put("SCHEMA", schema.toString())
+                        .log();
+            }
+        }
+        /**
+        * PhoneLab
+        *
+        * {
+        * "Category": "SQLite",
+        * "SubCategory": "Query",
+        * "Tag": "SQLite-Query-PhoneLab",
+        * "Action": "TABLES",
+        * "Description": "Logging TABLES associated with a database."
+        * }
+        */
+        (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                .put(StrictJSONObject.KEY_ACTION, "TABLES")
+                .put("DB_PATH",path)
+                .put("TABLES", tables.toString())
+                .log();
+
         return db;
     }
 
@@ -1435,6 +1520,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     public long insertWithOnConflict(String table, String nullColumnHack,
             ContentValues initialValues, int conflictAlgorithm) {
         acquireReference();
+        long returnValue = 0;
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("INSERT");
@@ -1466,13 +1552,45 @@ public final class SQLiteDatabase extends SQLiteClosable {
 
             SQLiteStatement statement = new SQLiteStatement(this, sql.toString(), bindArgs);
             try {
-                return statement.executeInsert();
-            } finally {
+                long startTime = System.nanoTime();
+                returnValue = statement.executeInsert();
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+
+                StringBuilder hashStringBuilder = new StringBuilder(500);
+                for (int j = 0; j < bindArgs.length; j++)
+                {
+                        hashStringBuilder.append(bindArgs[j].hashCode());
+                        hashStringBuilder.append(",");
+                }
+                String hashString = hashStringBuilder.toString();
+                /**
+                 * PhoneLab
+                 *
+                 * {
+                 * "Category": "SQLite",
+                 * "SubCategory": "Instumentation",
+                 * "Tag": "SQLite-Query-PhoneLab",
+                 * "Action": "INSERT",
+                 * "Description": "Logging INSERT queries."
+                 * }
+                 */
+                (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                  .put(StrictJSONObject.KEY_ACTION, "INSERT")
+                  .put("Time", duration)
+                  .put("Arguments(hashCoded)", hashString)
+                  .put("Results", statement.toString())
+                  .log();
+
+            } catch(NullPointerException e){
+                System.out.println("Encountered NullPointerException: "+e.getMessage());
+            }finally {
                 statement.close();
             }
         } finally {
             releaseReference();
         }
+        return returnValue;
     }
 
     /**
@@ -1490,17 +1608,50 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public int delete(String table, String whereClause, String[] whereArgs) {
         acquireReference();
+        int returnValue = 0;
         try {
             SQLiteStatement statement =  new SQLiteStatement(this, "DELETE FROM " + table +
                     (!TextUtils.isEmpty(whereClause) ? " WHERE " + whereClause : ""), whereArgs);
             try {
-                return statement.executeUpdateDelete();
-            } finally {
+                long startTime = System.nanoTime();
+                returnValue = statement.executeUpdateDelete();
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+
+//                StringBuilder hashStringBuilder = new StringBuilder(500);
+//                for (int j = 0; j < whereArgs.length; j++)
+//                {
+//                        hashStringBuilder.append(whereArgs[j].hashCode());
+//                        hashStringBuilder.append(",");
+//                }
+//                String hashString = hashStringBuilder.toString();
+                /**
+                 * PhoneLab
+                 *
+                 * {
+                 * "Category": "SQLite",
+                 * "SubCategory": "Instrumentation",
+                 * "Tag": "SQLite-Query-PhoneLab",
+                 * "Action": "DELETE",
+                 * "Description": "Logging DELETE queries."
+                 * }
+                 */
+                (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                  .put(StrictJSONObject.KEY_ACTION, "DELETE")
+                  .put("Time", duration)
+                  .put("Arguments", Arrays.toString(whereArgs))
+                  .put("Results", statement.toString())
+                  .log();
+            } catch(NullPointerException e){
+                System.out.println("Encountered NullPointerException: "+e.getMessage());
+            }
+            finally {
                 statement.close();
             }
         } finally {
             releaseReference();
         }
+        return returnValue;
     }
 
     /**
@@ -1540,7 +1691,9 @@ public final class SQLiteDatabase extends SQLiteClosable {
             throw new IllegalArgumentException("Empty values");
         }
 
+
         acquireReference();
+        int returnValue = 0;
         try {
             StringBuilder sql = new StringBuilder(120);
             sql.append("UPDATE ");
@@ -1569,15 +1722,57 @@ public final class SQLiteDatabase extends SQLiteClosable {
                 sql.append(whereClause);
             }
 
+
             SQLiteStatement statement = new SQLiteStatement(this, sql.toString(), bindArgs);
+
             try {
-                return statement.executeUpdateDelete();
+                long startTime = System.nanoTime();
+                returnValue = statement.executeUpdateDelete();
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+
+                /**
+                 * PhoneLab
+                 *
+                 * {
+                 * "Category": "SQLite",
+                 * "SubCategory": "Instumentation",
+                 * "Tag": "SQLite-Query-PhoneLab",
+                 * "Action": "UPDATE",
+                 * "Description": "Logging UPDATE queries."
+                 * }
+                 */
+                if(bindArgs.length >1){
+                StringBuilder hashStringBuilder = new StringBuilder(400);
+                for (int j = 0; j < bindArgs.length; j++) {
+                    hashStringBuilder.append(bindArgs[j].hashCode());
+                        hashStringBuilder.append(",");
+                }
+                String hashString = hashStringBuilder.toString();
+                    (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                            .put(StrictJSONObject.KEY_ACTION, "UPDATE")
+                            .put("Time", duration)
+                            .put("Arguments", hashString)
+                            .put("Results", statement.toString())
+                            .log();
+                }
+                else{
+                    (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                            .put(StrictJSONObject.KEY_ACTION, "UPDATE")
+                            .put("Time", duration)
+                            .put("Arguments", Arrays.toString(bindArgs))
+                            .put("Results", statement.toString())
+                            .log();
+                }
+            } catch (NullPointerException e) {
+                System.out.print("Encountered NullPointerException:" + e.getMessage());
             } finally {
                 statement.close();
             }
         } finally {
             releaseReference();
         }
+        return returnValue;
     }
 
     /**

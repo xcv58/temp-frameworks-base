@@ -64,7 +64,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 final class Notifier {
     private static final String TAG = "PowerManagerNotifier";
-    private static final String PHONELAB_TAG = "PhoneLab-Power-Screen";
+    private static final String PHONELAB_TAG = "Power-Screen-PhoneLab";
 
     private static final boolean DEBUG = false;
 
@@ -442,7 +442,7 @@ final class Notifier {
              * {
              * "Category": "Power",
              * "SubCategory": "Screen",
-             * "Tag": "PhoneLab-Power-Screen",
+             * "Tag": "Power-Screen-PhoneLab",
              * "Action": "android.intent.action.SCREEN_ON",
              * "Description": "Screen turned on."
              * }
@@ -526,7 +526,7 @@ final class Notifier {
              * {
              * "Category": "Power",
              * "SubCategory": "Screen",
-             * "Tag": "PhoneLab-Power-Screen",
+             * "Tag": "Power-Screen-PhoneLab",
              * "Action": "android.intent.action.SCREEN_OFF",
              * "Description": "Screen turned off."
              * }

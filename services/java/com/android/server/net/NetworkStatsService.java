@@ -140,7 +140,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 public class NetworkStatsService extends INetworkStatsService.Stub {
     private static final String TAG = "NetworkStats";
-    private final String PHONELAB_TAG = "PhoneLab-Network-Misc";
+    private final String PHONELAB_TAG = "Network-Misc-PhoneLab";
     private static final boolean LOGV = false;
 
     private static final int MSG_PERFORM_POLL = 1;
@@ -992,7 +992,7 @@ public class NetworkStatsService extends INetworkStatsService.Stub {
              * {
              * "Category": "Network",
              * "SubCategory": "Misc",
-             * "Tag": "PhoneLab-Network-Misc",
+             * "Tag": "Network-Misc-PhoneLab",
              * "Action": "com.android.server.action.NETWORK_STATS_UPDATED",
              * "Description": "Per process network statistics."
              * }

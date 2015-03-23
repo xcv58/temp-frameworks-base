@@ -62,7 +62,7 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
  */
 class TelephonyRegistry extends ITelephonyRegistry.Stub {
     private static final String TAG = "TelephonyRegistry";
-    private static final String PHONELAB_TAG = "PhoneLab-Network-Telephony";
+    private static final String PHONELAB_TAG = "Network-Telephony-PhoneLab";
     private static final boolean DBG = false;
     private static final boolean DBG_LOC = false;
 
@@ -450,7 +450,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.telephony.MESSAGE_WAITING_CHANGED",
          * "Description": "Message waiting status changed."
          * }
@@ -485,7 +485,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.telephony.CALL_FORWARDING_CHANGED",
          * "Description": "Call forwarding status changed."
          * }
@@ -522,7 +522,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.telephony.DATA_ACTIVITY_CHANGED",
          * "Description": "Cellular data activity."
          * }
@@ -647,7 +647,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.telephony.CELL_LOCATION_CHANGED",
          * "Description": "Cell tower location changed."
          * }
@@ -730,7 +730,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.intent.action.SERVICE_STATE",
          * "Description": "Cellular service state changed."
          * }
@@ -763,7 +763,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.intent.action.SIG_STR",
          * "Description": "Cellular signal strength changed."
          * }
@@ -802,7 +802,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.intent.action.PHONE_STATE",
          * "Description": "Phone calling state changed (incoming call)."
          * }
@@ -834,7 +834,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.intent.action.ANY_DATA_STATE",
          * "Description": "Cellular data connectivity changed."
          * }
@@ -889,7 +889,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
          * {
          * "Category": "Network",
          * "SubCategory": "Telephony",
-         * "Tag": "PhoneLab-Network-Telephony",
+         * "Tag": "Network-Telephony-PhoneLab",
          * "Action": "android.intent.action.DATA_CONNECTION_FAILED",
          * "Description": "Cellular data connection failed."
          * }

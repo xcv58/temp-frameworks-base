@@ -18,6 +18,7 @@ package android.database.sqlite;
 
 import android.database.DatabaseUtils;
 import android.os.CancellationSignal;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 import java.util.Arrays;
 
@@ -78,6 +79,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
         } else {
             mBindArgs = null;
         }
+
     }
 
     final SQLiteDatabase getDatabase() {

@@ -16,10 +16,14 @@
 
 package android.database.sqlite;
 
+import java.util.Arrays;
+
 import android.database.CursorWindow;
 import android.os.CancellationSignal;
 import android.os.OperationCanceledException;
 import android.util.Log;
+
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 /**
  * Represents a query that reads the resulting rows into a {@link SQLiteQuery}.
@@ -56,14 +60,39 @@ public final class SQLiteQuery extends SQLiteProgram {
      */
     int fillWindow(CursorWindow window, int startPos, int requiredPos, boolean countAllRows) {
         acquireReference();
+        int numRows = 0;
         try {
             window.acquireReference();
             try {
-                int numRows = getSession().executeForCursorWindow(getSql(), getBindArgs(),
+                long startTime = System.nanoTime();
+                numRows = getSession().executeForCursorWindow(getSql(), getBindArgs(),
                         window, startPos, requiredPos, countAllRows, getConnectionFlags(),
                         mCancellationSignal);
-                return numRows;
-            } catch (SQLiteDatabaseCorruptException ex) {
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+
+                /**
+                 * PhoneLab
+                 *
+                 * {
+                 * "Category": "SQLite",
+                 * "SubCategory": "Instumentation",
+                 * "Tag": "SQLite-Instrumentation-PhoneLab",
+                 * "Action": "SELECT",
+                 * "Description": "Logging SELECT queries."
+                 * }
+                 */
+                (new StrictJSONObject("SQLite-Query-PhoneLab"))
+                  .put(StrictJSONObject.KEY_ACTION, "SELECT")
+                  .put("Arguments", Arrays.toString(getBindArgs()))
+                  .put("Results", getSql())
+                  .put("Time", duration)
+                  .put("Rows returned", numRows)
+                  .log();
+
+            } catch (NullPointerException e) {
+                System.out.println("Encountered NullPointerException: "+e.getMessage());
+            }catch (SQLiteDatabaseCorruptException ex) {
                 onCorruption();
                 throw ex;
             } catch (SQLiteException ex) {
@@ -75,6 +104,7 @@ public final class SQLiteQuery extends SQLiteProgram {
         } finally {
             releaseReference();
         }
+        return numRows;
     }
 
     @Override
