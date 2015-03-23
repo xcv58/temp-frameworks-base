@@ -19,6 +19,9 @@ package android.hardware;
 
 import android.os.Build;
 
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Class representing a sensor. Use {@link SensorManager#getSensorList} to get
  * the list of available Sensors.
@@ -28,7 +31,7 @@ import android.os.Build;
  * @see SensorEvent
  *
  */
-public final class Sensor {
+public final class Sensor implements JSONable {
 
     /**
      * A constant describing an accelerometer sensor type.
@@ -417,4 +420,16 @@ public final class Sensor {
                 + ", type=" + mType + ", maxRange=" + mMaxRange + ", resolution=" + mResolution
                 + ", power=" + mPower + ", minDelay=" + mMinDelay + "}";
     }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("name", mName)
+            .put("vendor", mVendor)
+            .put("version", mVersion)
+            .put("type", mType)
+            .put("minDelay", mMinDelay);
+    }
+
+
 }

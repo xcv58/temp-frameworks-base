@@ -16,6 +16,10 @@
 
 package android.hardware;
 
+
+import edu.buffalo.cse.phonelab.json.JSONable;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * This class represents a {@link android.hardware.Sensor Sensor} event and
  * holds informations such as the sensor's type, the time-stamp, accuracy and of
@@ -53,7 +57,7 @@ package android.hardware;
  *
  */
 
-public class SensorEvent {
+public class SensorEvent implements JSONable {
     /**
      * <p>
      * The length and contents of the {@link #values values} array depends on
@@ -503,5 +507,14 @@ public class SensorEvent {
 
     SensorEvent(int valueSize) {
         values = new float[valueSize];
+    }
+
+    /** {@hide} */
+    public StrictJSONObject toJSONObject() {
+        return (new StrictJSONObject())
+            .put("sensor", sensor)
+            .put("accuracy", accuracy)
+            .put("timestamp", timestamp)
+            .put("values", values);
     }
 }
