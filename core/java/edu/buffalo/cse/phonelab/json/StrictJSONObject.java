@@ -70,38 +70,7 @@ public class StrictJSONObject {
         return this;
     }
 
-    public StrictJSONObject put(String name, Integer value) {
-        try {
-            json.put(name, value == null? NONE: value);
-        }
-        catch (JSONException e) {
-            // ignore
-        }
-        return this;
-    }
-
-    public StrictJSONObject put(String name, Long value) {
-        try {
-            json.put(name, value == null? NONE: value);
-        }
-        catch (JSONException e) {
-            // ignore
-        }
-        return this;
-    }
-
-    public StrictJSONObject put(String name, Float value) {
-        try {
-            json.put(name, value == null? NONE: value);
-        }
-        catch (JSONException e) {
-            // ignore
-        }
-        return this;
-    }
-
-
-    public StrictJSONObject put(String name, Double value) {
+    public <T extends Number> StrictJSONObject put(String name, T value) {
         try {
             json.put(name, value == null? NONE: value);
         }
@@ -162,11 +131,39 @@ public class StrictJSONObject {
         return this;
     }
 
+    public StrictJSONObject put(String name, Boolean[] values) {
+        if (values != null) {
+            StrictJSONArray array = new StrictJSONArray();
+            for (Boolean v : values) {
+                array.put(v);
+            }
+            this.put(name, array);
+        }
+        else {
+            this.put(name, NONE);
+        }
+        return this;
+    }
+
     public StrictJSONObject put(String name, String[] values) {
         if (values != null) {
             StrictJSONArray array = new StrictJSONArray();
             for (String s : values) {
                 array.put(s);
+            }
+            this.put(name, array);
+        }
+        else {
+            this.put(name, NONE);
+        }
+        return this;
+    }
+
+    public <T extends Number> StrictJSONObject put(String name, T[] values) {
+        if (values != null) {
+            StrictJSONArray array = new StrictJSONArray();
+            for (T v : values) {
+                array.put(v);
             }
             this.put(name, array);
         }
