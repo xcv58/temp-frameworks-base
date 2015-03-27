@@ -511,10 +511,15 @@ public class SensorEvent implements JSONable {
 
     /** {@hide} */
     public StrictJSONObject toJSONObject() {
+        Float[] f = new Float[values.length];
+        for (int i = 0; i < values.length; i++) {
+            f[i] = values[i];
+        }
+
         return (new StrictJSONObject())
             .put("sensor", sensor)
             .put("accuracy", accuracy)
             .put("timestamp", timestamp)
-            .put("values", values);
+            .put("values", f);
     }
 }

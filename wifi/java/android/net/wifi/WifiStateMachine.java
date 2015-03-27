@@ -115,7 +115,7 @@ import java.lang.Exception;
 public class WifiStateMachine extends StateMachine {
 
     private static final String NETWORKTYPE = "WIFI";
-    private static final boolean DBG = false;
+    private static final boolean DBG = true;
 
     private final String PHONELAB_TAG = "Network-Wifi-PhoneLab";
 
@@ -866,15 +866,6 @@ public class WifiStateMachine extends StateMachine {
      * @param workSource If not null, blame is given to workSource.
      */
     public void startScan(int callingUid, WorkSource workSource) {
-        updateNetworkStatsService();
-        if (mNetworkStatsService != null) {
-            try {
-                mNetworkStatsService.forceUpdate();
-            }
-            catch (Exception e) {
-                Log.e(PHONELAB_TAG, "Failed to update network stats.", e);
-            }
-        }
         sendMessage(CMD_START_SCAN, callingUid, 0, workSource);
     }
 
@@ -1257,6 +1248,16 @@ public class WifiStateMachine extends StateMachine {
     }
 
     private void startScanNative(int type) {
+        updateNetworkStatsService();
+        if (mNetworkStatsService != null) {
+            try {
+                mNetworkStatsService.forceUpdate();
+            }
+            catch (Exception e) {
+                Log.e(PHONELAB_TAG, "Failed to update network stats.", e);
+            }
+        }
+
         mWifiNative.scan(type);
         mScanResultIsPending = true;
     }

@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 /**
  * Sensor manager implementation that communicates with the built-in
  * system sensors.
@@ -39,6 +41,8 @@ import java.util.List;
 public class SystemSensorManager extends SensorManager {
     private static native void nativeClassInit();
     private static native int nativeGetNextSensor(Sensor sensor, int next);
+
+    private static final String PHONELAB_TAG = "Mobility-Sensor-PhoneLab";
 
     private static boolean sSensorModuleInitialized = false;
     private static final Object sSensorModuleLock = new Object();
