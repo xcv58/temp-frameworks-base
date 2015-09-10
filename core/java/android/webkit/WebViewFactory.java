@@ -93,8 +93,10 @@ public final class WebViewFactory {
 
             final int uid = android.os.Process.myUid();
             if (uid == android.os.Process.ROOT_UID || uid == android.os.Process.SYSTEM_UID) {
-                throw new UnsupportedOperationException(
-                        "For security reasons, WebView is not allowed in privileged processes");
+                // Jinghao: 09/11/2015: allow system apps to use webview,  since
+                // Conductor use webview to display a bunch information
+                //throw new UnsupportedOperationException(
+                        // "For security reasons, WebView is not allowed in privileged processes");
             }
 
             Trace.traceBegin(Trace.TRACE_TAG_WEBVIEW, "WebViewFactory.getProvider()");
