@@ -25,8 +25,22 @@ public class StrictJSONArray {
         return this;
     }
 
+    public StrictJSONArray put(Integer value) {
+        array.put(value == null? NONE: value);
+        return this;
+    }
 
-    public <T extends Number> StrictJSONArray put(T value) {
+    public StrictJSONArray put(Long value) {
+        array.put(value == null? NONE: value);
+        return this;
+    }
+
+    public StrictJSONArray put(Float value) {
+        array.put(value == null? NONE: value);
+        return this;
+    }
+
+    public StrictJSONArray put(Double value) {
         array.put(value == null? NONE: value);
         return this;
     }

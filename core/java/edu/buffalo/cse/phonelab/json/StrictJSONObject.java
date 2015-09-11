@@ -19,7 +19,7 @@ import org.json.JSONArray;
  *
  * It's different with org.json.JSONobject in two ways.
  *
- * First, values can only be one of following :
+ * First, values can only be one of following:
  *  - primitive types/wrappers (Boolean, Integer, Long, Float, Double)
  *  - String
  *  - StrictJSONObject
@@ -36,17 +36,20 @@ import org.json.JSONArray;
  * Also, this object provides a {@code log} method, which will log out the JSON
  * string to logcat, with specified tag.
  *
+ * Log format change:
+ *
+ *  - v1.0 -> v1.1: remove "counter", add "timestamp"
+ *
  * @hide
  */
 public class StrictJSONObject {
-    public static final String LOG_FORMAT = "1.0";
+    public static final String LOG_FORMAT = "1.1";
     public static final String DEFAULT_TAG = "PhoneLabLog";
     public static final String NONE = "<none>";
 
     public static final String KEY_ACTION = "Action";
+    public static final String KEY_TIMESTAMP = "timestamp";
     public static final String UNKNOWN = "UNKNOWN";
-
-    private static long counter = 0;
 
     private String tag = DEFAULT_TAG;
     private JSONObject json;
@@ -70,7 +73,38 @@ public class StrictJSONObject {
         return this;
     }
 
-    public <T extends Number> StrictJSONObject put(String name, T value) {
+    public StrictJSONObject put(String name, Integer value) {
+        try {
+            json.put(name, value == null? NONE: value);
+        }
+        catch (JSONException e) {
+            // ignore
+        }
+        return this;
+    }
+
+    public StrictJSONObject put(String name, Long value) {
+        try {
+            json.put(name, value == null? NONE: value);
+        }
+        catch (JSONException e) {
+            // ignore
+        }
+        return this;
+    }
+
+    public StrictJSONObject put(String name, Float value) {
+        try {
+            json.put(name, value == null? NONE: value);
+        }
+        catch (JSONException e) {
+            // ignore
+        }
+        return this;
+    }
+
+
+    public StrictJSONObject put(String name, Double value) {
         try {
             json.put(name, value == null? NONE: value);
         }
@@ -131,39 +165,11 @@ public class StrictJSONObject {
         return this;
     }
 
-    public StrictJSONObject put(String name, Boolean[] values) {
-        if (values != null) {
-            StrictJSONArray array = new StrictJSONArray();
-            for (Boolean v : values) {
-                array.put(v);
-            }
-            this.put(name, array);
-        }
-        else {
-            this.put(name, NONE);
-        }
-        return this;
-    }
-
     public StrictJSONObject put(String name, String[] values) {
         if (values != null) {
             StrictJSONArray array = new StrictJSONArray();
             for (String s : values) {
                 array.put(s);
-            }
-            this.put(name, array);
-        }
-        else {
-            this.put(name, NONE);
-        }
-        return this;
-    }
-
-    public <T extends Number> StrictJSONObject put(String name, T[] values) {
-        if (values != null) {
-            StrictJSONArray array = new StrictJSONArray();
-            for (T v : values) {
-                array.put(v);
             }
             this.put(name, array);
         }
@@ -188,16 +194,13 @@ public class StrictJSONObject {
     }
 
     public void log() {
+        if (!json.has(KEY_TIMESTAMP)) {
+            this.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        }
         this.put("LogFormat", LOG_FORMAT);
         if (!json.has(KEY_ACTION)) {
-            try {
-                json.put(KEY_ACTION, UNKNOWN);
-            }
-            catch (JSONException e) {
-                // ignore it
-            }
+            this.put(KEY_ACTION, UNKNOWN);
         }
-        this.put("Counter", counter++);
         Log.i(tag, json.toString());
     }
 }
