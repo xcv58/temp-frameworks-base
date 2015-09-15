@@ -44,12 +44,14 @@ import org.json.JSONArray;
  */
 public class StrictJSONObject {
     public static final String LOG_FORMAT = "1.1";
+    public static final String DEFAULT_TAG = "PhoneLabLog";
     public static final String NONE = "<none>";
 
     public static final String KEY_ACTION = "Action";
     public static final String KEY_TIMESTAMP = "timestamp";
     public static final String UNKNOWN = "UNKNOWN";
 
+    private String tag = DEFAULT_TAG;
     private JSONObject json;
 
     public StrictJSONObject() {
@@ -193,7 +195,8 @@ public class StrictJSONObject {
 
     public void log() {
         if (!json.has(KEY_ACTION)) {
-            throws new Exception("StrictJSONObject must have a action key.");
+            Log.e("StrictJSONObject must have a action key.");
+            return;
         }
 
         if (!json.has(KEY_TIMESTAMP)) {
