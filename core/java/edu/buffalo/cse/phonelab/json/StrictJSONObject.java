@@ -195,7 +195,7 @@ public class StrictJSONObject {
 
     public void log() {
         if (!json.has(KEY_ACTION)) {
-            Log.e("StrictJSONObject must have a action key.");
+            Log.e(tag, "StrictJSONObject must have a action key.");
             return;
         }
 
