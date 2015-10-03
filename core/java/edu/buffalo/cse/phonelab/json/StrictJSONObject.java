@@ -204,7 +204,7 @@ public class StrictJSONObject {
             this.put(KEY_TIMESTAMP, System.currentTimeMillis());
         }
         if (!json.has(KEY_UPTIME)) {
-            this.put(KEY_UPTIME, SystemClock.elapsedRealtimeNanos();
+            this.put(KEY_UPTIME, SystemClock.elapsedRealtimeNanos());
         }
         this.put("LogFormat", LOG_FORMAT);
         Log.i(tag, json.toString());
