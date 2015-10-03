@@ -49,6 +49,7 @@ public class StrictJSONObject {
 
     public static final String KEY_ACTION = "Action";
     public static final String KEY_TIMESTAMP = "timestamp";
+    public static final String KEY_UPTIME = "uptimeNanos";
     public static final String UNKNOWN = "UNKNOWN";
 
     private String tag = DEFAULT_TAG;
@@ -201,6 +202,9 @@ public class StrictJSONObject {
 
         if (!json.has(KEY_TIMESTAMP)) {
             this.put(KEY_TIMESTAMP, System.currentTimeMillis());
+        }
+        if (!json.has(KEY_UPTIME)) {
+            this.put(KEY_UPTIME, SystemClock.elapsedRealtimeNanos();
         }
         this.put("LogFormat", LOG_FORMAT);
         Log.i(tag, json.toString());
