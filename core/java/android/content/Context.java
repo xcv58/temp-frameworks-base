@@ -2475,6 +2475,8 @@ public abstract class Context {
      */
     public static final String WIFI_SERVICE = "wifi";
 
+    public static final String MAYBE_SERVICE = "maybe";
+
     /**
      * Use with {@link #getSystemService} to retrieve a {@link
      * android.net.wifi.passpoint.WifiPasspointManager} for handling management of

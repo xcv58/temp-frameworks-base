@@ -110,6 +110,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.IPowerManager;
 import android.os.IUserManager;
+import android.os.IMaybeService;
+import android.os.MaybeManager;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Process;
@@ -528,6 +530,14 @@ class ContextImpl extends Context {
                     return new PowerManager(ctx.getOuterContext(),
                             service, ctx.mMainThread.getHandler());
                 }});
+
+        registerService(MAYBE_SERVICE, new ServiceFetcher() {
+            public Object createService(ContextImpl ctx) {
+                IBinder b = ServiceManager.getService(MAYBE_SERVICE);
+                IMaybeService service = IMaybeService.Stub.asInterface(b);
+                return new MaybeManager(ctx.getOuterContext(),
+                        service, ctx.mMainThread.getHandler());
+            }});
 
         registerService(SEARCH_SERVICE, new ServiceFetcher() {
                 public Object createService(ContextImpl ctx) {

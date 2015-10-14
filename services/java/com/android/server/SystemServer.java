@@ -670,6 +670,13 @@ public final class SystemServer {
                     reportWtf("starting NetworkPolicy Service", e);
                 }
 
+                try {
+                    Log.i(TAG, "Starting Maybe Service");
+                    ServiceManager.addService(Context.MAYBE_SERVICE, new MaybeService(context));
+                } catch (Throwable e) {
+                    reportWtf("starting Maybe Service", e);
+                }
+
                 mSystemServiceManager.startService(WIFI_P2P_SERVICE_CLASS);
                 mSystemServiceManager.startService(WIFI_SERVICE_CLASS);
                 mSystemServiceManager.startService(
