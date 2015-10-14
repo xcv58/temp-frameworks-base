@@ -69,6 +69,7 @@ import org.apache.http.entity.StringEntity;
 import android.os.IMaybeListener;
 import android.os.MaybeListener;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import java.util.TimerTask;
 import java.util.Timer;
@@ -77,7 +78,7 @@ import java.util.Date;
 public class MaybeService extends IMaybeService.Stub {
   private static final String TAG = "MaybeService";
   private static final String LOGTAG = "MaybeServiceLogging";
-  private static final String URL = "https://maybe.xcv58.me/maybe-api-v1/devices";
+  private static final String URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/devices";
   private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";
   private static final String GCM_ID_KEY = "gcm_id";
   private static final String GCM_PROJECT_ID = "0";
@@ -116,7 +117,8 @@ public class MaybeService extends IMaybeService.Stub {
   private String mGCMId = null;
   private SharedPreferences mSharedPrefs;
   private Object mGCMLock = new Object();
-  private long mPollInterval = 3600; //in seconds
+    // private long mPollInterval = 3600; //in seconds
+  private long mPollInterval = 60; //in seconds
   private Timer mDataDownloadTimer = null;
   private TimerTask mDataDownloaderTask = null;
 
@@ -127,14 +129,23 @@ public class MaybeService extends IMaybeService.Stub {
     }
     mContext = context;
     Log.i(TAG, "MaybeService Called context:"+mContext);
-
-    //init Database
     mDbHelper = MaybeDatabaseHelper.getInstance(mContext);
-    getDeviceMEID();
-    Log.d(TAG, "Device MEID:"+ mDeviceMEID);
-    mSharedPrefs = mContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-    initializeTimerTask();
+  }
 
+  private boolean hasActiveNetwork() {
+      ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+      return activeNetwork != null && activeNetwork.isConnected();
+  }
+
+  public void systemRunning() {
+      Log.i(TAG, "MaybeService systemRunning");
+      // start network sampling ..
+      //init Database
+    //   getDeviceMEID();
+    //   Log.d(TAG, "Device MEID:"+ mDeviceMEID);
+      mSharedPrefs = mContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+      initializeTimerTask();
   }
 
 /*
@@ -255,6 +266,10 @@ public class MaybeService extends IMaybeService.Stub {
     mDataDownloadTimer = new Timer();
     mDataDownloaderTask = new TimerTask(){
       public void run(){
+          if (!hasActiveNetwork()) {
+              Log.v(TAG, "Querying server canceled, no active network!");
+              return;
+          }
         Log.v(TAG, "Querying server");
         if(mIsDeviceRegistered){
           synchronized(sDownloadLock){
@@ -263,6 +278,7 @@ public class MaybeService extends IMaybeService.Stub {
               return;
             }
             String serverUrl = URL +"/"+deviceMeid;
+            Log.v(TAG, "Server URL: " + serverUrl);
             new JSONDownloaderTask().execute(serverUrl);
             try{
               sDownloadLock.wait();
@@ -291,7 +307,7 @@ public class MaybeService extends IMaybeService.Stub {
         }
       }
     };
-    mDataDownloadTimer.schedule(mDataDownloaderTask, 30000, (mPollInterval*1000));
+    mDataDownloadTimer.schedule(mDataDownloaderTask, 10000, (mPollInterval * 1000));
   }
 
 

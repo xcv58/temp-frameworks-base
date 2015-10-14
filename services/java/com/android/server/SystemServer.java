@@ -523,6 +523,7 @@ public final class SystemServer {
         LockSettingsService lockSettings = null;
         AssetAtlasService atlas = null;
         MediaRouterService mediaRouter = null;
+        MaybeService maybeService = null;
 
         // Bring up services needed for UI.
         if (mFactoryTestMode != FactoryTest.FACTORY_TEST_LOW_LEVEL) {
@@ -671,8 +672,9 @@ public final class SystemServer {
                 }
 
                 try {
-                    Log.i(TAG, "Starting Maybe Service");
-                    ServiceManager.addService(Context.MAYBE_SERVICE, new MaybeService(context));
+                    Slog.i(TAG, "Starting Maybe Service");
+                    maybeService = new MaybeService(context);
+                    ServiceManager.addService(Context.MAYBE_SERVICE, maybeService);
                 } catch (Throwable e) {
                     reportWtf("starting Maybe Service", e);
                 }
@@ -1062,6 +1064,7 @@ public final class SystemServer {
         final MediaRouterService mediaRouterF = mediaRouter;
         final AudioService audioServiceF = audioService;
         final MmsServiceBroker mmsServiceF = mmsService;
+        final MaybeService maybeServiceF = maybeService;
 
         // We now tell the activity manager it is okay to run third party
         // code.  It will call back into us once it has gotten to the state
@@ -1195,6 +1198,12 @@ public final class SystemServer {
                     if (mmsServiceF != null) mmsServiceF.systemRunning();
                 } catch (Throwable e) {
                     reportWtf("Notifying MmsService running", e);
+                }
+
+                try {
+                    if (maybeServiceF != null) maybeServiceF.systemRunning();
+                } catch (Throwable e) {
+                    reportWtf("Notifying MaybeService running", e);
                 }
             }
         });
