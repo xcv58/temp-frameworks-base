@@ -1,6 +1,5 @@
 package android.os;
 
-public interface MaybeListener{
-	
-	void onUpdate(String jsonData);
+public interface MaybeListener {
+    void onUpdate(String jsonData);
 }

@@ -21,24 +21,31 @@ import android.os.Binder;
 import android.os.IMaybeService;
 import android.os.RemoteException;
 import android.util.Log;
+
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+
 import android.content.Context;
 import org.json.JSONObject;
 import android.telephony.TelephonyManager;
 import org.apache.http.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+
 import java.io.OutputStream;
+
 import org.apache.http.client.*;
 import org.apache.http.impl.client.*;
+
 import java.io.IOException;
+
 import android.net.http.AndroidHttpClient;
 import org.apache.http.client.methods.HttpGet;
 import android.os.AsyncTask;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import java.lang.Void;
 
 import java.util.ArrayList;
@@ -49,6 +56,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -56,10 +64,12 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
+
 import java.net.URLEncoder;
 import java.io.*;
 import java.net.URL;
 import java.net.HttpURLConnection;
+
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpGet;
@@ -79,83 +89,84 @@ import android.os.MaybeListener;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
 import java.util.TimerTask;
 import java.util.Timer;
 import java.util.Date;
 
 public class MaybeService extends IMaybeService.Stub {
-  private static final String TAG = "MaybeService";
-  private static final String LOGTAG = "MaybeServiceLogging";
-  private static final String URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/devices";
-  private static final String BASE_URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/";
-  private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";
-  private static final String GCM_ID_KEY = "gcm_id";
-  private static final String GCM_PROJECT_ID = "0";
-  //Server Error Codes
-  private static final String ERR_NO_RECORDS_FOUND = "No Record(s) Found";
-  private static final String ERR_DUPLICATE_KEY = "E11000 duplicate key error index";
-  private static final String ERR_GENERIC_ERROR = "Error";
-  private static final String ERR_JSON_ERROR = "JSON parse error";
-  private static final int STATUS_200OK = 200;
-  private static final int STATUS_201CREATED = 201;
-  private static final int STATUS_204NOCONTENT = 204;
+    private static final String TAG = "MaybeService";
+    private static final String LOGTAG = "MaybeServiceLogging";
+    private static final String URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/devices";
+    private static final String BASE_URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/";
+    private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";
+    private static final String GCM_ID_KEY = "gcm_id";
+    private static final String GCM_PROJECT_ID = "0";
+    //Server Error Codes
+    private static final String ERR_NO_RECORDS_FOUND = "No Record(s) Found";
+    private static final String ERR_DUPLICATE_KEY = "E11000 duplicate key error index";
+    private static final String ERR_GENERIC_ERROR = "Error";
+    private static final String ERR_JSON_ERROR = "JSON parse error";
+    private static final int STATUS_200OK = 200;
+    private static final int STATUS_201CREATED = 201;
+    private static final int STATUS_204NOCONTENT = 204;
 
-  public static final String STRING_TYPE = "type";
-  public static final String STRING_NAME = "name";
-  public static final String STRING_LABELS = "labels";
-  public static final String STRING_LABEL = "label";
-  public static final String STRING_SCORE = "score";
-  public static final String STRING_CHOICES = "choices";
-  public static final String STRING_CHOICE = "choice";
-  public static final String STRING_LOG = "log";
-  public static final String STRING_BAD = "bad";
-  public static final String STRING_LAST_CHOICE = "last_choice";
+    public static final String STRING_TYPE = "type";
+    public static final String STRING_NAME = "name";
+    public static final String STRING_LABELS = "labels";
+    public static final String STRING_LABEL = "label";
+    public static final String STRING_SCORE = "score";
+    public static final String STRING_CHOICES = "choices";
+    public static final String STRING_CHOICE = "choice";
+    public static final String STRING_LOG = "log";
+    public static final String STRING_BAD = "bad";
+    public static final String STRING_LAST_CHOICE = "last_choice";
 
 
-  private Context mContext;
-  private String mJSONResponse;
-  private String mJSONDownloadData;
-  private boolean mHasResponse=false;
-  private final MaybeDatabaseHelper mDbHelper;
-  private static Object sNetworkCallLock = new Object();
-  private static Object sDownloadLock = new Object();
-  private boolean mIsDeviceRegistered = false;
+    private Context mContext;
+    private String mJSONResponse;
+    private String mJSONDownloadData;
+    private boolean mHasResponse = false;
+    private final MaybeDatabaseHelper mDbHelper;
+    private static Object sNetworkCallLock = new Object();
+    private static Object sDownloadLock = new Object();
+    private boolean mIsDeviceRegistered = false;
 
-  private String mDeviceMEID=null;
-  private String mHashedMEID=null;
-  private String mGCMId = null;
-  private SharedPreferences mSharedPrefs;
-  private Object mGCMLock = new Object();
+    private String mDeviceMEID = null;
+    private String mHashedMEID = null;
+    private String mGCMId = null;
+    private SharedPreferences mSharedPrefs;
+    private Object mGCMLock = new Object();
     // private long mPollInterval = 3600; //in seconds
-  private long mPollInterval = 60; //in seconds
-  private Timer mDataDownloadTimer = null;
-  private TimerTask mDataDownloaderTask = null;
+    private long mPollInterval = 60; //in seconds
+    private Timer mDataDownloadTimer = null;
+    private TimerTask mDataDownloaderTask = null;
 
-  public MaybeService(Context context) {
-    super();
-    if(context == null){
-      Log.e(TAG, "ERROR: context is null");
+    public MaybeService(Context context) {
+        super();
+        if (context == null) {
+            Log.e(TAG, "ERROR: context is null");
+        }
+        mContext = context;
+        Log.i(TAG, "MaybeService Called context:" + mContext);
+        mDbHelper = MaybeDatabaseHelper.getInstance(mContext);
     }
-    mContext = context;
-    Log.i(TAG, "MaybeService Called context:"+mContext);
-    mDbHelper = MaybeDatabaseHelper.getInstance(mContext);
-  }
 
-  private boolean hasActiveNetwork() {
-      ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-      return activeNetwork != null && activeNetwork.isConnected();
-  }
+    private boolean hasActiveNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
+    }
 
-  public void systemRunning() {
-      Log.i(TAG, "MaybeService systemRunning");
-      // start network sampling ..
-      //init Database
-    //   getDeviceMEID();
-    //   Log.d(TAG, "Device MEID:"+ mDeviceMEID);
-      mSharedPrefs = mContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-      initializeTimerTask();
-  }
+    public void systemRunning() {
+        Log.i(TAG, "MaybeService systemRunning");
+        // start network sampling ..
+        //init Database
+        //   getDeviceMEID();
+        //   Log.d(TAG, "Device MEID:"+ mDeviceMEID);
+        mSharedPrefs = mContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        initializeTimerTask();
+    }
 
 /*
   private void getGCMId(){
@@ -270,745 +281,741 @@ public class MaybeService extends IMaybeService.Stub {
   }
 */
 
-  private void initializeTimerTask(){
+    private void initializeTimerTask() {
 
-    mDataDownloadTimer = new Timer();
-    mDataDownloaderTask = new TimerTask(){
-      public void run(){
-          if (!hasActiveNetwork()) {
-              Log.v(TAG, "Querying server canceled, no active network!");
-              return;
-          }
-        Log.v(TAG, "Querying server");
-        String deviceMeid = getDeviceMEID();
-        Device device = new MaybeClient().getDevice(BASE_URL, deviceMeid);
-        Log.d(TAG, new Gson().toJson(device, Device.class));
+        mDataDownloadTimer = new Timer();
+        mDataDownloaderTask = new TimerTask() {
+            public void run() {
+                if (!hasActiveNetwork()) {
+                    Log.v(TAG, "Querying server canceled, no active network!");
+                    return;
+                }
+                Log.v(TAG, "Querying server");
+                String deviceMeid = getDeviceMEID();
+                Device device = new MaybeClient().getDevice(BASE_URL, deviceMeid);
+                Log.d(TAG, new Gson().toJson(device, Device.class));
 
-        // if(mIsDeviceRegistered){
-        //   synchronized(sDownloadLock){
-        //     String deviceMeid = getDeviceMEID();
-        //     if(deviceMeid == null){ // TelephonyManager not initialized
-        //       return;
-        //     }
-        //     String serverUrl = URL +"/"+deviceMeid;
-        //     Log.v(TAG, "Server URL: " + serverUrl);
-        //     new JSONDownloaderTask().execute(serverUrl);
-        //     try{
-        //       sDownloadLock.wait();
-        //       parseData(mJSONDownloadData);
+                // if(mIsDeviceRegistered){
+                //   synchronized(sDownloadLock){
+                //     String deviceMeid = getDeviceMEID();
+                //     if(deviceMeid == null){ // TelephonyManager not initialized
+                //       return;
+                //     }
+                //     String serverUrl = URL +"/"+deviceMeid;
+                //     Log.v(TAG, "Server URL: " + serverUrl);
+                //     new JSONDownloaderTask().execute(serverUrl);
+                //     try{
+                //       sDownloadLock.wait();
+                //       parseData(mJSONDownloadData);
 
-        //     }catch(InterruptedException e){
-        //       e.printStackTrace();
-        //     }
-        //   } //end sync sDownloadLock
-        // }else{
-        //   synchronized(sNetworkCallLock){
-
-
-        //   new DeviceRegisterTask().execute(URL);
-
-        //   try{
-        //     sNetworkCallLock.wait();
-        //     parseData(mJSONResponse);
-        //   }catch(InterruptedException e){
-        //     e.printStackTrace();
-        //   }
-
-        //   Log.d(TAG, "Received data from TASK: "+mJSONResponse);
-
-        //   } //end sync sNetworkCallLock
-        // }
-      }
-    };
-    mDataDownloadTimer.schedule(mDataDownloaderTask, 10000, (mPollInterval * 1000));
-  }
+                //     }catch(InterruptedException e){
+                //       e.printStackTrace();
+                //     }
+                //   } //end sync sDownloadLock
+                // }else{
+                //   synchronized(sNetworkCallLock){
 
 
+                //   new DeviceRegisterTask().execute(URL);
 
-  protected synchronized void parseData(String data){
-    if(data == null){
-      Log.i(TAG, "data is null");
-      return;
+                //   try{
+                //     sNetworkCallLock.wait();
+                //     parseData(mJSONResponse);
+                //   }catch(InterruptedException e){
+                //     e.printStackTrace();
+                //   }
+
+                //   Log.d(TAG, "Received data from TASK: "+mJSONResponse);
+
+                //   } //end sync sNetworkCallLock
+                // }
+            }
+        };
+        mDataDownloadTimer.schedule(mDataDownloaderTask, 10000, (mPollInterval * 1000));
     }
-    try{
-    //JSONObject jsonData = new JSONObject(data.trim());
-    JSONArray jsonArray = MaybeUtils.getJSONArray(data);
-    if(jsonArray == null){
-      Log.e(TAG, "Not a valid JSON Array");
-      return;
-    }
-    JSONObject jsonData = jsonArray.getJSONObject(0); //one record for each device
 
-    Log.v(TAG, "JsonData:"+jsonData.toString());
-    JSONObject choiceData = jsonData.optJSONObject(STRING_CHOICES);
-    Log.v(TAG, "Choices:"+choiceData.toString());
-    Iterator<String> appHashKeys = choiceData.keys();
-    while(appHashKeys.hasNext()){
-      String packageHash = (String)appHashKeys.next();
-      Log.v(TAG, "Current packageHash:"+packageHash);
-      JSONObject packageJSONObj = choiceData.optJSONObject(packageHash);
-      String packageName = packageJSONObj.optString(STRING_NAME);
-      Log.v(TAG, "Current packageName:"+packageName);
-      JSONArray jsonArrayData = packageJSONObj.optJSONArray(STRING_LABELS);
+
+    protected synchronized void parseData(String data) {
+        if (data == null) {
+            Log.i(TAG, "data is null");
+            return;
+        }
+        try {
+            //JSONObject jsonData = new JSONObject(data.trim());
+            JSONArray jsonArray = MaybeUtils.getJSONArray(data);
+            if (jsonArray == null) {
+                Log.e(TAG, "Not a valid JSON Array");
+                return;
+            }
+            JSONObject jsonData = jsonArray.getJSONObject(0); //one record for each device
+
+            Log.v(TAG, "JsonData:" + jsonData.toString());
+            JSONObject choiceData = jsonData.optJSONObject(STRING_CHOICES);
+            Log.v(TAG, "Choices:" + choiceData.toString());
+            Iterator<String> appHashKeys = choiceData.keys();
+            while (appHashKeys.hasNext()) {
+                String packageHash = (String) appHashKeys.next();
+                Log.v(TAG, "Current packageHash:" + packageHash);
+                JSONObject packageJSONObj = choiceData.optJSONObject(packageHash);
+                String packageName = packageJSONObj.optString(STRING_NAME);
+                Log.v(TAG, "Current packageName:" + packageName);
+                JSONArray jsonArrayData = packageJSONObj.optJSONArray(STRING_LABELS);
       /* insert data into db */
-      if(!mDbHelper.hasEntries(packageName)){
-        mDbHelper.setUrl(packageName, URL);
-        mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.HASH_COL, packageHash);
-      }
+                if (!mDbHelper.hasEntries(packageName)) {
+                    mDbHelper.setUrl(packageName, URL);
+                    mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.HASH_COL, packageHash);
+                }
 
-      mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.DATA_COL, jsonArrayData.toString());
-      Log.i(TAG, jsonArrayData.toString());
+                mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.DATA_COL, jsonArrayData.toString());
+                Log.i(TAG, jsonArrayData.toString());
       /* end insert data into db */
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
-    }catch(JSONException e){
-      e.printStackTrace();
+
+    public void logTime(String message, long time1, long time2) {
+        long interval = time2 - time1;
+        if (interval < 0) {
+            interval *= -1;
+        }
+        JSONObject timeObj = new JSONObject();
+        try {
+            timeObj.put("interval", interval);
+            timeObj.put("message", message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.i(LOGTAG, timeObj.toString());
     }
-  }
 
-  public void logTime(String message, long time1, long time2){
-    long interval = time2 - time1;
-    if(interval < 0){
-      interval *= -1;
+    public Date tick() {
+        return new Date();
     }
-    JSONObject timeObj = new JSONObject();
-    try{
-    timeObj.put("interval", interval);
-    timeObj.put("message", message);
-    }catch(JSONException e){
-      e.printStackTrace();
+
+    public void tock(Date time1, JSONObject data) {
+        Date time2 = new Date();
+        long interval = time2.getTime() - time1.getTime();
+        if (interval < 0) {
+            interval *= -1;
+        }
+        JSONObject timeObj = new JSONObject();
+        try {
+            timeObj.put("interval", interval);
+            timeObj.put("message", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.i(LOGTAG, timeObj.toString());
     }
-    Log.i(LOGTAG, timeObj.toString());
-  }
 
-  public Date tick(){
-    return new Date();
-  }
 
-  public void tock(Date time1, JSONObject data){
-    Date time2 = new Date();
-    long interval = time2.getTime() - time1.getTime();
-    if(interval < 0){
-      interval *= -1;
+    public String getCurrentTime() throws RemoteException {
+        Log.d(TAG, "Time" + ":getCurrentTime()");
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Log.i(TAG, (sdf.format(cal.getTime())).toString());
+        return (sdf.format(cal.getTime())).toString();
     }
-    JSONObject timeObj = new JSONObject();
-    try{
-    timeObj.put("interval", interval);
-    timeObj.put("message", data);
-    }catch(JSONException e){
-      e.printStackTrace();
+
+    public void printCurrentTime() throws RemoteException {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Log.i(TAG, (sdf.format(cal.getTime())).toString());
     }
-    Log.i(LOGTAG, timeObj.toString());
-  }
 
-
-  public String getCurrentTime() throws RemoteException {
-    Log.d(TAG, "Time"+":getCurrentTime()");
-    Calendar cal = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-    Log.i(TAG, (sdf.format(cal.getTime())).toString());
-    return (sdf.format(cal.getTime())).toString();
-  }
-
-  public void printCurrentTime() throws RemoteException {
-    Calendar cal = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-    Log.i(TAG, (sdf.format(cal.getTime())).toString());
-  }
-
-  public int registerUrl(String pkgName, String url, String hash) throws RemoteException{
-    //add to database
-    //String packageName = getCallerPackageName();
-    //temporary hack
-    String packageName = pkgName;
-    if(mDbHelper.hasEntries(packageName)){
-      String urlInDb = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName);
-      if(url.equals(urlInDb)){
-        return 0;
-      }else{
-        mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.URL_COL, url);
-      }
-    }else{
-      mDbHelper.setUrl(packageName, url);
-      if(hash!=null){
-        mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.HASH_COL, hash);
-      }
-
-
-
-      synchronized(sNetworkCallLock){
-
-
-        new DeviceRegisterTask().execute(url, packageName, null);
-
-            try{
-              sNetworkCallLock.wait();
-
-              parseData(mJSONResponse);
-
-            }catch(InterruptedException e){
-              e.printStackTrace();
+    public int registerUrl(String pkgName, String url, String hash) throws RemoteException {
+        //add to database
+        //String packageName = getCallerPackageName();
+        //temporary hack
+        String packageName = pkgName;
+        if (mDbHelper.hasEntries(packageName)) {
+            String urlInDb = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName);
+            if (url.equals(urlInDb)) {
+                return 0;
+            } else {
+                mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.URL_COL, url);
+            }
+        } else {
+            mDbHelper.setUrl(packageName, url);
+            if (hash != null) {
+                mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.HASH_COL, hash);
             }
 
-        Log.d(TAG, "Received data from TASK: "+mJSONResponse);
 
-      }
+            synchronized (sNetworkCallLock) {
 
+
+                new DeviceRegisterTask().execute(url, packageName, null);
+
+                try {
+                    sNetworkCallLock.wait();
+
+                    parseData(mJSONResponse);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d(TAG, "Received data from TASK: " + mJSONResponse);
+
+            }
+
+        }
+
+
+        return 1; // Error codes in future?
+    }
+
+    public int registerUrl(String url) throws RemoteException {
+        //return registerUrl(null, url, null);
+        return 0;
+    }
+
+    public int deletePackageData() {
+        return mDbHelper.deletePackageInfo(getCallerPackageName());
     }
 
 
-    return 1; // Error codes in future?
-  }
-
-  public int registerUrl(String url) throws RemoteException{
-    //return registerUrl(null, url, null);
-    return 0;
-  }
-
-  public int deletePackageData(){
-    return mDbHelper.deletePackageInfo(getCallerPackageName());
-  }
-
-
-
-  private String getDeviceMEID(){
-    if(mDeviceMEID==null){
-      TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-      mDeviceMEID = tm.getDeviceId();
-      Log.d(TAG, "Device MEID:"+mDeviceMEID);
+    private String getDeviceMEID() {
+        if (mDeviceMEID == null) {
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            mDeviceMEID = tm.getDeviceId();
+            Log.d(TAG, "Device MEID:" + mDeviceMEID);
+        }
+        return mDeviceMEID;
     }
-    return mDeviceMEID;
-  }
 
-  /* testing only */
-  public String getAppData(String pkgName) throws RemoteException{
-    return null;
-  }
+    /* testing only */
+    public String getAppData(String pkgName) throws RemoteException {
+        return null;
+    }
 
 
-  public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener){
+    public void requestMaybeUpdates(String pkgName, String url, IMaybeListener listener) {
 
-  }
+    }
 
-  public void removeMaybeUpdates(String pkgName, IMaybeListener listener){
+    public void removeMaybeUpdates(String pkgName, IMaybeListener listener) {
 
-  }
+    }
 
-  public synchronized int getMaybeAlternative(String pkgName, String label){
-    Date tick = tick();
-    //String packageName = getCallerPackageName();
-    //temporary hack
-    String packageName = pkgName;
-    JSONObject jsonLog = new JSONObject();
-    Log.v(TAG, "Calling package:"+packageName);
-    String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
-    //JSONObject jsonObjData = MaybeUtils.getJSONObject(jsonData);
+    public synchronized int getMaybeAlternative(String pkgName, String label) {
+        Date tick = tick();
+        //String packageName = getCallerPackageName();
+        //temporary hack
+        String packageName = pkgName;
+        JSONObject jsonLog = new JSONObject();
+        Log.v(TAG, "Calling package:" + packageName);
+        String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
+        //JSONObject jsonObjData = MaybeUtils.getJSONObject(jsonData);
 
-    if(jsonData == null){
-      Log.i(TAG, "jsondata is null");
-      //TODO: Optimize logging for error scenarios
+        if (jsonData == null) {
+            Log.i(TAG, "jsondata is null");
+            //TODO: Optimize logging for error scenarios
 
-      try{
-        jsonLog.put("function","getMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("choice", "Error");
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","DBQUERY:NULL");
+            try {
+                jsonLog.put("function", "getMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("choice", "Error");
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "DBQUERY:NULL");
+                tock(tick, jsonLog);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return -1;
+        }
+
+        String strChoice = MaybeUtils.parseJSONArray(label, jsonData);
+        if (strChoice == null) {
+            Log.i(TAG, "strchoice is null");
+            //TODO: Optimize logging for error scenarios
+            try {
+                jsonLog.put("function", "getMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("choice", "Error");
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "JSON:NULL");
+                tock(tick, jsonLog);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return -1;
+        }
+
+        int choice = Integer.parseInt(strChoice);
+        Log.i(TAG, "choice: " + choice);
+
+
+        try {
+            jsonLog.put("function", "getMaybeAlternative");
+            jsonLog.put("label", label);
+            jsonLog.put("choice", choice);
+            jsonLog.put("package", pkgName);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         tock(tick, jsonLog);
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
+        return choice;
 
-      return -1;
     }
 
-    String strChoice = MaybeUtils.parseJSONArray(label, jsonData);
-    if(strChoice == null){
-      Log.i(TAG, "strchoice is null");
-      //TODO: Optimize logging for error scenarios
-      try{
-        jsonLog.put("function","getMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("choice", "Error");
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","JSON:NULL");
-        tock(tick, jsonLog);
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      return -1;
-    }
-
-    int choice = Integer.parseInt(strChoice);
-    Log.i(TAG, "choice: "+choice);
-
-
-    try{
-      jsonLog.put("function","getMaybeAlternative");
-      jsonLog.put("label",label);
-      jsonLog.put("choice", choice);
-      jsonLog.put("package", pkgName);
-
-    }catch(JSONException e){
-      e.printStackTrace();
-    }
-    tock(tick, jsonLog);
-    return choice;
-
-  }
-
-  public void badMaybeAlternative(String pkgName, String label, int value){
-    Date tick = tick();
-    //String packageName = getCallerPackageName();
-    //temporary hack
-    JSONObject jsonLog = new JSONObject();
-    String packageName = pkgName;
-    //TODO: Needs improvement
+    public void badMaybeAlternative(String pkgName, String label, int value) {
+        Date tick = tick();
+        //String packageName = getCallerPackageName();
+        //temporary hack
+        JSONObject jsonLog = new JSONObject();
+        String packageName = pkgName;
+        //TODO: Needs improvement
     /*
     if(!MaybeUtils.isValidJSONString(jsonstring)){
       Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
       return; //fail silently
     }
     */
-    String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
-    if(url == null){
-      Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
-      try{
-        jsonLog.put("function","badMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", value);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","URL:NULL");
+        String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName) + "/" + getDeviceMEID();
+        if (url == null) {
+            Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+            try {
+                jsonLog.put("function", "badMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", value);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "URL:NULL");
+                tock(tick, jsonLog);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
+        JSONObject scoreData = new JSONObject();
+        try {
+            scoreData.put(STRING_TYPE, STRING_BAD);
+            scoreData.put(STRING_NAME, packageName);
+            scoreData.put(label, value);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        new ServerUpdaterTask().execute(url, hash, scoreData.toString());
+
+
+        try {
+            jsonLog.put("function", "badMaybeAlternative");
+            jsonLog.put("label", label);
+            jsonLog.put("value", value);
+            jsonLog.put("package", pkgName);
+            tock(tick, jsonLog);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return; //if JSONException fail silently
+    }
+
+    /*
+      {
+
+      }
+    */
+    public void scoreMaybeAlternative(String pkgName, String label, String jsonString) {
+        Date tick = tick();
+        JSONObject jsonLog = new JSONObject();
+        //String packageName = getCallerPackageName();
+        //temporary hack
+        String packageName = pkgName;
+        //TODO: Needs improvement
+        if (!MaybeUtils.isValidJSONString(jsonString)) {
+            Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
+            try {
+                jsonLog.put("function", "scoreMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", jsonString);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "JSON:INVALID");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tock(tick, jsonLog);
+            return; //fail silently
+        }
+        String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName) + "/" + getDeviceMEID();
+        if (url == null) {
+            Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+            try {
+                jsonLog.put("function", "scoreMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", jsonString);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "URL:NULL");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tock(tick, jsonLog);
+            return;
+        }
+        String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
+        JSONObject scoreData = new JSONObject();
+        try {
+            scoreData.put(STRING_TYPE, STRING_SCORE);
+            scoreData.put(STRING_NAME, packageName);
+            scoreData.put(label, jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new ServerUpdaterTask().execute(url, hash, scoreData.toString());
+
+
+        try {
+            jsonLog.put("function", "scoreMaybeAlternative");
+            jsonLog.put("label", label);
+            jsonLog.put("value", jsonString);
+            jsonLog.put("package", pkgName);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         tock(tick, jsonLog);
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      return;
-    }
-    String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
-    JSONObject scoreData = new JSONObject();
-    try{
-    scoreData.put(STRING_TYPE, STRING_BAD);
-    scoreData.put(STRING_NAME, packageName);
-    scoreData.put(label,value);
-    }catch(JSONException e){
-      e.printStackTrace();
-    }
-    new ServerUpdaterTask().execute(url, hash, scoreData.toString());
-
-
-    try{
-      jsonLog.put("function","badMaybeAlternative");
-      jsonLog.put("label",label);
-      jsonLog.put("value", value);
-      jsonLog.put("package", pkgName);
-      tock(tick, jsonLog);
-    }catch(JSONException e){
-      e.printStackTrace();
+        return; //if JSONException fail silently
     }
 
-    return; //if JSONException fail silently
-  }
-/*
-  {
+    public void logMaybeAlternative(String pkgName, String label, String jsonString) {
+        Date tick = tick();
+        JSONObject jsonLog = new JSONObject();
+        //String packageName = getCallerPackageName();
+        //temporary hack
+        String packageName = pkgName;
 
-  }
-*/
-  public void scoreMaybeAlternative(String pkgName, String label, String jsonString){
-    Date tick = tick();
-    JSONObject jsonLog = new JSONObject();
-    //String packageName = getCallerPackageName();
-    //temporary hack
-    String packageName = pkgName;
-    //TODO: Needs improvement
-    if(!MaybeUtils.isValidJSONString(jsonString)){
-      Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
-      try{
-        jsonLog.put("function","scoreMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", jsonString);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error", "JSON:INVALID");
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      tock(tick, jsonLog);
-      return; //fail silently
-    }
-    String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
-    if(url == null){
-      Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
-      try{
-        jsonLog.put("function","scoreMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", jsonString);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error", "URL:NULL");
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      tock(tick, jsonLog);
-      return;
-    }
-    String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
-    JSONObject scoreData = new JSONObject();
-    try{
-    scoreData.put(STRING_TYPE, STRING_SCORE);
-    scoreData.put(STRING_NAME, packageName);
-    scoreData.put(label,jsonString);
-    }catch(JSONException e){
-      e.printStackTrace();
-    }
+        String lastChoice = null;
 
-    new ServerUpdaterTask().execute(url, hash, scoreData.toString());
+        if (!MaybeUtils.isValidJSONString(jsonString)) {
+            Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
+
+            try {
+                jsonLog.put("function", "logMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", jsonString);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "JSON:INVALID");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tock(tick, jsonLog);
+
+            return; //fail silently
+        }
+        String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName) + "/" + getDeviceMEID();
+        if (url == null) {
+            Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
+
+            try {
+                jsonLog.put("function", "logMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", jsonString);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "URL:NULL");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tock(tick, jsonLog);
+
+            return;
+        }
+        //TODO: How do we ensure data hasn't changed since last call?
+        String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
+        if (jsonData == null) {
+            Log.i(TAG, "jsondata is null");
+
+            try {
+                jsonLog.put("function", "logMaybeAlternative");
+                jsonLog.put("label", label);
+                jsonLog.put("value", jsonString);
+                jsonLog.put("package", pkgName);
+                jsonLog.put("Error", "JSON:NULL");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tock(tick, jsonLog);
+
+            return;
+        } else {
+
+            lastChoice = MaybeUtils.parseJSONArray(label, jsonData);
+            if (lastChoice == null) {
+                Log.i(TAG, "lastChoice is null");
+                try {
+                    jsonLog.put("function", "logMaybeAlternative");
+                    jsonLog.put("label", label);
+                    jsonLog.put("value", jsonString);
+                    jsonLog.put("package", pkgName);
+                    jsonLog.put("Error", "CHOICE:NULL");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                tock(tick, jsonLog);
+                return;
+            }
+        }
+        String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
+
+        JSONObject logData = new JSONObject();
+        try {
+            logData.put(STRING_TYPE, STRING_LOG);
+            logData.put(STRING_NAME, packageName);
+            logData.put(STRING_LAST_CHOICE, lastChoice);
+            logData.put(label, jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        new ServerUpdaterTask().execute(url, hash, logData.toString());
 
 
-    try{
-    jsonLog.put("function","scoreMaybeAlternative");
-    jsonLog.put("label",label);
-    jsonLog.put("value", jsonString);
-    jsonLog.put("package", pkgName);
-    }catch(JSONException e){
-      e.printStackTrace();
-    }
-    tock(tick, jsonLog);
-    return; //if JSONException fail silently
-  }
-
-  public void logMaybeAlternative(String pkgName, String label, String jsonString){
-    Date tick = tick();
-    JSONObject jsonLog = new JSONObject();
-    //String packageName = getCallerPackageName();
-    //temporary hack
-    String packageName = pkgName;
-
-    String lastChoice = null;
-
-    if(!MaybeUtils.isValidJSONString(jsonString)){
-      Log.e(TAG, "(1)Invalid JSON Object passed for scoring");
-
-      try{
-        jsonLog.put("function","logMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", jsonString);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","JSON:INVALID");
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      tock(tick, jsonLog);
-
-      return; //fail silently
-    }
-    String url = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.URL_COL, packageName)+"/"+getDeviceMEID();
-    if(url == null){
-      Log.e(TAG, "Server URL is null. Server url might not be registered with the service");
-
-      try{
-        jsonLog.put("function","logMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", jsonString);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","URL:NULL");
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      tock(tick, jsonLog);
-
-      return;
-    }
-    //TODO: How do we ensure data hasn't changed since last call?
-    String jsonData = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.DATA_COL, packageName);
-    if(jsonData == null){
-      Log.i(TAG, "jsondata is null");
-
-      try{
-        jsonLog.put("function","logMaybeAlternative");
-        jsonLog.put("label",label);
-        jsonLog.put("value", jsonString);
-        jsonLog.put("package", pkgName);
-        jsonLog.put("Error","JSON:NULL");
-      }catch(JSONException e){
-        e.printStackTrace();
-      }
-      tock(tick, jsonLog);
-
-      return;
-    }else{
-
-      lastChoice = MaybeUtils.parseJSONArray(label, jsonData);
-      if(lastChoice == null){
-        Log.i(TAG, "lastChoice is null");
-        try{
-          jsonLog.put("function","logMaybeAlternative");
-          jsonLog.put("label",label);
-          jsonLog.put("value", jsonString);
-          jsonLog.put("package", pkgName);
-          jsonLog.put("Error","CHOICE:NULL");
-        }catch(JSONException e){
-          e.printStackTrace();
+        try {
+            jsonLog.put("function", "logMaybeAlternative");
+            jsonLog.put("label", label);
+            jsonLog.put("value", jsonString);
+            jsonLog.put("package", pkgName);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         tock(tick, jsonLog);
         return;
-      }
+
     }
-    String hash = mDbHelper.getAppDataFromDb(MaybeDatabaseHelper.HASH_COL, packageName);
 
-    JSONObject logData = new JSONObject();
-    try{
-      logData.put(STRING_TYPE, STRING_LOG);
-      logData.put(STRING_NAME, packageName);
-      logData.put(STRING_LAST_CHOICE, lastChoice);
-      logData.put(label,jsonString);
-    }catch(JSONException e){
-      e.printStackTrace();
+
+    private String getCallerPackageName() {
+        return mContext.getPackageManager().getNameForUid(Binder.getCallingUid());
     }
-    new ServerUpdaterTask().execute(url, hash, logData.toString());
-
-
-    try{
-      jsonLog.put("function","logMaybeAlternative");
-      jsonLog.put("label",label);
-      jsonLog.put("value", jsonString);
-      jsonLog.put("package", pkgName);
-    }catch(JSONException e){
-      e.printStackTrace();
-    }
-    tock(tick, jsonLog);
-    return;
-
-  }
-
-
-
-  private String getCallerPackageName(){
-    return mContext.getPackageManager().getNameForUid(Binder.getCallingUid());
-  }
 
   /* HTTP post
   * @deprecated
   */
 
-  class JSONDownloaderTask extends AsyncTask<String, Void, String> {
-    HttpClient client;
+    class JSONDownloaderTask extends AsyncTask<String, Void, String> {
+        HttpClient client;
 
-    public JSONDownloaderTask(){
-      client = new DefaultHttpClient();
-
-    }
-
-    @Override
-    protected String doInBackground(String... params){
-      String networkResponse = null;
-      try{
-
-        HttpGet geturl = new HttpGet(params[0]);
-        geturl.setHeader("Content-type", "application/json");
-
-        HttpResponse response = client.execute(geturl);
-        int statusCode = response.getStatusLine().getStatusCode();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        response.getEntity().writeTo(out);
-        networkResponse = out.toString();
-        //TODO:
-        Log.d(TAG, networkResponse);
-        if (networkResponse.contains(ERR_NO_RECORDS_FOUND)) {
-            Log.d(TAG, "No Records found");
-            // Keep the error and parse it at the timer task. Register the device if
-            // this is the case.
-            mIsDeviceRegistered = false;
-            //networkResponse = null;
-        } else {
-          Log.d(TAG, "update exists");
-          //TODO: (?)
+        public JSONDownloaderTask() {
+            client = new DefaultHttpClient();
 
         }
-        out.close();
 
-      }catch(IOException e){
-        Log.v(TAG, "(1)JSON Downloader Task exception: check network connectivity");
-        e.printStackTrace();
-      }catch(Exception e){
-        Log.v(TAG, "(2)JSON Downloader Task exception: check network connectivity");
-        e.printStackTrace();
-      }
+        @Override
+        protected String doInBackground(String... params) {
+            String networkResponse = null;
+            try {
 
-      return networkResponse;
+                HttpGet geturl = new HttpGet(params[0]);
+                geturl.setHeader("Content-type", "application/json");
+
+                HttpResponse response = client.execute(geturl);
+                int statusCode = response.getStatusLine().getStatusCode();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                response.getEntity().writeTo(out);
+                networkResponse = out.toString();
+                //TODO:
+                Log.d(TAG, networkResponse);
+                if (networkResponse.contains(ERR_NO_RECORDS_FOUND)) {
+                    Log.d(TAG, "No Records found");
+                    // Keep the error and parse it at the timer task. Register the device if
+                    // this is the case.
+                    mIsDeviceRegistered = false;
+                    //networkResponse = null;
+                } else {
+                    Log.d(TAG, "update exists");
+                    //TODO: (?)
+
+                }
+                out.close();
+
+            } catch (IOException e) {
+                Log.v(TAG, "(1)JSON Downloader Task exception: check network connectivity");
+                e.printStackTrace();
+            } catch (Exception e) {
+                Log.v(TAG, "(2)JSON Downloader Task exception: check network connectivity");
+                e.printStackTrace();
+            }
+
+            return networkResponse;
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            synchronized (sDownloadLock) {
+                mJSONDownloadData = result;
+                sDownloadLock.notify();
+            }
+        }
+
     }
 
+    class ServerUpdaterTask extends AsyncTask<String, Void, String> {
+        HttpClient client;
 
+        public ServerUpdaterTask() {
+            client = new DefaultHttpClient();
 
-    @Override
-    protected void onPostExecute(String result){
-      synchronized(sDownloadLock){
-        mJSONDownloadData = result;
-        sDownloadLock.notify();
-      }
-    }
+        }
 
-  }
+        @Override
+        protected String doInBackground(String... params) {
+            // params[0]- url, params[1] - package name , params[2] - data in JSONString format
+            String networkResponse = "";
+            ByteArrayOutputStream out = null;
+            Log.v(TAG, "url:" + params[0] + " packagename:" + params[1] + " data:" + params[2]);
+            try {
 
-class ServerUpdaterTask extends AsyncTask<String, Void, String> {
-    HttpClient client;
-
-    public ServerUpdaterTask(){
-      client = new DefaultHttpClient();
-
-    }
-
-    @Override
-    protected String doInBackground(String... params){
-      // params[0]- url, params[1] - package name , params[2] - data in JSONString format
-      String networkResponse = "";
-      ByteArrayOutputStream out = null;
-      Log.v(TAG, "url:"+params[0]+" packagename:"+params[1]+" data:"+params[2]);
-      try{
-
-        HttpPut putUrl = new HttpPut(params[0]);
-        putUrl.setHeader("Content-type", "application/json");
+                HttpPut putUrl = new HttpPut(params[0]);
+                putUrl.setHeader("Content-type", "application/json");
         /*
         JSONObject data = new JSONObject();
         data.put(params[1],params[2]);
         */
-        JSONObject data = MaybeUtils.getJSONObject(params[2]);
-        JSONObject labelData = new JSONObject();
-        labelData.put(params[1],data);
-        JSONObject postData = new JSONObject();
-        postData.put("$set",labelData);
-        StringEntity se = new StringEntity(postData.toString());
-        putUrl.setEntity(se);
-        HttpResponse response = client.execute(putUrl);
-        //StatusLine statusLine = response.getStatusLine();
-        out = new ByteArrayOutputStream();
-        response.getEntity().writeTo(out);
-        networkResponse = out.toString();
-        int statusCode = response.getStatusLine().getStatusCode();
-        Log.d(TAG, "Network response|status code:"+networkResponse+statusCode);
-        if(statusCode == STATUS_204NOCONTENT || statusCode == STATUS_201CREATED || statusCode == STATUS_200OK){
-          networkResponse = out.toString();
-        }else{
-          networkResponse = ERR_GENERIC_ERROR;
+                JSONObject data = MaybeUtils.getJSONObject(params[2]);
+                JSONObject labelData = new JSONObject();
+                labelData.put(params[1], data);
+                JSONObject postData = new JSONObject();
+                postData.put("$set", labelData);
+                StringEntity se = new StringEntity(postData.toString());
+                putUrl.setEntity(se);
+                HttpResponse response = client.execute(putUrl);
+                //StatusLine statusLine = response.getStatusLine();
+                out = new ByteArrayOutputStream();
+                response.getEntity().writeTo(out);
+                networkResponse = out.toString();
+                int statusCode = response.getStatusLine().getStatusCode();
+                Log.d(TAG, "Network response|status code:" + networkResponse + statusCode);
+                if (statusCode == STATUS_204NOCONTENT || statusCode == STATUS_201CREATED || statusCode == STATUS_200OK) {
+                    networkResponse = out.toString();
+                } else {
+                    networkResponse = ERR_GENERIC_ERROR;
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+
+                if (out != null) {
+                    try {
+                        out.close();
+                        out = null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return networkResponse;
         }
 
 
-      }catch(IOException e){
-        e.printStackTrace();
-      }catch(Exception e){
-        e.printStackTrace();
-      }finally{
+        // Don't really need this at present, use in case we need it in future
+        // to display toasts/message to the user in case of failures
+        @Override
+        protected void onPostExecute(String result) {
+            String packageName = getCallerPackageName();
+            if (result.contains(ERR_DUPLICATE_KEY) || result.contains(ERR_GENERIC_ERROR)) {
+                Log.v(TAG, "Error while updating data to server");
+                return;
+            }
 
-        if(out!=null){
-          try{
-            out.close();
-            out = null;
-          }catch(IOException e){
-            e.printStackTrace();
-          }
         }
-      }
-
-      return networkResponse;
-    }
-
-
-    // Don't really need this at present, use in case we need it in future
-    // to display toasts/message to the user in case of failures
-    @Override
-    protected void onPostExecute(String result){
-        String packageName = getCallerPackageName();
-        if(result.contains(ERR_DUPLICATE_KEY) || result.contains(ERR_GENERIC_ERROR)){
-          Log.v(TAG, "Error while updating data to server");
-          return;
-        }
-
-    }
-
-  }
-
-class DeviceRegisterTask extends AsyncTask<String, Void, String> {
-    HttpClient client;
-
-    public DeviceRegisterTask(){
-      client = new DefaultHttpClient();
 
     }
 
-    @Override
-    protected String doInBackground(String... params){
-      String networkResponse = null;
-      ByteArrayOutputStream out=null;
-      try{
+    class DeviceRegisterTask extends AsyncTask<String, Void, String> {
+        HttpClient client;
 
-        HttpPost posturl = new HttpPost(params[0]);
-        posturl.setHeader("Content-type", "application/json");
+        public DeviceRegisterTask() {
+            client = new DefaultHttpClient();
 
-        JSONObject data = new JSONObject();
-        String meid = getDeviceMEID();
-        data.put("deviceid", meid);
-        StringEntity se = new StringEntity(data.toString());
-        posturl.setEntity(se);
-        HttpResponse response = client.execute(posturl);
-        //StatusLine statusLine = response.getStatusLine();
-        out = new ByteArrayOutputStream();
-        response.getEntity().writeTo(out);
-        int statusCode = response.getStatusLine().getStatusCode();
-        String networkResponseString = out.toString();
-        Log.v(TAG, "networkResponseString:"+networkResponseString);
-        if(statusCode == STATUS_204NOCONTENT || statusCode == STATUS_201CREATED || statusCode == STATUS_200OK){
-          Log.v(TAG, "Device Register Status code: 2xx ");
-          networkResponse = networkResponseString;
-          mIsDeviceRegistered = true;
-        }else{
-          if(networkResponseString.contains(ERR_DUPLICATE_KEY)){
-            //networkResponse = networkResponseString;
-            mIsDeviceRegistered = true;
-          }else{
-            Log.d(TAG, "Network error:"+networkResponseString);
-            //networkResponse = ERR_GENERIC_ERROR;
-
-          }
         }
 
-        Log.d(TAG, "Network response:"+networkResponse);
-        if(out != null){
-          out.close();
-          out = null;
+        @Override
+        protected String doInBackground(String... params) {
+            String networkResponse = null;
+            ByteArrayOutputStream out = null;
+            try {
+
+                HttpPost posturl = new HttpPost(params[0]);
+                posturl.setHeader("Content-type", "application/json");
+
+                JSONObject data = new JSONObject();
+                String meid = getDeviceMEID();
+                data.put("deviceid", meid);
+                StringEntity se = new StringEntity(data.toString());
+                posturl.setEntity(se);
+                HttpResponse response = client.execute(posturl);
+                //StatusLine statusLine = response.getStatusLine();
+                out = new ByteArrayOutputStream();
+                response.getEntity().writeTo(out);
+                int statusCode = response.getStatusLine().getStatusCode();
+                String networkResponseString = out.toString();
+                Log.v(TAG, "networkResponseString:" + networkResponseString);
+                if (statusCode == STATUS_204NOCONTENT || statusCode == STATUS_201CREATED || statusCode == STATUS_200OK) {
+                    Log.v(TAG, "Device Register Status code: 2xx ");
+                    networkResponse = networkResponseString;
+                    mIsDeviceRegistered = true;
+                } else {
+                    if (networkResponseString.contains(ERR_DUPLICATE_KEY)) {
+                        //networkResponse = networkResponseString;
+                        mIsDeviceRegistered = true;
+                    } else {
+                        Log.d(TAG, "Network error:" + networkResponseString);
+                        //networkResponse = ERR_GENERIC_ERROR;
+
+                    }
+                }
+
+                Log.d(TAG, "Network response:" + networkResponse);
+                if (out != null) {
+                    out.close();
+                    out = null;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+
+            }
+
+            return networkResponse;
         }
-      }catch(IOException e){
-        e.printStackTrace();
-      }catch(Exception e){
-        e.printStackTrace();
-      }finally{
-
-      }
-
-      return networkResponse;
-    }
 
 
-    // Don't really need this at present, use in case we need it in future
-    // to display toasts/message to the user in case of failures
-    @Override
-    protected void onPostExecute(String result){
+        // Don't really need this at present, use in case we need it in future
+        // to display toasts/message to the user in case of failures
+        @Override
+        protected void onPostExecute(String result) {
 
-        Log.v(TAG, "DeviceRegisterTask nw data received"+result);
+            Log.v(TAG, "DeviceRegisterTask nw data received" + result);
         /*
         if(result.contains(ERR_DUPLICATE_KEY) || result.contains(ERR_GENERIC_ERROR)){
           return;
         }
         */
 
-        synchronized(sNetworkCallLock){
+            synchronized (sNetworkCallLock) {
           /*
           if(mDbHelper.hasEntries(packageName)){
             mDbHelper.updateDataInDb(packageName, MaybeDatabaseHelper.DATA_COL, result);
           }
           */
-        mJSONResponse = result;
-        sNetworkCallLock.notify();
-      }
-    }
+                mJSONResponse = result;
+                sNetworkCallLock.notify();
+            }
+        }
 
-  }
+    }
 
 
 
@@ -1018,15 +1025,15 @@ class DeviceRegisterTask extends AsyncTask<String, Void, String> {
 
   /* Test suite */
 
-    private void dbTest(){
+    private void dbTest() {
 
     }
 
-    private void networkQueryTest(){
+    private void networkQueryTest() {
 
     }
 
-    private void cacheTest(){
+    private void cacheTest() {
 
     }
 
