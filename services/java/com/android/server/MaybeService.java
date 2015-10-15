@@ -64,7 +64,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
-//import com.google.android.gms.common.*;
+// import com.google.android.gms.common.*;
+import com.google.gson.Gson;
+import retrofit.Retrofit;
+import edu.buffalo.cse.maybeclient.MaybeClient;
+import edu.buffalo.cse.maybeclient.rest.Device;
+import com.google.gson.Gson;
+// import com.squareup.okhttp.OkHttpClient;
+// import com.squareup.okhttp.Request;
+// import com.squareup.okhttp.Response;
 
 import android.os.IMaybeListener;
 import android.os.MaybeListener;
@@ -79,6 +87,7 @@ public class MaybeService extends IMaybeService.Stub {
   private static final String TAG = "MaybeService";
   private static final String LOGTAG = "MaybeServiceLogging";
   private static final String URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/devices";
+  private static final String BASE_URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/";
   private static final String SHARED_PREFERENCES_NAME = "maybeServicePreferences";
   private static final String GCM_ID_KEY = "gcm_id";
   private static final String GCM_PROJECT_ID = "0";
@@ -271,40 +280,44 @@ public class MaybeService extends IMaybeService.Stub {
               return;
           }
         Log.v(TAG, "Querying server");
-        if(mIsDeviceRegistered){
-          synchronized(sDownloadLock){
-            String deviceMeid = getDeviceMEID();
-            if(deviceMeid == null){ // TelephonyManager not initialized
-              return;
-            }
-            String serverUrl = URL +"/"+deviceMeid;
-            Log.v(TAG, "Server URL: " + serverUrl);
-            new JSONDownloaderTask().execute(serverUrl);
-            try{
-              sDownloadLock.wait();
-              parseData(mJSONDownloadData);
+        String deviceMeid = getDeviceMEID();
+        Device device = new MaybeClient().getDevice(BASE_URL, deviceMeid);
+        Log.d(TAG, new Gson().toJson(device, Device.class));
 
-            }catch(InterruptedException e){
-              e.printStackTrace();
-            }
-          } //end sync sDownloadLock
-        }else{
-          synchronized(sNetworkCallLock){
+        // if(mIsDeviceRegistered){
+        //   synchronized(sDownloadLock){
+        //     String deviceMeid = getDeviceMEID();
+        //     if(deviceMeid == null){ // TelephonyManager not initialized
+        //       return;
+        //     }
+        //     String serverUrl = URL +"/"+deviceMeid;
+        //     Log.v(TAG, "Server URL: " + serverUrl);
+        //     new JSONDownloaderTask().execute(serverUrl);
+        //     try{
+        //       sDownloadLock.wait();
+        //       parseData(mJSONDownloadData);
+
+        //     }catch(InterruptedException e){
+        //       e.printStackTrace();
+        //     }
+        //   } //end sync sDownloadLock
+        // }else{
+        //   synchronized(sNetworkCallLock){
 
 
-          new DeviceRegisterTask().execute(URL);
+        //   new DeviceRegisterTask().execute(URL);
 
-          try{
-            sNetworkCallLock.wait();
-            parseData(mJSONResponse);
-          }catch(InterruptedException e){
-            e.printStackTrace();
-          }
+        //   try{
+        //     sNetworkCallLock.wait();
+        //     parseData(mJSONResponse);
+        //   }catch(InterruptedException e){
+        //     e.printStackTrace();
+        //   }
 
-          Log.d(TAG, "Received data from TASK: "+mJSONResponse);
+        //   Log.d(TAG, "Received data from TASK: "+mJSONResponse);
 
-          } //end sync sNetworkCallLock
-        }
+        //   } //end sync sNetworkCallLock
+        // }
       }
     };
     mDataDownloadTimer.schedule(mDataDownloaderTask, 10000, (mPollInterval * 1000));

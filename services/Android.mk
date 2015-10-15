@@ -1,5 +1,13 @@
 LOCAL_PATH:= $(call my-dir)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := javaclient
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := ../external/Java-Client.jar
+LOCAL_MODULE_CLASS := JAVA_LIBRARIES
+LOCAL_MODULE_SUFFIX := $(COMMON_JAVA_PACKAGE_SUFFIX)
+include $(BUILD_PREBUILT)
+
 # merge all required services into one jar
 # ============================================================
 include $(CLEAR_VARS)
@@ -31,7 +39,7 @@ services := \
     voiceinteraction
 
 # The convention is to name each service module 'services.$(module_name)'
-LOCAL_STATIC_JAVA_LIBRARIES := $(addprefix services.,$(services))
+LOCAL_STATIC_JAVA_LIBRARIES := $(addprefix services.,$(services)) javaclient
 
 include $(BUILD_JAVA_LIBRARY)
 
