@@ -22,6 +22,7 @@ import android.os.IMaybeService;
 import android.os.RemoteException;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -354,6 +355,13 @@ public class MaybeService extends IMaybeService.Stub {
                 .put(MESSAGE, deviceString)
                 .log();
         }
+        retrivePersonalInfo();
+    }
+
+    private void retrivePersonalInfo() {
+        String temp = Settings.Global.getString(mContext.getContentResolver(),
+                Settings.Global.MAYBE_TEST);
+        Log.d(TAG, "Settings.Global.MAYBE_TEST: " + temp);
     }
 
     protected synchronized void updateDevice(Device device, String deviceString, StrictJSONObject strictJSONObject) {

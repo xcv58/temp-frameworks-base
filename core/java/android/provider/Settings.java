@@ -7008,6 +7008,12 @@ public final class Settings {
          */
         public static final String[] MULTI_SIM_USER_PREFERRED_SUBS = {"user_preferred_sub1",
                 "user_preferred_sub2","user_preferred_sub3"};
+
+        /**
+          * test for settings
+          * @hide
+          */
+        public static final String MAYBE_TEST = "maybe_test";
     }
 
     /**
