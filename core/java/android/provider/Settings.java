@@ -7010,10 +7010,34 @@ public final class Settings {
                 "user_preferred_sub2","user_preferred_sub3"};
 
         /**
-          * test for settings
+          * PhoneLab survey for gender
           * @hide
           */
-        public static final String MAYBE_TEST = "maybe_test";
+        public static final String PHONELAB_GENDER = "phonelab_gender";
+
+        /**
+         * PhoneLab survey for age
+         * @hide
+         */
+        public static final String PHONELAB_AGE = "phonelab_age";
+
+        /**
+         * PhoneLab survey for laptop
+         * @hide
+         */
+        public static final String PHONELAB_LAPTOP = "phonelab_laptop";
+
+        /**
+         * PhoneLab survey for desktop
+         * @hide
+         */
+        public static final String PHONELAB_DESKTOP = "phonelab_desktop";
+
+        /**
+         * PhoneLab survey for another phone
+         * @hide
+         */
+        public static final String PHONELAB_ANOTHER_PHONE = "phonelab_another_phone";
     }
 
     /**

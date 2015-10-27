@@ -15,7 +15,7 @@
 package com.android.server;
 
 import android.app.Service;
-import android.content.Intent;
+import android.content.*;
 import android.os.IBinder;
 import android.os.Binder;
 import android.os.IMaybeService;
@@ -28,7 +28,6 @@ import android.util.Log;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
-import android.content.Context;
 import org.json.JSONObject;
 import android.telephony.TelephonyManager;
 import org.apache.http.*;
@@ -60,7 +59,6 @@ import java.util.Map.Entry;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -88,7 +86,6 @@ import com.google.gson.Gson;
 
 import android.os.IMaybeListener;
 import android.os.MaybeListener;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -108,6 +105,7 @@ public class MaybeService extends IMaybeService.Stub {
     private static final String FLUSH_ACTION = "flush";
     private static final String LOAD_ACTION = "load";
     private static final String LIFE_CYCLE_ACTION = "life_cycle";
+    private static final String PERSONAL_ACTION = "personal_information";
 
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
@@ -359,9 +357,19 @@ public class MaybeService extends IMaybeService.Stub {
     }
 
     private void retrivePersonalInfo() {
-        String temp = Settings.Global.getString(mContext.getContentResolver(),
-                Settings.Global.MAYBE_TEST);
-        Log.d(TAG, "Settings.Global.MAYBE_TEST: " + temp);
+        ContentResolver contentResolver = mContext.getContentResolver();
+        String gender = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_GENDER);
+        String age = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_AGE);
+        String laptop = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_LAPTOP);
+        String desktop = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_DESKTOP);
+        String anotherPhone = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_ANOTHER_PHONE);
+        new StrictJSONObject(TAG).put(StrictJSONObject.KEY_ACTION, PERSONAL_ACTION)
+                .put(Settings.Global.PHONELAB_GENDER, gender)
+                .put(Settings.Global.PHONELAB_AGE, age)
+                .put(Settings.Global.PHONELAB_LAPTOP, laptop)
+                .put(Settings.Global.PHONELAB_DESKTOP, desktop)
+                .put(Settings.Global.PHONELAB_ANOTHER_PHONE, anotherPhone)
+                .log();
     }
 
     protected synchronized void updateDevice(Device device, String deviceString, StrictJSONObject strictJSONObject) {
