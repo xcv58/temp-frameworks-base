@@ -353,10 +353,10 @@ public class MaybeService extends IMaybeService.Stub {
                 .put(MESSAGE, deviceString)
                 .log();
         }
-        retrivePersonalInfo();
+        retrievePersonalInfo();
     }
 
-    private void retrivePersonalInfo() {
+    private void retrievePersonalInfo() {
         ContentResolver contentResolver = mContext.getContentResolver();
         String gender = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_GENDER);
         String age = Settings.Global.getString(contentResolver, Settings.Global.PHONELAB_AGE);
