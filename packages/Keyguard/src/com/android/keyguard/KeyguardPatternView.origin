@@ -38,8 +38,6 @@ import com.android.internal.widget.LockPatternView;
 import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 
 import java.util.List;
-import android.os.MaybeManager;
-import java.lang.Exception;
 
 public class KeyguardPatternView extends LinearLayout implements KeyguardSecurityView,
         AppearAnimationCreator<LockPatternView.CellState> {
@@ -173,55 +171,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
     }
 
     private void maybeHitFactor() {
-        
-        float hitFactor;
-        
-        int __hit_factor__291 = 0;
-        
-        MaybeManager maybeManager;
-        
-        try {
-          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-        } catch (Exception e) {
-          Log.e("MaybeService-hit_factor", "Failed to get maybe service.", e);
-          return;
-        };
-        
-        try {
-          __hit_factor__291 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
-        } catch (Exception e) {
-          Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
-        };
-        switch (__hit_factor__291) {
-          
-          case 4: {
-                    hitFactor = 1.0f;
-                    break;
-          }  
-          case 3: {
-                    hitFactor = 0.8f;
-                    break;
-          }  
-          case 2: {
-                    hitFactor = 0.6f;
-                    break;
-          }  
-          case 1: {
-                    hitFactor = 0.4f;
-                    break;
-          }  
-          default: {
-                    hitFactor = 0.2f;
-                    if (__hit_factor__291 != 0) {
-                      try {
-                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__291);
-                      } catch (Exception e) {
-                        Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
-                      }
-                    }
-                    break;
-          }
-        }
+        float hitFactor = maybe("hit_factor") 0.2f, 0.4f, 0.6f, 0.8f, 1.0f;
         mLockPatternView.setHitFactor(hitFactor);
     }
 
@@ -486,4 +436,3 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         return false;
     }
 }
-
