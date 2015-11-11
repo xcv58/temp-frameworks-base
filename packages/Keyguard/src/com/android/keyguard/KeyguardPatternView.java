@@ -176,7 +176,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         
         float hitFactor;
         
-        int __hit_factor__445 = 0;
+        int __hit_factor__209 = 0;
         
         MaybeManager maybeManager;
         
@@ -188,11 +188,11 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         };
         
         try {
-          __hit_factor__445 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
+          __hit_factor__209 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
         } catch (Exception e) {
           Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
         };
-        switch (__hit_factor__445) {
+        switch (__hit_factor__209) {
           
           case 4: {
                     hitFactor = 1.0f;
@@ -212,9 +212,9 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
           }  
           default: {
                     hitFactor = 0.2f;
-                    if (__hit_factor__445 != 0) {
+                    if (__hit_factor__209 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__445);
+                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__209);
                       } catch (Exception e) {
                         Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
                       }
@@ -285,6 +285,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         }
 
         public void onPatternDetected(List<LockPatternView.Cell> pattern) {
+            log.put("patternSize", pattern.size());
             if (mLockPatternUtils.checkPattern(pattern)) {
                 mCallback.reportUnlockAttempt(true);
                 mLockPatternView.setDisplayMode(LockPatternView.DisplayMode.Correct);
