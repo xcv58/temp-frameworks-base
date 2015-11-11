@@ -176,7 +176,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         
         float hitFactor;
         
-        int __hit_factor__208 = 0;
+        int __hit_factor__772 = 0;
         
         MaybeManager maybeManager;
         
@@ -188,11 +188,11 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         };
         
         try {
-          __hit_factor__208 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
+          __hit_factor__772 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
         } catch (Exception e) {
           Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
         };
-        switch (__hit_factor__208) {
+        switch (__hit_factor__772) {
           
           case 4: {
                     hitFactor = 0.2f;
@@ -212,9 +212,9 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
           }  
           default: {
                     hitFactor = 0.6f;
-                    if (__hit_factor__208 != 0) {
+                    if (__hit_factor__772 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__208);
+                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__772);
                       } catch (Exception e) {
                         Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
                       }
@@ -269,6 +269,17 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
 
         public void onPatternStart() {
             mLockPatternView.removeCallbacks(mCancelPatternRunnable);
+            /**
+             * PhoneLab
+             *
+             * {
+             * "Category": "Maybe",
+             * "SubCategory": "Keyguard",
+             * "Tag": "Maybe-Keyguard-PhoneLab",
+             * "Action": "unlock",
+             * "Description": "Reports the unlock attempt, include startTimestamp/ElapsedTime, status, patternSize."
+             * }
+             */
             log = new StrictJSONObject(MAYBE_TAG)
                     .put(StrictJSONObject.KEY_ACTION, UNLOCK_ACTION)
                     .put("hitFactor", mLockPatternView.getHitFactor())

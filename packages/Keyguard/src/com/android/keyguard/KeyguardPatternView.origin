@@ -219,6 +219,17 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
 
         public void onPatternStart() {
             mLockPatternView.removeCallbacks(mCancelPatternRunnable);
+            /**
+             * PhoneLab
+             *
+             * {
+             * "Category": "Maybe",
+             * "SubCategory": "Keyguard",
+             * "Tag": "Maybe-Keyguard-PhoneLab",
+             * "Action": "unlock",
+             * "Description": "Reports the unlock attempt, include startTimestamp/ElapsedTime, status, patternSize."
+             * }
+             */
             log = new StrictJSONObject(MAYBE_TAG)
                     .put(StrictJSONObject.KEY_ACTION, UNLOCK_ACTION)
                     .put("hitFactor", mLockPatternView.getHitFactor())
