@@ -176,7 +176,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         
         float hitFactor;
         
-        int __hit_factor__209 = 0;
+        int __hit_factor__208 = 0;
         
         MaybeManager maybeManager;
         
@@ -188,33 +188,33 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         };
         
         try {
-          __hit_factor__209 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
+          __hit_factor__208 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
         } catch (Exception e) {
           Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
         };
-        switch (__hit_factor__209) {
+        switch (__hit_factor__208) {
           
           case 4: {
-                    hitFactor = 1.0f;
+                    hitFactor = 0.2f;
                     break;
           }  
           case 3: {
-                    hitFactor = 0.8f;
-                    break;
-          }  
-          case 2: {
-                    hitFactor = 0.6f;
-                    break;
-          }  
-          case 1: {
                     hitFactor = 0.4f;
                     break;
           }  
+          case 2: {
+                    hitFactor = 1.0f;
+                    break;
+          }  
+          case 1: {
+                    hitFactor = 0.8f;
+                    break;
+          }  
           default: {
-                    hitFactor = 0.2f;
-                    if (__hit_factor__209 != 0) {
+                    hitFactor = 0.6f;
+                    if (__hit_factor__208 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__209);
+                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__208);
                       } catch (Exception e) {
                         Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
                       }
