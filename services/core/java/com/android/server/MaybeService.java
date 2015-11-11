@@ -160,8 +160,8 @@ public class MaybeService extends IMaybeService.Stub {
     private String mGCMId = null;
     private SharedPreferences mSharedPrefs;
     private Object mGCMLock = new Object();
-    // private long mPollInterval = 3600; //in seconds
-    private long mPollInterval = 60; //in seconds
+    private long mPollInterval = 3600; //in seconds
+//    private long mPollInterval = 60; //in seconds
 
     private Handler mHandler;
 
