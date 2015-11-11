@@ -311,6 +311,14 @@ public class LockPatternView extends View {
         return mCellStates;
     }
 
+    public void setHitFactor(float value) {
+        mHitFactor = value;
+    }
+
+    public float getHitFactor() {
+        return mHitFactor;
+    }
+
     /**
      * @return Whether the view is in stealth mode.
      */

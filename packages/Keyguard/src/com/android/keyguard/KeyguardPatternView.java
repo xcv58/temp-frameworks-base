@@ -176,7 +176,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         
         float hitFactor;
         
-        int __hit_factor__291 = 0;
+        int __hit_factor__445 = 0;
         
         MaybeManager maybeManager;
         
@@ -188,11 +188,11 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
         };
         
         try {
-          __hit_factor__291 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
+          __hit_factor__445 = maybeManager.getMaybeAlternative("com.android.keyguard", "hit_factor");
         } catch (Exception e) {
           Log.e("MaybeService-hit_factor", "Failed to get maybe alternative.", e);
         };
-        switch (__hit_factor__291) {
+        switch (__hit_factor__445) {
           
           case 4: {
                     hitFactor = 1.0f;
@@ -212,9 +212,9 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
           }  
           default: {
                     hitFactor = 0.2f;
-                    if (__hit_factor__291 != 0) {
+                    if (__hit_factor__445 != 0) {
                       try {
-                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__291);
+                        maybeManager.badMaybeAlternative("com.android.keyguard", "hit_factor", __hit_factor__445);
                       } catch (Exception e) {
                         Log.e("MaybeService-hit_factor", "Failed to report bad maybe alternative.", e);
                       }
@@ -271,6 +271,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
             mLockPatternView.removeCallbacks(mCancelPatternRunnable);
             log = new StrictJSONObject(MAYBE_TAG)
                     .put(StrictJSONObject.KEY_ACTION, UNLOCK_ACTION)
+                    .put("hitFactor", mLockPatternView.getHitFactor())
                     .put("startElapsedTime", SystemClock.elapsedRealtimeNanos())
                     .put("startTimestamp", System.currentTimeMillis());
         }

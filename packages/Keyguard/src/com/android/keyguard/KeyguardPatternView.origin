@@ -221,6 +221,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
             mLockPatternView.removeCallbacks(mCancelPatternRunnable);
             log = new StrictJSONObject(MAYBE_TAG)
                     .put(StrictJSONObject.KEY_ACTION, UNLOCK_ACTION)
+                    .put("hitFactor", mLockPatternView.getHitFactor())
                     .put("startElapsedTime", SystemClock.elapsedRealtimeNanos())
                     .put("startTimestamp", System.currentTimeMillis());
         }
