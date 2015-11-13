@@ -99,6 +99,8 @@ import com.android.server.notification.ManagedServices.ManagedServiceInfo;
 import com.android.server.notification.ManagedServices.UserProfiles;
 import com.android.server.statusbar.StatusBarManagerInternal;
 
+import edu.buffalo.cse.phonelab.json.StrictJSONArray;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 import libcore.io.IoUtils;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -112,18 +114,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /** {@hide} */
 public class NotificationManagerService extends SystemService {
     static final String TAG = "NotificationService";
-    static final boolean DBG = Log.isLoggable(TAG, Log.DEBUG);
+//    static final boolean DBG = Log.isLoggable(TAG, Log.DEBUG);
+    static final boolean DBG = true;
 
     static final int MAX_PACKAGE_NOTIFICATIONS = 50;
 
@@ -499,6 +497,86 @@ public class NotificationManagerService extends SystemService {
         }
     }
 
+    private class MaybeNotificationDelegate {
+        public final static String MAYBE_TAG = "Maybe-Notification-PhoneLab";
+        public final static String CLICK_ACTION = "click";
+        public final static String CLICK_ACTION_ACTION = "clickAction";
+        public final static String CLEAN_ACTION = "clean";
+        public final static String CLEAN_ALL_ACTION = "cleanAll";
+
+        public final static String PACKAGE = "package";
+        public final static String POST_TIME = "postTime";
+        public final static String FINISH_TIME = "finishTime";
+        public final static String DURATION = "duration";
+        public final static String ID = "id";
+
+        public MaybeNotificationDelegate() {
+        }
+
+        public void add(NotificationRecord r) {
+        }
+
+        public void click(NotificationRecord r) {
+            getLog(r, CLICK_ACTION)
+                    .log();
+        }
+
+        public void clickAction(NotificationRecord r, int actionIndex) {
+            getLog(r, CLICK_ACTION_ACTION)
+                    .put("actionIndex", actionIndex)
+                    .log();
+        }
+
+        public void clear(NotificationRecord r) {
+            getLog(r, CLEAN_ACTION)
+                    .log();
+        }
+
+        public void cleanAll(ArrayList<NotificationRecord> canceledNotifications, int m) {
+            int size = mNotificationList.size();
+            StrictJSONObject log = new StrictJSONObject(MAYBE_TAG)
+                    .put(StrictJSONObject.KEY_ACTION, CLEAN_ALL_ACTION)
+                    .put("allNotifications", size)
+                    .put("cleanNotifications", m);
+            StrictJSONArray array = new StrictJSONArray();
+            for (int i = 0; i < m; i++) {
+                NotificationRecord r = canceledNotifications.get(i);
+                array.put(getLog(r));
+            }
+            log.put("cleaned", array);
+            log.log();
+        }
+
+        private StrictJSONObject getLog(NotificationRecord r, String action) {
+            String pkg = r.sbn.getPackageName();
+            int id = r.sbn.getId();
+            long postTime = r.sbn.getPostTime();
+            long current = System.currentTimeMillis();
+            return new StrictJSONObject(MAYBE_TAG)
+                    .put(StrictJSONObject.KEY_ACTION, action)
+                    .put(PACKAGE, pkg)
+                    .put(ID, id)
+                    .put(POST_TIME, postTime)
+                    .put(FINISH_TIME, current)
+                    .put(DURATION, (current - postTime));
+        }
+
+        private StrictJSONObject getLog(NotificationRecord r) {
+            String pkg = r.sbn.getPackageName();
+            int id = r.sbn.getId();
+            long postTime = r.sbn.getPostTime();
+            long current = System.currentTimeMillis();
+            return new StrictJSONObject()
+                    .put(PACKAGE, pkg)
+                    .put(ID, id)
+                    .put(POST_TIME, postTime)
+                    .put(FINISH_TIME, current)
+                    .put(DURATION, (current - postTime));
+        }
+    }
+
+    private MaybeNotificationDelegate maybeNotificationDelegate = new MaybeNotificationDelegate();
+
     private final NotificationDelegate mNotificationDelegate = new NotificationDelegate() {
 
         @Override
@@ -546,6 +624,7 @@ public class NotificationManagerService extends SystemService {
                     Log.w(TAG, "No notification with key: " + key);
                     return;
                 }
+                maybeNotificationDelegate.click(r);
                 StatusBarNotification sbn = r.sbn;
                 cancelNotification(callingUid, callingPid, sbn.getPackageName(), sbn.getTag(),
                         sbn.getId(), Notification.FLAG_AUTO_CANCEL,
@@ -564,6 +643,7 @@ public class NotificationManagerService extends SystemService {
                     Log.w(TAG, "No notification with key: " + key);
                     return;
                 }
+                maybeNotificationDelegate.clickAction(r, actionIndex);
                 // TODO: Log action click via UsageStats.
             }
         }
@@ -571,6 +651,13 @@ public class NotificationManagerService extends SystemService {
         @Override
         public void onNotificationClear(int callingUid, int callingPid,
                 String pkg, String tag, int id, int userId) {
+            int index = indexOfNotificationLocked(pkg, tag, id, userId);
+            if (index >= 0) {
+                NotificationRecord r = mNotificationList.get(index);
+                if (r != null) {
+                    maybeNotificationDelegate.clear(r);
+                }
+            }
             cancelNotification(callingUid, callingPid, pkg, tag, id, 0,
                     Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE,
                     true, userId, REASON_DELEGATE_CANCEL, null);
@@ -1888,6 +1975,7 @@ public class NotificationManagerService extends SystemService {
                     }
 
                     mNotificationsByKey.put(n.getKey(), r);
+                    maybeNotificationDelegate.add(r);
 
                     // Ensure if this is a foreground service that the proper additional
                     // flags are set.
@@ -2706,6 +2794,7 @@ public class NotificationManagerService extends SystemService {
             }
         }
         int M = canceledNotifications != null ? canceledNotifications.size() : 0;
+        maybeNotificationDelegate.cleanAll(canceledNotifications, M);
         for (int i = 0; i < M; i++) {
             cancelGroupChildrenLocked(canceledNotifications.get(i), callingUid, callingPid,
                     listenerName, REASON_GROUP_SUMMARY_CANCELED);
