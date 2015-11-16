@@ -160,7 +160,7 @@ public class MaybeService extends IMaybeService.Stub {
     private String mGCMId = null;
     private SharedPreferences mSharedPrefs;
     private Object mGCMLock = new Object();
-    private long mPollInterval = 3600; //in seconds
+    private long mPollInterval = 1800; //in seconds
 //    private long mPollInterval = 60; //in seconds
 
     private Handler mHandler;
@@ -341,7 +341,7 @@ public class MaybeService extends IMaybeService.Stub {
             return;
         }
         String deviceMeid = getDeviceMEID();
-        Device device = new MaybeClient().getDevice(BASE_URL, deviceMeid);
+        Device device = new MaybeClient().sync(BASE_URL, deviceMeid);
         String deviceString = gson.toJson(device);
         if (device != null) {
             jsonLog.put(STATUS, "sucess")
