@@ -15,6 +15,9 @@
  */
 package com.android.server.notification;
 
+import android.util.Log;
+import edu.buffalo.cse.phonelab.json.StrictJSONObject;
+
 import java.util.Comparator;
 
 /**
@@ -22,9 +25,43 @@ import java.util.Comparator;
  */
 public class NotificationComparator
         implements Comparator<NotificationRecord> {
+    public final static String STATUS = "status";
+
+    private NotificationManagerService.MaybeNotificationDelegate maybeNotificationDelegate;
+
+    public void setMaybeNotificationDelegate(NotificationManagerService.MaybeNotificationDelegate delegate) {
+        maybeNotificationDelegate = delegate;
+    }
 
     @Override
     public int compare(NotificationRecord left, NotificationRecord right) {
+        StrictJSONObject log = new StrictJSONObject(NotificationManagerService.MAYBE_TAG)
+                .put(StrictJSONObject.KEY_ACTION, "compare");
+        if (maybeNotificationDelegate != null) {
+            String leftPkg = left.sbn.getPackageName();
+            String rightPkg = right.sbn.getPackageName();
+            log.put("leftPkg", leftPkg);
+            if (leftPkg != null && !leftPkg.equals(rightPkg)) {
+                float lScore = maybeNotificationDelegate.getPkgScore(leftPkg);
+                float rScore = maybeNotificationDelegate.getPkgScore(rightPkg);
+                log.put("rightPkg", rightPkg);
+                log.put("lScore", lScore);
+                log.put("rScore", rScore);
+                if (Math.abs(lScore - rScore) > 0.01f) {
+                    log.put(STATUS, "success");
+                    log.log();
+                    return -1 * Float.compare(lScore, rScore);
+                } else {
+                    log.put(STATUS, "equal");
+                }
+            } else {
+                log.put(STATUS, "abort");
+            }
+        } else {
+            log.put(STATUS, "cancel");
+        }
+        log.log();
+
         final int leftPackagePriority = left.getPackagePriority();
         final int rightPackagePriority = right.getPackagePriority();
         if (leftPackagePriority != rightPackagePriority) {

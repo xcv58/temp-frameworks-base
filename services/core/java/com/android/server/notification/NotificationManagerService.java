@@ -34,18 +34,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.StatusBarManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
+import android.content.*;
+import android.content.pm.*;
 import android.content.pm.IPackageManager;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ParceledListSlice;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.media.AudioAttributes;
@@ -107,13 +99,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -497,8 +483,8 @@ public class NotificationManagerService extends SystemService {
         }
     }
 
-    private class MaybeNotificationDelegate {
-        public final static String MAYBE_TAG = "Maybe-Notification-PhoneLab";
+    public final static String MAYBE_TAG = "Maybe-Notification-PhoneLab";
+    public class MaybeNotificationDelegate {
         public final static String CLICK_ACTION = "click";
         public final static String CLICK_ACTION_ACTION = "clickAction";
         public final static String CLEAN_ACTION = "clean";
@@ -510,24 +496,37 @@ public class NotificationManagerService extends SystemService {
         public final static String DURATION = "duration";
         public final static String ID = "id";
 
+        private HashMap<String, NotificationPkgMetadata> map;
+
+        private long lastFlushTime = 0;
+        private long lastModifyTime = 0;
+
+        private final static int CLICK_INT = 0;
+        private final static int CLEAN_INT = 1;
+        private final static int CLEAN_ALL_INT = 2;
+
         public MaybeNotificationDelegate() {
+            load();
         }
 
         public void add(NotificationRecord r) {
         }
 
         public void click(NotificationRecord r) {
+            change(r, CLICK_INT);
             getLog(r, CLICK_ACTION)
                     .log();
         }
 
         public void clickAction(NotificationRecord r, int actionIndex) {
+            change(r, CLICK_INT);
             getLog(r, CLICK_ACTION_ACTION)
                     .put("actionIndex", actionIndex)
                     .log();
         }
 
         public void clear(NotificationRecord r) {
+            change(r, CLEAN_INT);
             getLog(r, CLEAN_ACTION)
                     .log();
         }
@@ -542,9 +541,15 @@ public class NotificationManagerService extends SystemService {
             for (int i = 0; i < m; i++) {
                 NotificationRecord r = canceledNotifications.get(i);
                 array.put(getLog(r));
+                change(r, CLEAN_ALL_INT);
             }
             log.put("cleaned", array);
             log.log();
+        }
+
+        public float getPkgScore(String pkg) {
+            NotificationPkgMetadata metadata = getMetadata(pkg);
+            return metadata.score;
         }
 
         private StrictJSONObject getLog(NotificationRecord r, String action) {
@@ -552,13 +557,20 @@ public class NotificationManagerService extends SystemService {
             int id = r.sbn.getId();
             long postTime = r.sbn.getPostTime();
             long current = System.currentTimeMillis();
+            NotificationPkgMetadata metadata = getMetadata(pkg);
             return new StrictJSONObject(MAYBE_TAG)
                     .put(StrictJSONObject.KEY_ACTION, action)
                     .put(PACKAGE, pkg)
                     .put(ID, id)
                     .put(POST_TIME, postTime)
                     .put(FINISH_TIME, current)
-                    .put(DURATION, (current - postTime));
+                    .put(DURATION, (current - postTime))
+                    .put("clickCount", metadata.click)
+                    .put("cleanCount", metadata.clean)
+                    .put("cleanAllCount", metadata.cleanAll)
+                    .put("rawScore", metadata.rawScore)
+                    .put("score", metadata.score)
+                    .put("globalScore", globalScore);
         }
 
         private StrictJSONObject getLog(NotificationRecord r) {
@@ -566,12 +578,157 @@ public class NotificationManagerService extends SystemService {
             int id = r.sbn.getId();
             long postTime = r.sbn.getPostTime();
             long current = System.currentTimeMillis();
+            NotificationPkgMetadata metadata = getMetadata(pkg);
             return new StrictJSONObject()
                     .put(PACKAGE, pkg)
                     .put(ID, id)
                     .put(POST_TIME, postTime)
                     .put(FINISH_TIME, current)
-                    .put(DURATION, (current - postTime));
+                    .put(DURATION, (current - postTime))
+                    .put("clickCount", metadata.click)
+                    .put("cleanCount", metadata.clean)
+                    .put("cleanAllCount", metadata.cleanAll)
+                    .put("rawScore", metadata.rawScore)
+                    .put("score", metadata.score)
+                    .put("globalScore", globalScore);
+        }
+
+        private void change(NotificationRecord r, int action) {
+            String pkg = r.sbn.getPackageName();
+            NotificationPkgMetadata metadata = getMetadata(pkg);
+            switch (action) {
+                case CLICK_INT:
+                    metadata.click++;
+                    break;
+                case CLEAN_INT:
+                    metadata.clean++;
+                    break;
+                case CLEAN_ALL_INT:
+                    metadata.cleanAll++;
+                    break;
+                default:
+                    new StrictJSONObject(MAYBE_TAG)
+                            .put(StrictJSONObject.KEY_ACTION, "error")
+                            .put("message", "package name: " + pkg
+                                    + " has unknown action: " + action)
+                            .log();
+            }
+            updateScore(metadata);
+        }
+
+        private final static int M = 32;
+        private final static int SMOOTH_BASE = 2;
+        private final static float globalScore = 0.3f;
+        /**
+         * (WR) = (v ÷ (v+M)) × R + (M ÷ (v+M)) × C
+         * R, the ration for this notification
+         * v, number of all events
+         * M, the smooth factor to eliminate click = 1, clean = 0
+         * C, the global score
+         * @param metadata
+         */
+        private void updateScore(NotificationPkgMetadata metadata) {
+            int click = metadata.click;
+            int clean = metadata.clean;
+            int cleanAll = metadata.cleanAll;
+            int sum = click + clean + cleanAll;
+            if (click > SMOOTH_BASE && sum != 0) {
+                metadata.rawScore = (float) click / (float) sum;
+            }
+            int v = sum;
+            metadata.score = ((v / (float) (v + M)) * metadata.score) + ((M / (float) (v + M)) * globalScore);
+            lastModifyTime = System.currentTimeMillis();
+        }
+
+        private NotificationPkgMetadata getMetadata(String pkg) {
+            NotificationPkgMetadata metadata = map.get(pkg);
+            if (metadata == null) {
+                metadata = new NotificationPkgMetadata();
+                metadata.click = 0;
+                metadata.clean = 0;
+                metadata.cleanAll = 0;
+                metadata.score = 0.0f;
+                map.put(pkg, metadata);
+            }
+            return metadata;
+        }
+
+        private final static String MAYBE_NOTIFICATION_FILENAME = "MAYBE_NOTIFICATION_FILENAME ";
+        private static final String FLUSH_ACTION = "flush";
+        private static final String LOAD_ACTION = "load";
+        private static final String STATUS = "status";
+        private static final String SUCCESS = "success";
+        private static final String FAIL = "fail";
+        private static final String CANCEL = "cancel";
+        private static final String MESSAGE = "message";
+        private static final String CONTENT = "content";
+        private static final String METHOD = "method";
+
+        private synchronized void load() {
+            if (map == null) {
+                File file = new File(Environment.getDataDirectory(), MAYBE_NOTIFICATION_FILENAME);
+                if (!file.exists()) {
+                    (new StrictJSONObject(MAYBE_TAG))
+                            .put(StrictJSONObject.KEY_ACTION, LOAD_ACTION)
+                            .put(STATUS, FAIL)
+                            .put(MESSAGE, "no file")
+                            .log();
+                    map = new HashMap<String, NotificationPkgMetadata>();
+                    return;
+                }
+                ObjectInputStream ois = null;
+                try {
+                    ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+                    Object obj = ois.readObject();
+                    if (obj instanceof HashMap) {
+                        map = (HashMap<String, NotificationPkgMetadata>) obj;
+                    }
+                    ois.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    (new StrictJSONObject(TAG))
+                            .put(StrictJSONObject.KEY_ACTION, LOAD_ACTION)
+                            .put(STATUS, FAIL)
+                            .put(MESSAGE, e.getMessage())
+                            .log();
+                    if (map == null) {
+                        map = new HashMap<String, NotificationPkgMetadata>();
+                    }
+                }
+            } else {
+                (new StrictJSONObject(MAYBE_TAG))
+                        .put(StrictJSONObject.KEY_ACTION, LOAD_ACTION)
+                        .put(STATUS, CANCEL)
+                        .put(MESSAGE, "map already exists!")
+                        .log();
+            }
+        }
+
+        private synchronized void flush() {
+            StrictJSONObject log = new StrictJSONObject(MAYBE_TAG)
+                    .put(StrictJSONObject.KEY_ACTION, FLUSH_ACTION);
+            if (lastFlushTime > lastModifyTime) {
+                log.put(STATUS, CANCEL)
+                        .put("lastFlush", lastFlushTime)
+                        .put("lastModify", lastModifyTime)
+                        .log();
+                return;
+            }
+            ObjectOutputStream oos = null;
+            try {
+                File file = new File(Environment.getDataDirectory(), MAYBE_NOTIFICATION_FILENAME);
+                oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+                oos.writeObject(map);
+                oos.close();
+                log.put(STATUS, SUCCESS)
+                        .put("file", MAYBE_NOTIFICATION_FILENAME);
+                lastFlushTime = System.currentTimeMillis();
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.put(STATUS, FAIL)
+                        .put(MESSAGE, e.getMessage());
+            }
+            log.log();
         }
     }
 
@@ -855,6 +1012,7 @@ public class NotificationManagerService extends SystemService {
             } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 mScreenOn = false;
                 updateNotificationPulse();
+                maybeNotificationDelegate.flush();
             } else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
                 mInCall = TelephonyManager.EXTRA_STATE_OFFHOOK
                         .equals(intent.getStringExtra(TelephonyManager.EXTRA_STATE));
@@ -1828,7 +1986,7 @@ public class NotificationManagerService extends SystemService {
                 // FLAG_FOREGROUND_SERVICE.
                 sbn.getNotification().flags =
                         (r.mOriginalFlags & ~Notification.FLAG_FOREGROUND_SERVICE);
-                mRankingHelper.sort(mNotificationList);
+                sort();
                 mListeners.notifyPostedLocked(sbn, sbn /* oldSbn */);
             }
         }
@@ -1985,7 +2143,7 @@ public class NotificationManagerService extends SystemService {
                     }
 
                     applyZenModeLocked(r);
-                    mRankingHelper.sort(mNotificationList);
+                    sort();
 
                     if (notification.icon != 0) {
                         StatusBarNotification oldSbn = (old != null) ? old.sbn : null;
@@ -2391,7 +2549,7 @@ public class NotificationManagerService extends SystemService {
             int visibilityBefore = record.getPackageVisibilityOverride();
             recon.applyChangesLocked(record);
             applyZenModeLocked(record);
-            mRankingHelper.sort(mNotificationList);
+            sort();
             int indexAfter = findNotificationRecordIndexLocked(record);
             boolean interceptAfter = record.isIntercepted();
             int visibilityAfter = record.getPackageVisibilityOverride();
@@ -2418,7 +2576,7 @@ public class NotificationManagerService extends SystemService {
                 mRankingHelper.extractSignals(r);
             }
             for (int i = 0; i < N; i++) {
-                mRankingHelper.sort(mNotificationList);
+                sort();
                 final NotificationRecord r = mNotificationList.get(i);
                 if (!orderBefore.get(i).equals(r.getKey())
                         || visibilities[i] != r.getPackageVisibilityOverride()) {
@@ -2427,6 +2585,10 @@ public class NotificationManagerService extends SystemService {
                 }
             }
         }
+    }
+
+    private void sort() {
+        mRankingHelper.sort(mNotificationList, maybeNotificationDelegate);
     }
 
     // let zen mode evaluate this record

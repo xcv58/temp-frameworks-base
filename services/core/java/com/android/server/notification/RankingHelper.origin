@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import android.os.MaybeManager;
-import java.lang.Exception;
 
 public class RankingHelper implements RankingConfig {
     private static final String TAG = "RankingHelper";
@@ -231,40 +229,10 @@ public class RankingHelper implements RankingConfig {
         }
 
         // rank each record individually
-        
-        int __sort__653 = 0;
-        
-        MaybeManager maybeManager;
-        
-        try {
-          maybeManager = (MaybeManager) mContext.getSystemService(Context.MAYBE_SERVICE);
-        } catch (Exception e) {
-          Log.e("MaybeService-sort", "Failed to get maybe service.", e);
-          return;
-        };
-        
-        try {
-          __sort__653 = maybeManager.getMaybeAlternative("com.android.server.notification", "sort");
-        } catch (Exception e) {
-          Log.e("MaybeService-sort", "Failed to get maybe alternative.", e);
-        };
-        switch (__sort__653) {
-          
-          case 1: {
-                      mPreliminaryComparator.setMaybeNotificationDelegate(null);
-                      break;
-          }  
-          default: {
-                      mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
-                      if (__sort__653 != 0) {
-                        try {
-                          maybeManager.badMaybeAlternative("com.android.server.notification", "sort", __sort__653);
-                        } catch (Exception e) {
-                          Log.e("MaybeService-sort", "Failed to report bad maybe alternative.", e);
-                        }
-                      }
-                      break;
-          }
+        maybe ("sort") {
+            mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
+        } or {
+            mPreliminaryComparator.setMaybeNotificationDelegate(null);
         }
         Collections.sort(notificationList, mPreliminaryComparator);
 
@@ -424,4 +392,3 @@ public class RankingHelper implements RankingConfig {
         }
     }
 }
-
