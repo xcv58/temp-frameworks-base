@@ -14,9 +14,9 @@
 
 package com.android.server;
 
-import android.app.Service;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.*;
-import android.os.IBinder;
 import android.os.Binder;
 import android.os.IMaybeService;
 import android.os.RemoteException;
@@ -25,7 +25,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 
-import java.util.Calendar;
+import java.util.*;
 import java.text.SimpleDateFormat;
 
 import org.json.JSONObject;
@@ -34,42 +34,21 @@ import org.apache.http.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 
-import java.io.OutputStream;
-
 import org.apache.http.client.*;
 import org.apache.http.impl.client.*;
 
 import java.io.IOException;
 
-import android.net.http.AndroidHttpClient;
 import org.apache.http.client.methods.HttpGet;
 import android.os.AsyncTask;
-import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.lang.Void;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
-
 import android.content.Context;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteStatement;
 
-import java.net.URLEncoder;
 import java.io.*;
-import java.net.URL;
-import java.net.HttpURLConnection;
 
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -77,15 +56,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 // import com.google.android.gms.common.*;
 import com.google.gson.Gson;
-import retrofit.Retrofit;
 import edu.buffalo.cse.maybeclient.MaybeClient;
 import edu.buffalo.cse.maybeclient.rest.Device;
 import edu.buffalo.cse.maybeclient.rest.PackageChoices;
 import edu.buffalo.cse.maybeclient.rest.Choice;
-import com.google.gson.Gson;
 
 import android.os.IMaybeListener;
-import android.os.MaybeListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -94,9 +70,8 @@ import edu.buffalo.cse.phonelab.json.StrictJSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 
-import java.util.Date;
+import static android.content.Intent.ACTION_SHUTDOWN;
 
 public class MaybeService extends IMaybeService.Stub {
     private static final String TAG = "Maybe-Service-PhoneLab";
@@ -160,16 +135,28 @@ public class MaybeService extends IMaybeService.Stub {
     private String mGCMId = null;
     private SharedPreferences mSharedPrefs;
     private Object mGCMLock = new Object();
-    private long mPollInterval = 1800; //in seconds
-//    private long mPollInterval = 60; //in seconds
 
-    private Handler mHandler;
+    private static final String POLL_INTENT = "edu.buffalo.cse.MAYBE_POLL_INTENT";
 
-    private Runnable queryRunnable = new Runnable() {
+    //    private long mPollInterval = 1800; //in seconds
+    private final long mPollInterval = 60; //in seconds
+
+    private final Object mStatsLock = new Object();
+
+    private BroadcastReceiver mPollReceiver = new BroadcastReceiver() {
         @Override
-        public void run() {
+        public void onReceive(Context context, Intent intent) {
             queryBackend();
-            mHandler.postDelayed(this, mPollInterval * 1000);
+        }
+    };
+
+    private BroadcastReceiver mShutdownReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // SHUTDOWN is protected broadcast.
+            synchronized (mStatsLock) {
+                shutdownLocked();
+            }
         }
     };
 
@@ -321,18 +308,41 @@ public class MaybeService extends IMaybeService.Stub {
 */
 
     private void initializeTimerTask() {
-        mHandler = new Handler();
-        long first = 15L;
-        (new StrictJSONObject(TAG))
-            .put(StrictJSONObject.KEY_ACTION, LIFE_CYCLE_ACTION)
-            .put(METHOD, "initializeTimerTask")
-            .put("first", first)
-            .put("interval", mPollInterval)
-            .log();
-        mHandler.postDelayed(queryRunnable, (first * 1000));
+        setRepeatPoll();
+
+        final IntentFilter pollFilter = new IntentFilter(POLL_INTENT);
+        mContext.registerReceiver(mPollReceiver, pollFilter);
+
+        final IntentFilter shutdownFilter = new IntentFilter(ACTION_SHUTDOWN);
+        mContext.registerReceiver(mShutdownReceiver, shutdownFilter);
     }
 
-    private void queryBackend() {
+    public void setRepeatPoll() {
+        long first = 15L;
+        (new StrictJSONObject(TAG))
+                .put(StrictJSONObject.KEY_ACTION, LIFE_CYCLE_ACTION)
+                .put(METHOD, "setRepeatPoll")
+                .put("first", first)
+                .put("interval", mPollInterval)
+                .log();
+        Intent intent = new Intent(POLL_INTENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_NO_CREATE);
+        if (pendingIntent == null) {
+            pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setInexactRepeating(AlarmManager.RTC,
+                    System.currentTimeMillis() + (first * 1000L), mPollInterval * 1000L,
+                    pendingIntent);
+        }
+    }
+
+    private void shutdownLocked() {
+        mContext.unregisterReceiver(mPollReceiver);
+        mContext.unregisterReceiver(mShutdownReceiver);
+    }
+
+    private synchronized void queryBackend() {
+        retrievePersonalInfo();
         StrictJSONObject jsonLog = new StrictJSONObject(TAG)
             .put(StrictJSONObject.KEY_ACTION, QUERY_BACKEND_ACTION)
             .put("start", System.currentTimeMillis());
@@ -344,7 +354,7 @@ public class MaybeService extends IMaybeService.Stub {
         Device device = new MaybeClient().sync(BASE_URL, deviceMeid);
         String deviceString = gson.toJson(device);
         if (device != null) {
-            jsonLog.put(STATUS, "sucess")
+            jsonLog.put(STATUS, "success")
                 .put("end", System.currentTimeMillis())
                 .put(CONTENT, deviceString);
             updateDevice(device, deviceString, jsonLog);
@@ -353,7 +363,6 @@ public class MaybeService extends IMaybeService.Stub {
                 .put(MESSAGE, deviceString)
                 .log();
         }
-        retrievePersonalInfo();
     }
 
     private void retrievePersonalInfo() {
@@ -392,9 +401,8 @@ public class MaybeService extends IMaybeService.Stub {
                 .put("file", MDEVICE_FILENAME);
         } catch (IOException e) {
             e.printStackTrace();
-            localJSONObject.put(STATUS, SUCCESS)
-                .put(STATUS, FAIL)
-                .put(MESSAGE, e.getMessage());
+            localJSONObject.put(STATUS, FAIL)
+                    .put(MESSAGE, e.getMessage());
         }
         strictJSONObject.put(FLUSH_ACTION, localJSONObject).log();
     }
