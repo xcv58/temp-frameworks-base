@@ -138,8 +138,8 @@ public class MaybeService extends IMaybeService.Stub {
 
     private static final String POLL_INTENT = "edu.buffalo.cse.MAYBE_POLL_INTENT";
 
-    //    private long mPollInterval = 1800; //in seconds
-    private final long mPollInterval = 60; //in seconds
+        private long mPollInterval = 1800; //in seconds
+//    private final long mPollInterval = 60; //in seconds
 
     private final Object mStatsLock = new Object();
 
