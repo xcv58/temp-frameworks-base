@@ -10,5 +10,4 @@ public class NotificationPkgMetadata implements Serializable {
     int clean;
     int cleanAll;
     float score;
-    float rawScore;
 }

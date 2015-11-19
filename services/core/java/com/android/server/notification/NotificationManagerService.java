@@ -568,7 +568,6 @@ public class NotificationManagerService extends SystemService {
                     .put("clickCount", metadata.click)
                     .put("cleanCount", metadata.clean)
                     .put("cleanAllCount", metadata.cleanAll)
-                    .put("rawScore", metadata.rawScore)
                     .put("score", metadata.score)
                     .put("globalScore", globalScore);
         }
@@ -588,7 +587,6 @@ public class NotificationManagerService extends SystemService {
                     .put("clickCount", metadata.click)
                     .put("cleanCount", metadata.clean)
                     .put("cleanAllCount", metadata.cleanAll)
-                    .put("rawScore", metadata.rawScore)
                     .put("score", metadata.score)
                     .put("globalScore", globalScore);
         }
@@ -625,7 +623,7 @@ public class NotificationManagerService extends SystemService {
          * v, number of all events
          * M, the smooth factor to eliminate click = 1, clean = 0
          * C, the global score
-         * @param metadata
+         * @param metadata the metadata need to update score
          */
         private void updateScore(NotificationPkgMetadata metadata) {
             int click = metadata.click;
@@ -633,12 +631,10 @@ public class NotificationManagerService extends SystemService {
             int cleanAll = metadata.cleanAll;
             int sum = click + clean + cleanAll;
             if (sum >= SMOOTH_BASE) {
-                metadata.rawScore = (float) click / (float) sum;
+                metadata.score = (float) click / (float) sum;
             } else {
-                metadata.rawScore = globalScore;
+                metadata.score = globalScore;
             }
-            int v = sum;
-            metadata.score = ((v / (float) (v + M)) * metadata.rawScore) + ((M / (float) (v + M)) * globalScore);
             lastModifyTime = System.currentTimeMillis();
         }
 
@@ -650,7 +646,6 @@ public class NotificationManagerService extends SystemService {
                 metadata.clean = 0;
                 metadata.cleanAll = 0;
                 metadata.score = 0.0f;
-                metadata.rawScore = 0.0f;
                 map.put(pkg, metadata);
             }
             return metadata;
