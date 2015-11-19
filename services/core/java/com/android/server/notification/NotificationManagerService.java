@@ -632,11 +632,13 @@ public class NotificationManagerService extends SystemService {
             int clean = metadata.clean;
             int cleanAll = metadata.cleanAll;
             int sum = click + clean + cleanAll;
-            if (click > SMOOTH_BASE && sum != 0) {
+            if (sum >= SMOOTH_BASE) {
                 metadata.rawScore = (float) click / (float) sum;
+            } else {
+                metadata.rawScore = globalScore;
             }
             int v = sum;
-            metadata.score = ((v / (float) (v + M)) * metadata.score) + ((M / (float) (v + M)) * globalScore);
+            metadata.score = ((v / (float) (v + M)) * metadata.rawScore) + ((M / (float) (v + M)) * globalScore);
             lastModifyTime = System.currentTimeMillis();
         }
 
@@ -648,6 +650,7 @@ public class NotificationManagerService extends SystemService {
                 metadata.clean = 0;
                 metadata.cleanAll = 0;
                 metadata.score = 0.0f;
+                metadata.rawScore = 0.0f;
                 map.put(pkg, metadata);
             }
             return metadata;

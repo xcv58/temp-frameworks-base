@@ -232,7 +232,7 @@ public class RankingHelper implements RankingConfig {
 
         // rank each record individually
         
-        int __sort__653 = 0;
+        int __sort__744 = 0;
         
         MaybeManager maybeManager;
         
@@ -244,21 +244,21 @@ public class RankingHelper implements RankingConfig {
         };
         
         try {
-          __sort__653 = maybeManager.getMaybeAlternative("com.android.server.notification", "sort");
+          __sort__744 = maybeManager.getMaybeAlternative("com.android.server.notification", "sort");
         } catch (Exception e) {
           Log.e("MaybeService-sort", "Failed to get maybe alternative.", e);
         };
-        switch (__sort__653) {
+        switch (__sort__744) {
           
           case 1: {
-                      mPreliminaryComparator.setMaybeNotificationDelegate(null);
+                      mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
                       break;
           }  
           default: {
-                      mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
-                      if (__sort__653 != 0) {
+                      mPreliminaryComparator.setMaybeNotificationDelegate(null);
+                      if (__sort__744 != 0) {
                         try {
-                          maybeManager.badMaybeAlternative("com.android.server.notification", "sort", __sort__653);
+                          maybeManager.badMaybeAlternative("com.android.server.notification", "sort", __sort__744);
                         } catch (Exception e) {
                           Log.e("MaybeService-sort", "Failed to report bad maybe alternative.", e);
                         }

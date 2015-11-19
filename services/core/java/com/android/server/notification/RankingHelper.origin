@@ -230,9 +230,9 @@ public class RankingHelper implements RankingConfig {
 
         // rank each record individually
         maybe ("sort") {
-            mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
-        } or {
             mPreliminaryComparator.setMaybeNotificationDelegate(null);
+        } or {
+            mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);
         }
         Collections.sort(notificationList, mPreliminaryComparator);
 

@@ -1,15 +1,15 @@
 {
     "statements": [
         {
-            "content": "        maybe (\"sort\") {\n            mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);\n        } or {\n            mPreliminaryComparator.setMaybeNotificationDelegate(null);\n        }", 
+            "content": "        maybe (\"sort\") {\n            mPreliminaryComparator.setMaybeNotificationDelegate(null);\n        } or {\n            mPreliminaryComparator.setMaybeNotificationDelegate(maybeNotificationDelegate);\n        }", 
             "alternatives": [
                 {
                     "start": 24, 
-                    "end": 126, 
+                    "end": 105, 
                     "value": 0
                 }, 
                 {
-                    "start": 131, 
+                    "start": 110, 
                     "end": 212, 
                     "value": 1
                 }
@@ -19,6 +19,6 @@
             "label": "sort"
         }
     ], 
-    "sha224_hash": "761b6f0cfec910658caeb83b5e5104da68ae86b7df914a47dc26c1e2", 
+    "sha224_hash": "9e979253633c17864b490a02370c32e419edd99e022fd3303f9fe310", 
     "package": "com.android.server.notification"
 }
