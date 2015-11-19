@@ -47,7 +47,7 @@ public class NotificationComparator
                 log.put("rightPkg", rightPkg);
                 log.put("lScore", lScore);
                 log.put("rScore", rScore);
-                if (Math.abs(lScore - rScore) > 0.01f) {
+                if (Math.abs(lScore - rScore) > 0.0128f) {
                     log.put(STATUS, "success");
                     log.log();
                     return -1 * Float.compare(lScore, rScore);

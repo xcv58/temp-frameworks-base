@@ -616,7 +616,7 @@ public class NotificationManagerService extends SystemService {
             updateScore(metadata);
         }
 
-        private final static int M = 32;
+        private final static int M = 128;
         private final static int SMOOTH_BASE = 2;
         private final static float globalScore = 0.3f;
         /**
